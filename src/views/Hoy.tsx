@@ -5,6 +5,7 @@ import { db, getSettings } from '../db/db'
 import {
   finishSession,
   reorderPositions,
+  reopenSession,
   saveBodyWeight,
   scheduledRoutineFor,
   startSession,
@@ -205,9 +206,14 @@ export function Hoy() {
                   </button>
                 )}
                 {session && finished && (
-                  <Link to={`/resumen/${session.id}`} className="btn-text" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
-                    Ver el resumen de la sesión
-                  </Link>
+                  <>
+                    <Link to={`/resumen/${session.id}`} className="btn-text" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
+                      Ver el resumen de la sesión
+                    </Link>
+                    <button className="btn-text soft" onClick={() => void reopenSession(session.id)}>
+                      Reabrir sesión
+                    </button>
+                  </>
                 )}
               </div>
             </section>

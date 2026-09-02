@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate, useParams } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
-import { deleteSession, repeatSession } from '../db/repo'
+import { deleteSession, reopenSession, repeatSession } from '../db/repo'
 import { fmtDateLong } from '../lib/format'
+import { todayISO } from '../lib/dates'
 import { MaterialHeader, materialFor } from '../components/MaterialHeader'
 import { TopBar } from '../components/TopBar'
 import { ExerciseCard } from '../components/ExerciseCard'
@@ -88,6 +89,16 @@ export function SesionPasada() {
           <button className="btn-text" onClick={() => void onRepeat()}>
             Repetir esta sesión
           </button>
+          {session.date === todayISO() && session.finished_at !== null && (
+            <button
+              className="btn-text soft"
+              onClick={() => {
+                void reopenSession(session.id).then(() => navigate('/'))
+              }}
+            >
+              Reabrir sesión (vuelve a Hoy en curso)
+            </button>
+          )}
           {editing && (
             <>
               <div className="row" style={{ marginTop: 'var(--sp-4)' }}>

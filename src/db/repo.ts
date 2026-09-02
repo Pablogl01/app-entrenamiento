@@ -400,6 +400,39 @@ export async function finishSession(sessionId: string): Promise<void> {
   void uploadBackup()
 }
 
+/**
+ * Deshace un "Finalizar" accidental: la sesión vuelve a estar en curso y se
+ * reponen las series propuestas que el cierre eliminó, hasta el objetivo.
+ */
+export async function reopenSession(sessionId: string): Promise<void> {
+  await db.sessions.update(sessionId, { finished_at: null })
+  const links = await db.session_exercises.where('session_id').equals(sessionId).toArray()
+  for (const link of links) {
+    const sets = await db.sets.where('session_exercise_id').equals(link.id).toArray()
+    const work = sets.filter((s) => s.kind !== 'warmup').sort((a, b) => a.set_index - b.set_index)
+    const missing = link.target_sets - work.length
+    if (missing <= 0) continue
+    const past = await lastPerformance(link.exercise_id)
+    const rows: SetEntry[] = []
+    for (let i = 0; i < missing; i++) {
+      const p = past[work.length + i] ?? past.at(-1)
+      rows.push({
+        id: uuid(),
+        user_id: USER_ID,
+        session_exercise_id: link.id,
+        set_index: sets.length + i,
+        weight: p?.weight ?? work.at(-1)?.weight ?? null,
+        reps: p?.reps ?? work.at(-1)?.reps ?? link.target_reps_min,
+        rir: null,
+        kind: 'work',
+        completed: false,
+        logged_at: null,
+      })
+    }
+    await db.sets.bulkAdd(rows)
+  }
+}
+
 export async function deleteSession(sessionId: string): Promise<void> {
   const links = await db.session_exercises.where('session_id').equals(sessionId).toArray()
   await db.transaction('rw', [db.sessions, db.session_exercises, db.sets], async () => {

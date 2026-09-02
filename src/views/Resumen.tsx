@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate, useParams } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
-import { saveSessionAsRoutine, sessionStats } from '../db/repo'
+import { reopenSession, saveSessionAsRoutine, sessionStats } from '../db/repo'
 import { fmtDuration, fmtNum, fmtWeight } from '../lib/format'
 import { TopBar } from '../components/TopBar'
 
@@ -133,6 +133,15 @@ export function Resumen() {
         <div style={{ marginTop: 'var(--sp-6)' }}>
           <button className="btn-cta" onClick={() => navigate('/')}>
             Cerrar
+          </button>
+          <button
+            className="btn-text soft"
+            style={{ marginTop: 'var(--sp-3)' }}
+            onClick={() => {
+              void reopenSession(session.id).then(() => navigate('/'))
+            }}
+          >
+            Terminé sin querer: reabrir la sesión
           </button>
         </div>
       </div>
