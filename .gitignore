@@ -29,3 +29,5 @@ dev-dist/
 server/.env
 server/data.db*
 server/dist/
+.wrangler/
+worker/.dev.vars

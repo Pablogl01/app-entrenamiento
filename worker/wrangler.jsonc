@@ -1,0 +1,25 @@
+{
+  "name": "app-entrenamiento",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Sirve la PWA construida; /api/* pasa siempre por el worker.
+  "assets": {
+    "directory": "../dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "entrenamiento",
+      "database_id": "088d7adf-4186-4bb2-b016-5a7c1059ee42"
+    }
+  ],
+  // Cron cada 15 minutos en UTC (especificaciones §6.3).
+  "triggers": { "crons": ["*/15 * * * *"] },
+  "vars": {
+    "VAPID_SUBJECT": "mailto:p.garcia@mdmsystems.es"
+  }
+  // Secretos (wrangler secret put): VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY
+}

@@ -380,6 +380,6 @@ Todo ello es añadible sin romper el modelo gracias a tres decisiones tomadas de
 Cerradas en la v1.2 (implementación):
 
 1. **Detector de estancamiento:** implementado conservador — ventana de las últimas 5 sesiones (mínimo 4 puntos), umbral del 1 % de cambio proyectado sobre la ventana. Pendiente solo de calibrar con datos reales.
-2. **Runtime del backend:** Node + cron. El paquete `web-push` asume el `crypto` de Node, y con una función Node normal el problema del edge no aparece.
+2. **Runtime del backend:** en producción, Cloudflare Workers + D1 (`worker/`), con web-push firmado por WebCrypto (`@block65/webcrypto-web-push`) — la alternativa que §6.3 anticipaba para runtimes edge; elegido por ser gratuito y siempre encendido. El servidor Node + cron (`server/`) queda como equivalente autoalojado y para desarrollo local.
 3. **e1RM por encima de 12 reps:** se excluye del cálculo de e1RM (Epley degradado). La serie sigue contando para volumen.
 4. **Guardar como plantilla desde una sesión improvisada:** hereda, por ejercicio, el nº de series de trabajo observadas y el rango min–max de reps observado.
