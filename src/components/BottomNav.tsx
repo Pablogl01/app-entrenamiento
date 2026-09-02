@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 
-const TABS = [
+export const TABS = [
   { to: '/', label: 'Hoy' },
   { to: '/calendario', label: 'Calendario' },
   { to: '/progreso', label: 'Progreso' },

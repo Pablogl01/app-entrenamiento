@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigationType } from 'react-router-dom'
-import { BottomNav } from './components/BottomNav'
+import { useEffect, useRef } from 'react'
+import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
+import { BottomNav, TABS } from './components/BottomNav'
 import { Hoy } from './views/Hoy'
 import { Calendario } from './views/Calendario'
 import { Progreso } from './views/Progreso'
@@ -17,11 +17,14 @@ import { initOutbox } from './lib/outbox'
 import { ensureSubscription } from './lib/push'
 import { dailyBackupIfDue } from './lib/backup'
 
-/** La vista nueva entra: fundido entre pestañas, deslizamiento al apilar. */
+/** La vista nueva entra: fundido entre pestañas, deslizamiento al apilar.
+ *  Un cambio por gesto lateral anima en la dirección del deslizamiento. */
 function AnimatedOutlet({ root }: { root: boolean }) {
   const location = useLocation()
   const navType = useNavigationType()
-  const cls = navType === 'POP' ? 'view-pop' : root ? 'view-fade' : 'view-push'
+  const swipe = (location.state as { swipe?: 'next' | 'prev' } | null)?.swipe
+  const cls =
+    swipe === 'next' ? 'view-push' : swipe === 'prev' ? 'view-pop' : navType === 'POP' ? 'view-pop' : root ? 'view-fade' : 'view-push'
   return (
     <div key={location.pathname} className={cls}>
       <Outlet />
@@ -29,9 +32,48 @@ function AnimatedOutlet({ root }: { root: boolean }) {
   )
 }
 
+const SWIPE_MIN_X = 60
+const SWIPE_MAX_MS = 600
+
 function RootLayout() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const start = useRef<{ x: number; y: number; t: number } | null>(null)
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement
+    // no robar el gesto a lo que ya se desliza o se escribe
+    if (target.closest('.seltext, input, textarea, select')) {
+      start.current = null
+      return
+    }
+    start.current = { x: e.clientX, y: e.clientY, t: Date.now() }
+  }
+
+  function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    const s = start.current
+    start.current = null
+    if (s === null || Date.now() - s.t > SWIPE_MAX_MS) return
+    const dx = e.clientX - s.x
+    const dy = e.clientY - s.y
+    // horizontal claro: umbral y dominancia sobre el eje vertical
+    if (Math.abs(dx) < SWIPE_MIN_X || Math.abs(dx) < 2 * Math.abs(dy)) return
+    const index = TABS.findIndex((t) => t.to === location.pathname)
+    if (index === -1) return
+    const next = dx < 0 ? index + 1 : index - 1
+    if (next < 0 || next >= TABS.length) return
+    navigate(TABS[next].to, { state: { swipe: dx < 0 ? 'next' : 'prev' } })
+  }
+
   return (
-    <div className="app-shell">
+    <div
+      className="app-shell app-shell--swipe"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => {
+        start.current = null
+      }}
+    >
       <AnimatedOutlet root />
       <BottomNav />
     </div>

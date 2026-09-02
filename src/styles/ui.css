@@ -24,6 +24,12 @@ input, textarea, select {
   background: var(--paper);
 }
 
+/* En las pestañas raíz el navegador solo gestiona el scroll vertical:
+   el eje horizontal queda libre para el gesto de cambio de vista. */
+.app-shell--swipe { touch-action: pan-y; }
+
+.seltext { touch-action: pan-x; }
+
 .screen {
   min-height: 100dvh;
   padding-bottom: calc(var(--h-bar) + env(safe-area-inset-bottom, 0px) + var(--sp-6));

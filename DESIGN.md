@@ -373,6 +373,7 @@ Orden: PRs, cifras, valoración, notas.
 - **Una sola secuencia orquestada:** al abrir Hoy, la cabecera aparece y las tarjetas entran escalonadas con `animation-delay`. Ocurre una vez por sesión de app.
 - El resto del movimiento responde a una acción del usuario y muestra qué ha cambiado: expandir tarjeta (plegado a 220 ms), confirmar serie (el filo `--go` crece desde arriba, 200 ms), arrastrar para reordenar.
 - **Cambio de vista (v1.7):** entra solo la vista nueva — fundido de 140 ms entre pestañas, deslizamiento corto de 200 ms al apilar y de 180 ms al volver. La vista vieja no se anima y nada dura más de 220 ms.
+- **Gesto lateral (v1.8):** en las pestañas raíz, deslizar en horizontal cambia de pestaña y la animación sigue la dirección del gesto. Umbral de 60px con dominancia clara sobre el eje vertical; el gesto no roba el scroll de los selectores de texto ni los campos de escritura.
 - **Prohibido:** fade-and-slide-up en cada sección al scrollear, y transición de hover en cada tarjeta. Es el default y se lee como generado.
 - `prefers-reduced-motion` respetado en todo.
 
@@ -453,6 +454,7 @@ Ninguna. Las siete de la v1.5 se cerraron en la v1.6:
 
 ## 10. Changelog
 
+- **2026-09-02** — v1.8. Deslizamiento lateral entre pestañas raíz, con animación direccional. Selección múltiple en el catálogo al añadir ejercicios (círculo que se rellena en `--ink`, CTA fijo abajo).
 - **2026-09-02** — v1.7. Movimiento implementado y acotado: transiciones de cambio de vista (fundido entre pestañas, deslizamiento al apilar/volver), plegado animado de tarjetas y filas de editor, filo `--go` que crece al confirmar. Todo ≤220 ms, bajo `prefers-reduced-motion`.
 - **2026-09-02** — v1.6. Se cierran las siete decisiones abiertas de §9 para la implementación: `rest_seconds` borrado, barra inferior confirmada, cifras editables unificadas con `--panel-deep`, días asignados al final del editor, sesión improvisada desde Rutinas (`Sesión vacía` + `Entrenar hoy`), veredicto de estancamiento sin consejo.
 - **2026-09-02** — v1.5. Barrido a 320px midiendo con las fuentes reales. Tres correcciones: `display-xl` va a dos líneas con interlineado 0.90 y el editor limita el nombre de la rutina; la columna derecha de Rutinas abrevia por debajo de 360px; la rejilla del calendario sangra a los bordes por debajo de 360px para conservar los 44px táctiles.
