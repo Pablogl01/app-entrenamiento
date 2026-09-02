@@ -184,6 +184,30 @@
   color: var(--paper);
 }
 
+/* ---- Catálogo: selección múltiple ---- */
+
+.cat-check {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  border: var(--hairline) solid var(--rule);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cat-check.on {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.cat-cta {
+  position: sticky;
+  bottom: 0;
+  background: var(--paper);
+  border-top: var(--hairline) solid var(--rule);
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+}
+
 /* ---- Ajustes ---- */
 
 .time-input {

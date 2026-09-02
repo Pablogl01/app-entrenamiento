@@ -42,6 +42,8 @@ export function Catalogo() {
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState<MuscleGroup | null>(null)
   const [creating, setCreating] = useState(false)
+  /** Selección múltiple al añadir: se marcan varios y se confirman de una vez. */
+  const [selected, setSelected] = useState<string[]>([])
   const [newGroup, setNewGroup] = useState<MuscleGroup>('pecho')
   const [newLoad, setNewLoad] = useState<LoadType>('machine')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -59,16 +61,21 @@ export function Catalogo() {
     (e) => (q === '' || normalize(e.name).includes(q)) && (group === null || e.muscle_group === group),
   )
 
-  async function pick(exercise: Exercise) {
-    if (sessionId !== null) {
-      await addExerciseToSession(sessionId, exercise.id)
-      navigate(-1)
-    } else if (routineId !== null) {
-      await addExerciseToRoutine(routineId, exercise.id)
-      navigate(-1)
-    } else {
-      navigate(`/ejercicio/${exercise.id}`)
+  function toggle(exercise: Exercise) {
+    setSelected((s) => (s.includes(exercise.id) ? s.filter((id) => id !== exercise.id) : [...s, exercise.id]))
+  }
+
+  function pick(exercise: Exercise) {
+    if (picking) toggle(exercise)
+    else navigate(`/ejercicio/${exercise.id}`)
+  }
+
+  async function confirmAdd() {
+    for (const id of selected) {
+      if (sessionId !== null) await addExerciseToSession(sessionId, id)
+      else if (routineId !== null) await addExerciseToRoutine(routineId, id)
     }
+    navigate(-1)
   }
 
   async function onCreate() {
@@ -82,18 +89,26 @@ export function Catalogo() {
       min_increment: settings.increments[newLoad],
       unit_mode: 'weight_reps',
     })
-    await pick(exercise)
+    setCreating(false)
+    if (picking) {
+      // queda marcado; se confirma junto al resto
+      setSelected((s) => [...s, exercise.id])
+      setQuery('')
+    } else {
+      navigate(`/ejercicio/${exercise.id}`)
+    }
   }
 
   function row(e: Exercise) {
+    const isSelected = selected.includes(e.id)
     return (
-      <button key={e.id} className="row" style={{ width: '100%' }} onClick={() => void pick(e)}>
+      <button key={e.id} className="row" style={{ width: '100%' }} onClick={() => pick(e)} aria-pressed={picking ? isSelected : undefined}>
         <span style={{ flex: 'none', width: 36 }}>
           <ExerciseMark group={e.muscle_group} size={28} />
         </span>
         <span className="row__main t-item">{e.name}</span>
         <span className="t-data soft">{GROUPS.find((g) => g.key === e.muscle_group)?.label}</span>
-        <span className="row__chev">›</span>
+        {picking ? <span className={isSelected ? 'cat-check on' : 'cat-check'} aria-hidden="true" /> : <span className="row__chev">›</span>}
       </button>
     )
   }
@@ -172,6 +187,14 @@ export function Catalogo() {
           )}
         </section>
       </div>
+
+      {picking && selected.length > 0 && (
+        <div className="cat-cta">
+          <button className="btn-cta" onClick={() => void confirmAdd()}>
+            Añadir {selected.length} {selected.length === 1 ? 'ejercicio' : 'ejercicios'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -11,7 +11,7 @@ import { EjercicioDetalle } from './views/EjercicioDetalle'
 import { SesionPasada } from './views/SesionPasada'
 import { Resumen } from './views/Resumen'
 import { Ajustes } from './views/Ajustes'
-import { cleanupStaleDrafts } from './db/repo'
+import { cleanupStaleDrafts, syncCatalog } from './db/repo'
 import { seedDemo } from './db/demo'
 import { initOutbox } from './lib/outbox'
 import { ensureSubscription } from './lib/push'
@@ -50,6 +50,7 @@ function App() {
   useEffect(() => {
     const boot = async () => {
       if (new URLSearchParams(window.location.search).has('demo')) await seedDemo()
+      await syncCatalog()
       await cleanupStaleDrafts()
       initOutbox()
       void ensureSubscription()

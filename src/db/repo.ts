@@ -11,6 +11,7 @@ import type {
   SetKind,
 } from './types'
 import { todayISO, weekdayMon0 } from '../lib/dates'
+import { seedExercises } from './seed'
 import { setE1rm, setVolume, type Point } from '../lib/calc'
 import { reportFact } from '../lib/outbox'
 import { uploadBackup } from '../lib/backup'
@@ -607,6 +608,26 @@ export async function createExercise(
   }
   await db.exercises.add(exercise)
   return exercise
+}
+
+function normalizeName(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+/**
+ * Añade al catálogo los precargados que falten (nuevas versiones amplían la
+ * lista y el populate solo corre en bases vírgenes). No duplica nombres que
+ * ya existan, tampoco los creados por el usuario.
+ */
+export async function syncCatalog(): Promise<void> {
+  const existing = await db.exercises.toArray()
+  const names = new Set(existing.map((e) => normalizeName(e.name)))
+  const missing = seedExercises(USER_ID).filter((e) => !names.has(normalizeName(e.name)))
+  if (missing.length > 0) await db.exercises.bulkAdd(missing)
 }
 
 /** Borradores de días anteriores: fuera. Lo programado no existe en la BD. */
