@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups — App de registro de entrenamiento</title>
+<!-- Las fuentes vienen de CDN SOLO en este archivo de mockups.
+     En la app van auto-alojadas en WOFF2 con subset: nada del flujo de
+     entrenar puede depender de la red. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ---------- Hoja de contactos (no es la app) ---------- */
+body{margin:0;padding:40px 24px 80px;background:#E7E3DA;font-family:var(--font-ui);color:var(--ink)}
+h1{font-family:var(--font-display);font-variation-settings:'wght' 800,'wdth' 100;font-size:32px;margin:0 0 4px}
+.lead{font-size:var(--body-size);line-height:1.5;color:var(--ink-soft);max-width:62ch;margin:0 0 40px}
+.sheet{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.slot{width:380px}
+.slot.narrow{width:320px}
+.cap{font-size:var(--info-size);font-weight:500;margin:0 0 8px}
+.cap span{color:var(--ink-soft);font-weight:400}
+
+/* ---------- Marco del teléfono ---------- */
+.fr{width:380px;background:var(--paper);border-radius:24px;overflow:hidden;
+    border:1px solid rgba(20,16,12,.22)}
+.fr.n320{width:320px}
+
+/* ---------- Cabecera con material ---------- */
+/* PLACEHOLDER: aquí va la textura fotográfica en WebP (~80 KB) según
+   routine_type, con --material-scrim encima. El plano es un marcador. */
+.hd{min-height:var(--h-header-min);background:#2B2621;display:flex;flex-direction:column;
+    justify-content:flex-end;padding:0 var(--sp-4) var(--sp-6)}
+.hd.rest{min-height:var(--h-header-rest);background:#4A443C}
+.hd.short{min-height:180px}
+.eyb{font-size:var(--info-size);line-height:1.3;font-weight:500;color:var(--on-material-soft);margin:0 0 6px}
+.dsp{font-family:var(--font-display);font-variation-settings:'wght' 800,'wdth' 112;
+     font-size:var(--display-xl-size);line-height:var(--display-xl-lh);letter-spacing:-.02em;
+     color:var(--on-material);text-transform:uppercase;margin:0}
+.hd-title{font-size:var(--title-size);line-height:1.2;font-weight:600;color:var(--on-material);margin:0}
+
+/* ---------- Hoja solapada ---------- */
+.sh{position:relative;margin-top:-20px;background:var(--paper);
+    border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;padding:var(--sp-5) var(--sp-4) var(--sp-5)}
+.flat{padding:var(--sp-5) var(--sp-4) var(--sp-5)}
+
+/* ---------- Tipos de texto ---------- */
+.ttl{font-size:var(--title-size);line-height:1.2;font-weight:600;margin:0 0 var(--sp-3)}
+.nm{font-size:var(--item-size);line-height:1.25;font-weight:600;margin:0}
+.mt{font-family:var(--font-data);font-size:var(--data-size);line-height:1.2;font-weight:500;
+    color:var(--ink-soft);margin:3px 0 0}
+.vd{font-size:var(--body-size);line-height:1.5;margin:0}
+.lb{font-size:var(--body-size)}
+.dl{font-family:var(--font-data);font-size:var(--data-lg-size);line-height:1;font-weight:500}
+.un{font-size:var(--info-size);font-weight:500;color:var(--ink-soft)}
+.cv{color:var(--ink-soft);font-size:16px}
+.hero{font-family:var(--font-display);font-variation-settings:'wght' 800;
+      font-size:var(--display-hero-size);line-height:var(--display-hero-lh);letter-spacing:-.03em;margin:0}
+.hl{font-size:var(--info-size);line-height:1.3;font-weight:500;color:var(--ink-soft);margin:4px 0 0}
+
+/* ---------- Fila de bloque plegado / lista ---------- */
+.row{display:flex;align-items:center;gap:var(--sp-3);min-height:var(--h-row);
+     border-top:var(--hairline) solid var(--rule);border-bottom:var(--hairline) solid var(--rule)}
+.rw{display:flex;align-items:center;gap:var(--sp-3);height:80px;border-top:var(--hairline) solid var(--rule)}
+.rw.first{border-top:none}
+.rw.last{border-bottom:var(--hairline) solid var(--rule)}
+.grow{flex:1;min-width:0}
+.lv{font-family:var(--font-data);font-size:var(--data-size);font-weight:500;color:var(--ink-soft);
+    text-align:right;white-space:nowrap}
+.dte{font-family:var(--font-data);font-size:var(--data-size);font-weight:500;color:var(--ink-soft);width:60px}
+
+/* ---------- Tarjeta de ejercicio ---------- */
+.cd{background:var(--panel);border-radius:var(--radius-card);overflow:hidden;margin-bottom:var(--sp-2)}
+.cd.last{margin-bottom:0}
+.hdr{display:grid;grid-template-columns:33% 1fr;min-height:var(--h-card)}
+.il{background:var(--panel-deep);display:flex;align-items:center;justify-content:center}
+.rt{display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-3)}
+.up{transform:rotate(180deg)}
+
+/* ---------- Fila de serie: la ruptura de escala ---------- */
+.st{display:flex;align-items:center;height:var(--h-set-row);border-top:var(--hairline) solid var(--rule)}
+.cf{flex:1;height:100%;display:flex;align-items:center;padding-left:var(--sp-3);
+    border-right:var(--hairline) solid var(--rule)}
+.cf.done{border-left:3px solid var(--go);padding-left:9px}
+.ix{font-family:var(--font-data);font-size:var(--data-size);font-weight:500;color:var(--ink-soft)}
+.ix.done{color:var(--ink)}
+.fg{display:flex;align-items:center;gap:6px;padding:0 var(--sp-3)}
+.fg.proposed{color:var(--ink-soft)}
+.warmup{opacity:.55}
+.bt{width:var(--touch-set);height:var(--touch-set);border-radius:var(--radius-control);
+    background:var(--panel-deep);color:var(--ink);font-family:var(--font-data);font-size:20px;
+    display:flex;align-items:center;justify-content:center;flex:none;margin-right:var(--sp-2)}
+.bt.sm{width:var(--touch);height:var(--touch)}
+
+/* ---------- Controles ---------- */
+.cta{height:var(--h-cta);border-radius:var(--radius-control);background:var(--ink);color:var(--paper);
+     font-size:var(--body-size);font-weight:600;display:flex;align-items:center;justify-content:center;
+     margin-top:var(--sp-6)}
+.cta.tight{margin-top:var(--sp-4)}
+.fld{min-height:var(--h-set-row);background:var(--panel-deep);border-radius:var(--radius-control);
+     display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-4)}
+.na{background:var(--panel-deep);border-radius:var(--radius-control);padding:14px var(--sp-4);
+    font-size:var(--body-size);line-height:1.5;color:var(--ink-soft);min-height:88px;margin-top:var(--sp-3)}
+.vl{font-family:var(--font-data);font-size:var(--data-lg-size);line-height:1;font-weight:500;
+    background:var(--panel-deep);border-radius:var(--radius-control);padding:8px var(--sp-3)}
+.ctl{display:flex;align-items:center;justify-content:space-between;height:var(--h-set-row);
+     border-top:var(--hairline) solid var(--rule);padding:0 var(--sp-2) 0 var(--sp-3)}
+.ctl .lb{font-size:var(--info-size);font-weight:500;color:var(--ink-soft)}
+.add{display:flex;align-items:center;gap:var(--sp-2);height:var(--h-set-row);
+     border-top:var(--hairline) solid var(--rule);border-bottom:var(--hairline) solid var(--rule);
+     font-size:var(--body-size);font-weight:600;margin-top:var(--sp-2)}
+
+/* Selector: reutiliza el subrayado de la barra de navegación. Sin segmentado. */
+.rg{display:flex;gap:20px;border-bottom:var(--hairline) solid var(--rule)}
+.rgi{font-size:var(--info-size);font-weight:500;color:var(--ink-soft);padding-bottom:10px}
+.rgi.on{color:var(--ink);border-bottom:2px solid var(--ink)}
+
+/* Valoración 1-5. Sin estrellas y sin emoji. */
+.rt5{display:flex;gap:var(--sp-2);margin-top:var(--sp-3)}
+.rti{width:var(--touch-set);height:var(--touch-set);border-radius:var(--radius-control);
+     background:var(--panel-deep);color:var(--ink-soft);display:flex;align-items:center;
+     justify-content:center;font-family:var(--font-data);font-size:var(--data-lg-size);font-weight:500}
+.rti.on{background:var(--ink);color:var(--paper)}
+
+/* ---------- Barras ---------- */
+.bar{height:var(--h-bar);display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-2)}
+.bar.onpaper{border-bottom:var(--hairline) solid var(--rule)}
+.ic{width:var(--touch);height:var(--touch);display:flex;align-items:center;justify-content:center;
+    font-size:26px;line-height:1}
+.ic.white{color:var(--on-material)}
+.act{font-size:var(--item-size);font-weight:600;padding:0 var(--sp-2)}
+.nv{display:flex;border-top:var(--hairline) solid var(--rule)}
+.nvi{flex:1;height:var(--h-bar);display:flex;align-items:center;justify-content:center;
+     font-size:var(--info-size);font-weight:500;color:var(--ink-soft)}
+.nvi.on{color:var(--ink);border-bottom:2px solid var(--ink)}
+
+/* ---------- Calendario ---------- */
+.gr{display:grid;grid-template-columns:repeat(7,1fr)}
+/* Por debajo de 360px la rejilla sangra: con margen la celda cae a 41px. */
+.n320 .gr{margin:0 calc(-1 * var(--sp-4))}
+.wd{font-size:var(--micro-size);line-height:1.2;font-weight:500;color:var(--ink-soft);text-align:center;
+    padding-bottom:var(--sp-2);border-bottom:var(--hairline) solid var(--rule)}
+.dy{height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.dn{font-size:var(--micro-size);line-height:1.2;font-weight:500;color:var(--ink-soft)}
+.dn.today{color:var(--ink);font-weight:600}
+.dt{width:8px;height:8px;border-radius:var(--radius-pill)}
+.dt.done{background:var(--go)}
+.dt.missed{background:var(--rule)}
+.dt.today{border:1px solid var(--ink-soft)}
+.dt.future{border:1px solid var(--rule)}
+
+/* ---------- Bloques ---------- */
+.block{margin-top:var(--sp-6)}
+.pr{display:flex;align-items:center;justify-content:space-between;min-height:var(--h-row);
+    border-left:3px solid var(--go);padding:0 var(--sp-3) 0 9px}
+.pr + .pr{border-top:var(--hairline) solid var(--rule)}
+.figs .fig{display:flex;align-items:center;justify-content:space-between;height:56px;
+           border-bottom:var(--hairline) solid var(--rule)}
+.best{display:flex;align-items:center;justify-content:space-between;height:48px;
+      border-top:var(--hairline) solid var(--rule)}
+.best.last{border-bottom:var(--hairline) solid var(--rule)}
+.dsm{font-family:var(--font-data);font-size:var(--data-size);font-weight:500}
+.note{font-size:var(--body-size);line-height:1.5;color:var(--ink-soft);margin:var(--sp-5) 0}
+svg{display:block}
+</style>
+</head>
+<body>
+
+<h1>Mockups — app de registro de entrenamiento</h1>
+<p class="lead">Diez pantallas contra DESIGN.md v1.5. El bloque oscuro de cabecera es un marcador plano: el material real es fotografía de piedra, hierro o arena en WebP, y falsearlo con un degradado es el punto 1 de la lista negra. Las fuentes se cargan de CDN solo aquí.</p>
+
+<div class="sheet">
+
+<!-- 1. HOY — TARDE -->
+<div class="slot">
+<p class="cap">1 · Hoy, tarde <span>— peso plegado, entreno abierto</span></p>
+<div class="fr">
+  <div class="hd"><p class="eyb">Día de entreno</p><p class="dsp">Torso superior</p></div>
+  <div class="sh">
+    <div class="row" style="margin-bottom:var(--sp-6)">
+      <div class="grow"><p class="nm">Peso de hoy</p><p class="mt">sin registrar · 78,4 kg ayer</p></div>
+      <span class="cv">⌄</span>
+    </div>
+    <div class="cd">
+      <div class="hdr">
+        <div class="il"><svg viewBox="0 0 64 64" width="62" height="62" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="44" x2="52" y2="44"/><line x1="18" y1="44" x2="18" y2="54"/><line x1="46" y1="44" x2="46" y2="54"/><line x1="8" y1="24" x2="56" y2="24"/><line x1="16" y1="16" x2="16" y2="32"/><line x1="48" y1="16" x2="48" y2="32"/></svg></div>
+        <div class="rt"><div><p class="nm">Press banca</p><p class="mt">4×8-10 · 2/4</p></div><span class="cv up">⌄</span></div>
+      </div>
+      <div class="st warmup"><div class="cf"><span class="ix">cal</span></div><div class="fg"><span class="dl">40</span><span class="un">kg</span><span class="un">×</span><span class="dl">10</span></div><span class="bt">+</span></div>
+      <div class="st"><div class="cf done"><span class="ix done">1</span></div><div class="fg"><span class="dl">60</span><span class="un">kg</span><span class="un">×</span><span class="dl">10</span></div><span class="bt">+</span></div>
+      <div class="st"><div class="cf done"><span class="ix done">2</span></div><div class="fg"><span class="dl">60</span><span class="un">kg</span><span class="un">×</span><span class="dl">9</span></div><span class="bt">+</span></div>
+      <div class="st"><div class="cf"><span class="ix">3</span></div><div class="fg proposed"><span class="dl">60</span><span class="un">kg</span><span class="un">×</span><span class="dl">10</span></div><span class="bt">+</span></div>
+    </div>
+    <div class="cd last">
+      <div class="hdr">
+        <div class="il"><svg viewBox="0 0 64 64" width="62" height="62" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="10" y1="46" x2="54" y2="46"/><line x1="16" y1="40" x2="16" y2="52"/><line x1="48" y1="40" x2="48" y2="52"/><line x1="32" y1="46" x2="32" y2="26"/><line x1="32" y1="26" x2="14" y2="16"/></svg></div>
+        <div class="rt"><div><p class="nm">Remo con barra</p><p class="mt">4×8-10 · 0/4</p></div><span class="cv">⌄</span></div>
+      </div>
+    </div>
+    <div class="cta">Empezar sesión</div>
+  </div>
+  <div class="nv"><div class="nvi on">Hoy</div><div class="nvi">Calendario</div><div class="nvi">Progreso</div><div class="nvi">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 2. HOY — MAÑANA -->
+<div class="slot">
+<p class="cap">2 · Hoy, mañana <span>— peso abierto, entreno plegado</span></p>
+<div class="fr">
+  <div class="hd"><p class="eyb">Día de entreno</p><p class="dsp">Torso superior</p></div>
+  <div class="sh">
+    <p class="ttl">Peso de hoy</p>
+    <div class="fld"><span class="dl" style="color:var(--ink-soft)">78,4</span><span class="un">kg</span><span class="grow"></span><span class="un">ayer</span></div>
+    <svg viewBox="0 0 348 80" width="348" height="80" style="margin-top:var(--sp-4)" aria-hidden="true">
+      <circle cx="4" cy="18" r="1.6" fill="#6A645A"/><circle cx="35" cy="22" r="1.6" fill="#6A645A"/><circle cx="66" cy="25" r="1.6" fill="#6A645A"/><circle cx="97" cy="36" r="1.6" fill="#6A645A"/><circle cx="128" cy="22" r="1.6" fill="#6A645A"/><circle cx="159" cy="30" r="1.6" fill="#6A645A"/><circle cx="190" cy="42" r="1.6" fill="#6A645A"/><circle cx="221" cy="30" r="1.6" fill="#6A645A"/><circle cx="252" cy="36" r="1.6" fill="#6A645A"/><circle cx="283" cy="48" r="1.6" fill="#6A645A"/><circle cx="314" cy="36" r="1.6" fill="#6A645A"/><circle cx="344" cy="42" r="1.6" fill="#6A645A"/>
+      <polyline points="4,24 35,26 66,27 97,29 128,31 159,33 190,35 221,37 252,39 283,41 314,43 344,45" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <p class="vd" style="margin-top:var(--sp-3)">Bajando 0,2 kg por semana desde hace tres semanas.</p>
+    <div class="cta tight">Guardar peso</div>
+    <div class="row" style="margin-top:var(--sp-6)">
+      <div class="grow"><p class="nm">Entreno de hoy</p><p class="mt">6 ejercicios · 0/22 series</p></div>
+      <span class="cv">⌄</span>
+    </div>
+  </div>
+  <div class="nv"><div class="nvi on">Hoy</div><div class="nvi">Calendario</div><div class="nvi">Progreso</div><div class="nvi">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 3. HOY — DÍA DE DESCANSO -->
+<div class="slot">
+<p class="cap">3 · Hoy, día sin rutina <span>— solo peso, sin titular grande</span></p>
+<div class="fr">
+  <div class="hd rest"><p class="hd-title">Día de descanso</p></div>
+  <div class="sh">
+    <p class="ttl">Peso de hoy</p>
+    <div class="fld"><span class="dl" style="color:var(--ink-soft)">78,4</span><span class="un">kg</span><span class="grow"></span><span class="un">ayer</span></div>
+    <svg viewBox="0 0 348 80" width="348" height="80" style="margin-top:var(--sp-4)" aria-hidden="true">
+      <circle cx="4" cy="18" r="1.6" fill="#6A645A"/><circle cx="35" cy="22" r="1.6" fill="#6A645A"/><circle cx="66" cy="25" r="1.6" fill="#6A645A"/><circle cx="97" cy="36" r="1.6" fill="#6A645A"/><circle cx="128" cy="22" r="1.6" fill="#6A645A"/><circle cx="159" cy="30" r="1.6" fill="#6A645A"/><circle cx="190" cy="42" r="1.6" fill="#6A645A"/><circle cx="221" cy="30" r="1.6" fill="#6A645A"/><circle cx="252" cy="36" r="1.6" fill="#6A645A"/><circle cx="283" cy="48" r="1.6" fill="#6A645A"/><circle cx="314" cy="36" r="1.6" fill="#6A645A"/><circle cx="344" cy="42" r="1.6" fill="#6A645A"/>
+      <polyline points="4,24 35,26 66,27 97,29 128,31 159,33 190,35 221,37 252,39 283,41 314,43 344,45" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <p class="vd" style="margin-top:var(--sp-3)">Bajando 0,2 kg por semana desde hace tres semanas.</p>
+    <div class="cta tight">Guardar peso</div>
+  </div>
+  <div class="nv"><div class="nvi on">Hoy</div><div class="nvi">Calendario</div><div class="nvi">Progreso</div><div class="nvi">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 4. CALENDARIO -->
+<div class="slot">
+<p class="cap">4 · Calendario <span>— relleno pasado, anillo futuro, sin rojo</span></p>
+<div class="fr">
+  <div class="flat">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--sp-4)">
+      <p class="ttl" style="margin:0">Septiembre</p>
+      <span class="dsm" style="color:var(--ink-soft)">2026</span>
+    </div>
+    <div class="gr">
+      <div class="wd">l</div><div class="wd">m</div><div class="wd">x</div><div class="wd">j</div><div class="wd">v</div><div class="wd">s</div><div class="wd">d</div>
+      <div class="dy"><span class="dn">1</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">2</span></div>
+      <div class="dy"><span class="dn">3</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">4</span></div>
+      <div class="dy"><span class="dn">5</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">6</span></div>
+      <div class="dy"><span class="dn">7</span></div>
+      <div class="dy"><span class="dn">8</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">9</span></div>
+      <div class="dy"><span class="dn">10</span><span class="dt missed"></span></div>
+      <div class="dy"><span class="dn">11</span></div>
+      <div class="dy"><span class="dn">12</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">13</span></div>
+      <div class="dy"><span class="dn">14</span></div>
+      <div class="dy"><span class="dn">15</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">16</span></div>
+      <div class="dy"><span class="dn">17</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">18</span></div>
+      <div class="dy"><span class="dn">19</span><span class="dt missed"></span></div>
+      <div class="dy"><span class="dn">20</span></div>
+      <div class="dy"><span class="dn">21</span></div>
+      <div class="dy"><span class="dn">22</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">23</span></div>
+      <div class="dy"><span class="dn">24</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">25</span></div>
+      <div class="dy"><span class="dn">26</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">27</span></div>
+      <div class="dy"><span class="dn">28</span></div>
+      <div class="dy"><span class="dn">29</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn today">30</span><span class="dt today"></span></div>
+      <div class="dy"><span class="dn">1</span><span class="dt future"></span></div>
+      <div class="dy"><span class="dn">2</span></div>
+      <div class="dy"><span class="dn">3</span><span class="dt future"></span></div>
+      <div class="dy"><span class="dn">4</span></div>
+      <div class="dy"><span class="dn">5</span></div>
+    </div>
+    <div class="block">
+      <div class="rw first"><span class="dte">mar 29</span><div class="grow"><p class="nm">Torso superior</p><p class="mt">6 ejercicios · 22 series</p></div><span class="cv">›</span></div>
+      <div class="rw"><span class="dte">vie 26</span><div class="grow"><p class="nm">Pierna</p><p class="mt">5 ejercicios · 18 series</p></div><span class="cv">›</span></div>
+      <div class="rw last"><span class="dte">vie 19</span><div class="grow"><p class="nm" style="color:var(--ink-soft)">Pierna</p><p class="mt">programada, sin hacer</p></div><span class="cv">›</span></div>
+    </div>
+  </div>
+  <div class="nv"><div class="nvi">Hoy</div><div class="nvi on">Calendario</div><div class="nvi">Progreso</div><div class="nvi">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 5. PROGRESO — PESO -->
+<div class="slot">
+<p class="cap">5 · Progreso, peso corporal <span>— veredictos y el único 72px de la app</span></p>
+<div class="fr">
+  <div class="flat">
+    <p class="vd" style="padding-bottom:14px">Press militar: e1RM plano desde hace 5 semanas.</p>
+    <p class="vd" style="padding:14px 0;border-top:1px solid var(--rule)">Sentadilla: +4 % este mes.</p>
+    <p class="vd" style="padding:14px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)">Peso corporal bajando de forma sostenida desde agosto.</p>
+    <div class="block">
+      <p class="hero">−0,20</p>
+      <p class="hl">kg por semana · media de 7 días</p>
+      <div class="rg" style="margin:var(--sp-5) 0 var(--sp-2)"><span class="rgi on">4 semanas</span><span class="rgi">3 meses</span><span class="rgi">1 año</span></div>
+      <svg viewBox="0 0 348 176" width="348" height="176" aria-hidden="true">
+        <line x1="38" y1="20" x2="344" y2="20" stroke="#D9D1C1"/><line x1="38" y1="60" x2="344" y2="60" stroke="#D9D1C1"/><line x1="38" y1="100" x2="344" y2="100" stroke="#D9D1C1"/><line x1="38" y1="140" x2="344" y2="140" stroke="#D9D1C1"/>
+        <text x="0" y="24" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">81,0</text>
+        <text x="0" y="64" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">80,0</text>
+        <text x="0" y="104" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">79,0</text>
+        <text x="0" y="144" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">78,0</text>
+        <circle cx="38" cy="30" r="1.8" fill="#6A645A"/><circle cx="62" cy="38" r="1.8" fill="#6A645A"/><circle cx="86" cy="46" r="1.8" fill="#6A645A"/><circle cx="110" cy="50" r="1.8" fill="#6A645A"/><circle cx="134" cy="58" r="1.8" fill="#6A645A"/><circle cx="158" cy="64" r="1.8" fill="#6A645A"/><circle cx="182" cy="70" r="1.8" fill="#6A645A"/><circle cx="206" cy="78" r="1.8" fill="#6A645A"/><circle cx="230" cy="84" r="1.8" fill="#6A645A"/><circle cx="254" cy="90" r="1.8" fill="#6A645A"/><circle cx="278" cy="96" r="1.8" fill="#6A645A"/><circle cx="302" cy="102" r="1.8" fill="#6A645A"/><circle cx="326" cy="108" r="1.8" fill="#6A645A"/>
+        <polyline points="38,36 64,40 89,48 115,52 140,60 166,68 191,76 217,84 242,92 268,100 293,108 319,116 344,120" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round"/>
+        <text x="38" y="166" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">jun</text>
+        <text x="115" y="166" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">jul</text>
+        <text x="217" y="166" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">ago</text>
+        <text x="319" y="166" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">sep</text>
+      </svg>
+    </div>
+  </div>
+  <div class="nv"><div class="nvi">Hoy</div><div class="nvi">Calendario</div><div class="nvi on">Progreso</div><div class="nvi">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 6. PROGRESO — EJERCICIO Y CUMPLIMIENTO -->
+<div class="slot">
+<p class="cap">6 · Progreso, por ejercicio <span>— medido sólido, previsto discontinuo</span></p>
+<div class="fr">
+  <div class="flat">
+    <p class="nm">Press militar</p>
+    <p class="vd" style="margin-top:4px">e1RM plano desde hace 5 semanas. Cinco sesiones sin cambio por encima del ruido.</p>
+    <svg viewBox="0 0 348 186" width="348" height="186" style="margin-top:var(--sp-4)" aria-hidden="true">
+      <line x1="42" y1="24" x2="344" y2="24" stroke="#D9D1C1"/><line x1="42" y1="63" x2="344" y2="63" stroke="#D9D1C1"/><line x1="42" y1="102" x2="344" y2="102" stroke="#D9D1C1"/><line x1="42" y1="141" x2="344" y2="141" stroke="#D9D1C1"/>
+      <text x="0" y="28" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">60</text>
+      <text x="0" y="67" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">55</text>
+      <text x="0" y="106" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">50</text>
+      <text x="0" y="145" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">45</text>
+      <line x1="242" y1="20" x2="242" y2="148" stroke="#D9D1C1"/>
+      <polyline points="42,118 70,104 98,98 126,94 154,96 182,92 210,95 238,93" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round"/>
+      <polyline points="238,93 290,92 344,91" fill="none" stroke="#6A645A" stroke-width="1" stroke-dasharray="4 5"/>
+      <circle cx="42" cy="118" r="2.6" fill="#14100C"/><circle cx="70" cy="104" r="2.6" fill="#14100C"/><circle cx="98" cy="98" r="2.6" fill="#14100C"/><circle cx="126" cy="94" r="2.6" fill="#14100C"/><circle cx="154" cy="96" r="2.6" fill="#14100C"/><circle cx="182" cy="92" r="2.6" fill="#14100C"/><circle cx="210" cy="95" r="2.6" fill="#14100C"/><circle cx="238" cy="93" r="2.6" fill="#14100C"/>
+      <text x="42" y="168" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">jul</text>
+      <text x="140" y="168" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">ago</text>
+      <text x="216" y="168" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">sep</text>
+      <text x="250" y="168" font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#6A645A">previsto</text>
+    </svg>
+    <div class="best"><span class="dsm" style="color:var(--ink-soft)">5 reps</span><span class="dsm">80 kg</span></div>
+    <div class="best"><span class="dsm" style="color:var(--ink-soft)">8 reps</span><span class="dsm">70 kg</span></div>
+    <div class="best last"><span class="dsm" style="color:var(--ink-soft)">10 reps</span><span class="dsm">65 kg</span></div>
+    <div class="block">
+      <p class="ttl" style="margin-bottom:4px">Sesiones por semana</p>
+      <p class="vd">Ocho de las diez últimas semanas completas.</p>
+      <svg viewBox="0 0 348 176" width="348" height="176" style="margin-top:var(--sp-4)" aria-hidden="true">
+        <line x1="34" y1="140" x2="344" y2="140" stroke="#D9D1C1"/>
+        <line x1="34" y1="44" x2="344" y2="44" stroke="#6A645A" stroke-dasharray="3 4"/>
+        <text x="0" y="48" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">4</text>
+        <text x="0" y="144" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">0</text>
+        <rect x="34" y="44" width="20" height="96" fill="#14100C"/><rect x="66" y="44" width="20" height="96" fill="#14100C"/><rect x="98" y="68" width="20" height="72" fill="#14100C"/><rect x="130" y="44" width="20" height="96" fill="#14100C"/><rect x="162" y="92" width="20" height="48" fill="#14100C"/><rect x="194" y="44" width="20" height="96" fill="#14100C"/><rect x="226" y="44" width="20" height="96" fill="#14100C"/><rect x="258" y="68" width="20" height="72" fill="#14100C"/><rect x="290" y="44" width="20" height="96" fill="#14100C"/><rect x="322" y="44" width="20" height="96" fill="#14100C"/>
+        <text x="34" y="162" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">jul 6</text>
+        <text x="130" y="162" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">jul 27</text>
+        <text x="226" y="162" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">ago 17</text>
+        <text x="313" y="162" font-family="IBM Plex Mono" font-size="13" font-weight="500" fill="#6A645A">sep 7</text>
+      </svg>
+    </div>
+  </div>
+  <div class="nv"><div class="nvi">Hoy</div><div class="nvi">Calendario</div><div class="nvi on">Progreso</div><div class="nvi">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 7. RUTINAS — LISTA -->
+<div class="slot">
+<p class="cap">7 · Rutinas, lista <span>— la última vez, en columna</span></p>
+<div class="fr">
+  <div class="flat">
+    <div class="rw first"><div class="grow"><p class="nm">Torso superior</p><p class="mt">6 ejercicios · lun y jue</p></div><span class="lv">hace 3 días</span><span class="cv">›</span></div>
+    <div class="rw"><div class="grow"><p class="nm">Pierna</p><p class="mt">5 ejercicios · vie</p></div><span class="lv">hace 6 días</span><span class="cv">›</span></div>
+    <div class="rw"><div class="grow"><p class="nm">Movilidad</p><p class="mt">4 ejercicios · sin día</p></div><span class="lv">hace 5 semanas</span><span class="cv">›</span></div>
+    <div class="rw last"><div class="grow"><p class="nm">Empuje antiguo</p><p class="mt">7 ejercicios · sin día</p></div><span class="lv">hace 8 meses</span><span class="cv">›</span></div>
+    <div class="cta">Crear rutina</div>
+  </div>
+  <div class="nv"><div class="nvi">Hoy</div><div class="nvi">Calendario</div><div class="nvi">Progreso</div><div class="nvi on">Rutinas</div></div>
+</div>
+</div>
+
+<!-- 8. RUTINAS — EDITOR -->
+<div class="slot">
+<p class="cap">8 · Rutinas, editor <span>— routine_type se elige en la propia cabecera</span></p>
+<div class="fr">
+  <div class="hd short">
+    <div class="bar" style="margin:0 calc(-1 * var(--sp-4))"><span class="ic white">‹</span></div>
+    <p class="dsp" style="margin-top:var(--sp-5)">Torso superior</p>
+  </div>
+  <div class="sh">
+    <div class="rg"><span class="rgi on">Fuerza</span><span class="rgi">Movilidad</span><span class="rgi">Sin tipo</span></div>
+    <div class="block">
+      <div class="cd">
+        <div class="rt" style="min-height:var(--h-row)"><div><p class="nm">Press banca</p><p class="mt">4×8-10</p></div><span class="cv up">⌄</span></div>
+        <div class="ctl"><span class="lb">Series</span><div class="fg" style="padding:0"><span class="bt sm">−</span><span class="vl">4</span><span class="bt sm" style="margin-right:0">+</span></div></div>
+        <div class="ctl"><span class="lb">Reps</span><div class="fg" style="padding:0"><span class="vl">8</span><span class="lb" style="color:var(--ink-soft)">a</span><span class="vl">10</span></div></div>
+      </div>
+      <div class="cd"><div class="rt" style="min-height:var(--h-row)"><div><p class="nm">Remo con barra</p><p class="mt">4×8-10</p></div><span class="cv">⌄</span></div></div>
+      <div class="cd last"><div class="rt" style="min-height:var(--h-row)"><div><p class="nm">Press militar</p><p class="mt">3×8-10</p></div><span class="cv">⌄</span></div></div>
+      <div class="add"><span style="font-family:var(--font-data);font-size:20px">+</span>Añadir ejercicio</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 9. RESUMEN POST-SESIÓN -->
+<div class="slot">
+<p class="cap">9 · Resumen post-sesión <span>— los PRs son la recompensa</span></p>
+<div class="fr">
+  <div class="hd short">
+    <div class="bar" style="margin:0 calc(-1 * var(--sp-4))"><span class="ic white">‹</span></div>
+    <p class="eyb" style="margin-top:var(--sp-5)">Martes 29 de septiembre</p>
+    <p class="dsp">Torso superior</p>
+  </div>
+  <div class="sh">
+    <p class="ttl">Dos récords hoy</p>
+    <div class="cd last">
+      <div class="pr"><div><p class="nm">Press banca</p><p class="mt">e1RM 82,5 kg · antes 80,0</p></div><span class="dl">+2,5</span></div>
+      <div class="pr"><div><p class="nm">Remo con barra</p><p class="mt">10 reps a 70 kg · antes 65,0</p></div><span class="dl">+5,0</span></div>
+    </div>
+    <div class="block figs">
+      <div class="fig"><span class="lb">Volumen</span><span class="dl">4 820 kg</span></div>
+      <div class="fig"><span class="lb">Series de trabajo</span><span class="dl">22</span></div>
+      <div class="fig"><span class="lb">Duración</span><span class="dl">58 min</span></div>
+    </div>
+    <div class="block">
+      <p class="ttl" style="margin-bottom:0">Cómo fue</p>
+      <div class="rt5"><span class="rti">1</span><span class="rti">2</span><span class="rti">3</span><span class="rti on">4</span><span class="rti">5</span></div>
+    </div>
+    <div class="block">
+      <p class="ttl" style="margin-bottom:0">Notas</p>
+      <div class="na">Hombro derecho molestando en la última serie de press.</div>
+    </div>
+    <div class="cta">Cerrar</div>
+  </div>
+</div>
+</div>
+
+<!-- 10. BARRA SUPERIOR -->
+<div class="slot">
+<p class="cap">10 · Barra superior <span>— solo en pantallas apiladas, nunca el título</span></p>
+<div class="fr" style="margin-bottom:16px">
+  <div class="hd short">
+    <div class="bar" style="margin:0 calc(-1 * var(--sp-4))"><span class="ic white">‹</span><span class="act" style="color:var(--on-material)">Editar</span></div>
+    <p class="eyb" style="margin-top:var(--sp-5)">Martes 29 de septiembre</p>
+    <p class="dsp">Torso superior</p>
+  </div>
+  <div class="sh"><div class="rw first"><div class="grow"><p class="nm">Press banca</p><p class="mt">4 series · 60 kg</p></div></div></div>
+</div>
+<div class="fr">
+  <div class="bar onpaper"><span class="ic">‹</span></div>
+  <div class="flat">
+    <p class="ttl">Añadir ejercicio</p>
+    <div class="fld" style="min-height:52px"><span style="font-size:var(--body-size);color:var(--ink-soft)">Buscar ejercicio</span></div>
+    <div class="rw" style="height:var(--h-set-row)"><span class="nm grow">Press banca</span><span class="dsm" style="color:var(--ink-soft)">pecho</span></div>
+    <div class="rw last" style="height:var(--h-set-row)"><span class="nm grow">Press inclinado</span><span class="dsm" style="color:var(--ink-soft)">pecho</span></div>
+  </div>
+</div>
+</div>
+
+<!-- 11. 320px -->
+<div class="slot narrow">
+<p class="cap">11 · 320px <span>— titular a dos líneas, columna abreviada, rejilla a sangre</span></p>
+<div class="fr n320" style="margin-bottom:16px">
+  <div class="hd"><p class="eyb">Día de entreno</p><p class="dsp">Torso superior</p></div>
+  <div class="sh">
+    <div class="cd last">
+      <div class="hdr">
+        <div class="il"><svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="#14100C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="44" x2="52" y2="44"/><line x1="18" y1="44" x2="18" y2="54"/><line x1="46" y1="44" x2="46" y2="54"/><line x1="8" y1="24" x2="56" y2="24"/><line x1="16" y1="16" x2="16" y2="32"/><line x1="48" y1="16" x2="48" y2="32"/></svg></div>
+        <div class="rt"><div><p class="nm">Press banca</p><p class="mt">4×8-10 · 2/4</p></div><span class="cv up">⌄</span></div>
+      </div>
+      <div class="st"><div class="cf done"><span class="ix done">1</span></div><div class="fg"><span class="dl">60</span><span class="un">kg</span><span class="un">×</span><span class="dl">10</span></div><span class="bt">+</span></div>
+      <div class="st"><div class="cf"><span class="ix">3</span></div><div class="fg proposed"><span class="dl">60</span><span class="un">kg</span><span class="un">×</span><span class="dl">10</span></div><span class="bt">+</span></div>
+    </div>
+  </div>
+</div>
+<div class="fr n320">
+  <div class="flat">
+    <div class="rw first"><div class="grow"><p class="nm">Torso superior</p><p class="mt">6 ejercicios · lun y jue</p></div><span class="lv">3 d</span><span class="cv">›</span></div>
+    <div class="rw"><div class="grow"><p class="nm">Movilidad</p><p class="mt">4 ejercicios · sin día</p></div><span class="lv">5 sem</span><span class="cv">›</span></div>
+    <div class="rw last"><div class="grow"><p class="nm">Empuje antiguo</p><p class="mt">7 ejercicios · sin día</p></div><span class="lv">8 mes</span><span class="cv">›</span></div>
+    <div class="gr" style="margin-top:var(--sp-6)">
+      <div class="wd">l</div><div class="wd">m</div><div class="wd">x</div><div class="wd">j</div><div class="wd">v</div><div class="wd">s</div><div class="wd">d</div>
+      <div class="dy"><span class="dn">22</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">23</span></div>
+      <div class="dy"><span class="dn">24</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">25</span></div>
+      <div class="dy"><span class="dn">26</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn">27</span></div>
+      <div class="dy"><span class="dn">28</span></div>
+      <div class="dy"><span class="dn">29</span><span class="dt done"></span></div>
+      <div class="dy"><span class="dn today">30</span><span class="dt today"></span></div>
+      <div class="dy"><span class="dn">1</span><span class="dt future"></span></div>
+      <div class="dy"><span class="dn">2</span></div>
+      <div class="dy"><span class="dn">3</span><span class="dt future"></span></div>
+      <div class="dy"><span class="dn">4</span></div>
+      <div class="dy"><span class="dn">5</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

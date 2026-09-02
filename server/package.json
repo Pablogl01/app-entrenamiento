@@ -1,0 +1,28 @@
+{
+  "name": "app-entrenamiento-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Notificador y backup de la app de entrenamiento. Node + cron (especificaciones §6).",
+  "scripts": {
+    "vapid": "node scripts/vapid.mjs",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^4.17.23",
+    "@types/node": "^22.10.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/web-push": "^3.6.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.0"
+  }
+}

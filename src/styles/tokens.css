@@ -1,0 +1,89 @@
+/* tokens.css — App de registro de entrenamiento
+   Fuente de verdad: DESIGN.md v1.5, secciones 1, 3 y 4.
+   Ningún componente escribe un hex a mano. */
+
+:root {
+  /* ---- Color (DESIGN.md §1) ---- */
+  --paper: #FAF8F4;
+  --panel: #EDE6D9;
+  --panel-deep: #DED5C4;
+  --ink: #14100C;
+  --ink-soft: #6A645A;
+  --rule: #D9D1C1;
+
+  /* Acento único. Significa "completado", nada más. */
+  --go: #1E8E3E;
+  /* Solo para rellenos y puntos sobre fondos oscuros. Nunca para texto. */
+  --go-bright: #3FBF52;
+
+  /* Capa de oscurecido sobre el material fotográfico. No negociable: el
+     texto blanco encima pasa 4.5:1 con esta capa aplicada. */
+  --material-scrim: rgba(20, 16, 12, 0.42);
+  --on-material: #FFFFFF;
+  --on-material-soft: rgba(255, 255, 255, 0.86);
+
+  /* ---- Tipografía (DESIGN.md §3) ---- */
+  /* Auto-alojadas en WOFF2 con subset. Sin CDN: la app arranca sin red. */
+  --font-display: "Archivo", sans-serif;
+  --font-ui: "IBM Plex Sans", sans-serif;
+  --font-data: "IBM Plex Mono", monospace;
+
+  --display-hero-size: 72px;   /* solo tendencia kg/semana, solo en Progreso */
+  --display-hero-lh: 0.90;
+  --display-xl-size: 40px;     /* solo nombre de rutina en cabecera */
+  --display-xl-lh: 0.90;       /* 0.90 porque va a dos líneas, ver §3 */
+  --title-size: 20px;
+  --item-size: 16px;
+  --body-size: 15px;
+  --info-size: 13px;
+  --data-size: 13px;
+  --data-lg-size: 24px;
+  --micro-size: 11px;          /* exclusivo de la rejilla del calendario */
+
+  /* ---- Espaciado (DESIGN.md §4) ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 40px;
+  --sp-7: 64px;
+
+  /* ---- Radios: codifican jerarquía, no son un valor único ---- */
+  --radius-sheet: 20px;   /* solo esquinas superiores */
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --radius-pill: 999px;
+
+  /* ---- Alturas fijadas por el diseño ---- */
+  --h-header-min: 240px;      /* cabecera con material en día de entreno */
+  --h-header-rest: 160px;     /* día de descanso: sin titular grande */
+  --h-card: 88px;             /* tarjeta de ejercicio colapsada */
+  --h-set-row: 64px;          /* ruptura de escala: no 40 */
+  --h-row: 72px;              /* fila de bloque plegado, PR, lista */
+  --h-bar: 56px;              /* barra superior e inferior */
+  --h-cta: 52px;
+  --touch: 44px;              /* mínimo en la app */
+  --touch-set: 48px;          /* mínimo en registro de series */
+
+  --hairline: 1px;
+  --focus-ring: 2px;
+}
+
+/* Cero box-shadow en toda la app. La separación la dan el fondo tintado y
+   los hairlines. No se añade ninguna sombra a esta hoja. */
+
+* { font-variant-numeric: tabular-nums; }
+
+:focus-visible {
+  outline: var(--focus-ring) solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

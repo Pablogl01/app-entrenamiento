@@ -1,0 +1,39 @@
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      registerType: 'autoUpdate',
+      injectManifest: {
+        // Precache completo: fuentes y texturas incluidas. La app arranca sin red.
+        globPatterns: ['**/*.{js,css,html,woff2,webp,svg,png}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+      },
+      manifest: {
+        name: 'Entrenamiento',
+        short_name: 'Entreno',
+        description: 'Registro de entrenamiento y peso corporal',
+        lang: 'es',
+        display: 'standalone',
+        start_url: '/',
+        background_color: '#FAF8F4',
+        theme_color: '#FAF8F4',
+        icons: [
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+    }),
+  ],
+  server: {
+    proxy: { '/api': 'http://localhost:8787' },
+  },
+})

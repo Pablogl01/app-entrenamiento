@@ -1,0 +1,525 @@
+/* Componentes base. Separación por fondo tintado y hairlines: cero box-shadow. */
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+input, textarea, select {
+  font: inherit;
+  color: var(--ink);
+  border: none;
+  background: none;
+}
+
+.app-shell {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+.screen {
+  min-height: 100dvh;
+  padding-bottom: calc(var(--h-bar) + env(safe-area-inset-bottom, 0px) + var(--sp-6));
+}
+
+.screen--stacked {
+  padding-bottom: var(--sp-6);
+}
+
+.pad { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+
+.hr { border: none; border-top: var(--hairline) solid var(--rule); margin: 0; }
+
+/* ---- Cabecera de material ---- */
+
+.mat {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.mat__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mat__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--material-scrim);
+}
+
+.mat__text {
+  position: relative;
+  padding: var(--sp-4) var(--sp-4) calc(var(--sp-5) + 20px);
+  color: var(--on-material);
+  max-width: 100%;
+}
+
+.mat__eyebrow {
+  color: var(--on-material-soft);
+  margin-bottom: var(--sp-2);
+}
+
+/* ---- Hoja solapada ---- */
+
+.sheet {
+  position: relative;
+  margin-top: -20px;
+  background: var(--paper);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  padding: var(--sp-5) var(--sp-4) 0;
+}
+
+/* ---- Barra superior (solo pantallas apiladas) ---- */
+
+.topbar {
+  height: var(--h-bar);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-1);
+}
+
+.topbar--paper {
+  position: sticky;
+  top: 0;
+  background: var(--paper);
+  z-index: 5;
+}
+
+.topbar--paper.is-scrolled { border-bottom: var(--hairline) solid var(--rule); }
+
+.topbar--material {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+}
+
+.topbar__back {
+  width: var(--touch);
+  height: var(--touch);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.topbar--material .topbar__back { color: var(--on-material); }
+
+.topbar__action {
+  padding: 0 var(--sp-3);
+  height: var(--touch);
+  display: grid;
+  align-items: center;
+}
+
+/* ---- Barra de navegación inferior ---- */
+
+.bottomnav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  max-width: 560px;
+  height: calc(var(--h-bar) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--paper);
+  border-top: var(--hairline) solid var(--rule);
+  display: flex;
+  z-index: 10;
+}
+
+.bottomnav a {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  color: var(--ink-soft);
+}
+
+.bottomnav a > span {
+  padding: var(--sp-1) 0;
+  border-bottom: 2px solid transparent;
+}
+
+.bottomnav a.active { color: var(--ink); }
+.bottomnav a.active > span { border-bottom-color: var(--ink); }
+
+/* ---- Botones ---- */
+
+.btn-cta {
+  display: block;
+  width: 100%;
+  height: var(--h-cta);
+  border-radius: var(--radius-control);
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--item-size);
+}
+
+.btn-cta--go { background: var(--go); color: #fff; }
+
+.btn-text {
+  display: block;
+  width: 100%;
+  min-height: var(--touch);
+  display: flex;
+  align-items: center;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--item-size);
+}
+
+/* ---- Filas plegadas y de lista ---- */
+
+.row {
+  min-height: var(--h-row);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  border-top: var(--hairline) solid var(--rule);
+  width: 100%;
+}
+
+.row:last-of-type, .row--closed { border-bottom: var(--hairline) solid var(--rule); }
+
+.row__main { flex: 1; min-width: 0; }
+
+.row__chev { color: var(--ink-soft); font-size: 16px; flex: none; }
+
+/* ---- Campos ---- */
+
+.field {
+  display: flex;
+  align-items: center;
+  background: var(--panel-deep);
+  border-radius: var(--radius-control);
+  min-height: 64px;
+  padding: 0 var(--sp-4);
+}
+
+.field input, .field textarea {
+  width: 100%;
+  outline: none;
+}
+
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-soft); }
+
+textarea.field {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  padding: var(--sp-3) var(--sp-4);
+  resize: vertical;
+  outline-offset: 2px;
+}
+
+/* Cifra editable: el token de "aquí se escribe" (§9.4, cerrada v1.6). */
+.numfield {
+  background: var(--panel-deep);
+  border-radius: var(--radius-control);
+  min-height: var(--touch);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--sp-3);
+}
+
+.numfield input {
+  width: 4.5ch;
+  outline: none;
+  font: inherit;
+}
+
+/* ---- Selector de texto subrayado (rango, tipo de rutina) ---- */
+
+.seltext {
+  display: flex;
+  gap: var(--sp-4);
+  overflow-x: auto;
+}
+
+.seltext button {
+  min-height: var(--touch);
+  display: grid;
+  align-items: center;
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.seltext button.active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+/* ---- Interruptor ---- */
+
+.toggle {
+  flex: none;
+  width: 52px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--rule);
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.toggle[aria-checked='true'] { background: var(--ink); }
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  transition: transform 0.15s ease;
+}
+
+.toggle[aria-checked='true']::after { transform: translateX(20px); }
+
+/* ---- Stepper − / + ---- */
+
+.stepbtn {
+  width: var(--touch);
+  height: var(--touch);
+  display: grid;
+  place-items: center;
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius-control);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ---- Tarjeta de ejercicio ---- */
+
+.xcard {
+  background: var(--panel);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.xcard + .xcard { margin-top: var(--sp-2); }
+
+.xcard__head {
+  display: grid;
+  grid-template-columns: 33% 1fr;
+  min-height: var(--h-card);
+  width: 100%;
+  align-items: stretch;
+}
+
+.xcard__panel {
+  background: var(--panel-deep);
+  display: grid;
+  place-items: center;
+}
+
+.xcard__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  min-width: 0;
+}
+
+.xcard__names { flex: 1; min-width: 0; }
+
+.xcard__names .t-item { display: block; }
+
+.xcard__sub { display: block; margin-top: var(--sp-1); color: var(--ink-soft); }
+
+.xcard__chev {
+  flex: none;
+  color: var(--ink-soft);
+  font-size: 16px;
+  transition: transform 0.15s ease;
+}
+
+.xcard.open .xcard__chev { transform: rotate(180deg); }
+
+.xcard.dragging { opacity: 0.7; }
+
+/* ---- Fila de serie: la ruptura de escala ---- */
+
+.set {
+  display: grid;
+  grid-template-columns: 56px 1fr var(--touch-set);
+  align-items: center;
+  min-height: var(--h-set-row);
+  border-top: var(--hairline) solid var(--rule);
+  position: relative;
+  padding-right: var(--sp-2);
+}
+
+.set--done::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--go);
+}
+
+.set--warmup { opacity: 0.55; }
+.set--warmup.set--done::before { background: transparent; }
+
+.set__confirm {
+  height: 100%;
+  min-height: var(--h-set-row);
+  display: grid;
+  place-items: center;
+  border-right: var(--hairline) solid var(--rule);
+  color: var(--ink-soft);
+}
+
+.set--done .set__confirm { color: var(--ink); }
+
+.set__figs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-2);
+  padding: 0 var(--sp-3);
+  min-height: var(--touch-set);
+  background: var(--panel-deep);
+  border-radius: var(--radius-control);
+  color: var(--ink-soft);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.set--done .set__figs { color: var(--ink); background: transparent; }
+
+.set__figs input {
+  width: 4ch;
+  outline: none;
+  font: inherit;
+  color: var(--ink);
+}
+
+.set__plus {
+  width: var(--touch-set);
+  height: var(--touch-set);
+  display: grid;
+  place-items: center;
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius-control);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.set__extra {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+}
+
+.xcard__foot {
+  display: flex;
+  gap: var(--sp-2);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.xcard__foot button {
+  flex: 1;
+  min-height: var(--touch);
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+}
+
+/* ---- Gráficas ---- */
+
+.chart-label {
+  font-family: var(--font-data);
+  font-weight: 500;
+  font-size: var(--data-size);
+  fill: var(--ink-soft);
+}
+
+/* ---- Movimiento (DESIGN.md §5) ----
+   Una secuencia orquestada al abrir Hoy; el resto responde a una acción del
+   usuario. Nada se anima al scrollear. prefers-reduced-motion lo apaga todo
+   (regla global en tokens.css). */
+
+@keyframes enter-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.anim-enter { animation: enter-up 0.3s ease both; }
+
+/* Cambio de vista: la nueva entra; corto y funcional. */
+@keyframes view-fade {
+  from { opacity: 0; }
+}
+
+@keyframes view-push {
+  from { opacity: 0; transform: translateX(24px); }
+}
+
+@keyframes view-pop {
+  from { opacity: 0; transform: translateX(-16px); }
+}
+
+.view-fade { animation: view-fade 0.14s ease both; }
+.view-push { animation: view-push 0.2s ease both; }
+.view-pop { animation: view-pop 0.18s ease both; }
+
+/* Despliegue de tarjeta / fila: muestra qué ha cambiado. */
+.fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.22s ease;
+}
+
+.fold.open { grid-template-rows: 1fr; }
+
+/* El contenido plegado no existe para el dedo ni para el teclado. */
+.fold > * {
+  overflow: hidden;
+  min-height: 0;
+  visibility: hidden;
+  transition: visibility 0s 0.22s;
+}
+
+.fold.open > * {
+  visibility: visible;
+  transition: visibility 0s;
+}
+
+/* Confirmar serie: el filo --go crece bajo el dedo y las cifras asientan. */
+.set__figs { transition: background 0.18s ease, color 0.18s ease; }
+
+.set--done::before {
+  animation: edge-in 0.2s ease both;
+  transform-origin: top;
+}
+
+@keyframes edge-in {
+  from { transform: scaleY(0); }
+}
