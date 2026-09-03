@@ -151,7 +151,7 @@ export function Hoy() {
   const ringC = 94.2
 
   return (
-    <div className="screen" style={{ paddingLeft: 0, paddingRight: 0, paddingTop: 64, paddingBottom: 0 }}>
+    <div className="screen">
       <RootTopBar tab="Hoy" live={live} />
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full space-y-lg">

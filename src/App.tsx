@@ -78,7 +78,9 @@ function RootLayout() {
         start.current = null
       }}
     >
-      <AnimatedOutlet root />
+      <div className="app-scroll">
+        <AnimatedOutlet root />
+      </div>
       <BottomNav />
     </div>
   )
@@ -87,7 +89,9 @@ function RootLayout() {
 function StackedLayout() {
   return (
     <div className="app-shell">
-      <AnimatedOutlet root={false} />
+      <div className="app-scroll app-scroll--stacked">
+        <AnimatedOutlet root={false} />
+      </div>
     </div>
   )
 }

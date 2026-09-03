@@ -10,6 +10,10 @@ html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  /* El documento no se desplaza: solo el contenedor de contenido (.app-scroll). */
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 html {
@@ -27,7 +31,8 @@ body {
 }
 
 #root {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 a {

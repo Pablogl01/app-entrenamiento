@@ -192,7 +192,7 @@ export function Progreso() {
   const selectedExercise = (trained ?? []).find((e) => e.id === selectedId) ?? null
 
   return (
-    <div className="screen" style={{ paddingLeft: 0, paddingRight: 0, paddingTop: 64, paddingBottom: 0 }}>
+    <div className="screen">
       <RootTopBar tab="Progreso" live={live === true} />
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full gap-lg pb-6">

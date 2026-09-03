@@ -134,7 +134,7 @@ export function Ajustes() {
   const lastSync = settings.last_backup_at === null ? 'nunca' : new Date(settings.last_backup_at).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="screen screen--stacked" style={{ paddingBottom: 0 }}>
+    <div className="screen screen--stacked">
       <TopBar title="Ajustes" />
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full gap-lg pb-2xl">

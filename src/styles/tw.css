@@ -209,7 +209,7 @@
 .space-y-sm > * + * { margin-top: 8px; }
 .space-y-md > * + * { margin-top: 12px; }
 .space-y-lg > * + * { margin-top: 20px; }
-.pb-24 { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+.pb-24 { padding-bottom: 24px; }
 .pb-lg { padding-bottom: 20px; }
 .pb-xxs { padding-bottom: 2px; }
 .pt-lg { padding-top: 20px; }

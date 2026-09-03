@@ -140,7 +140,7 @@ export function Catalogo() {
   const showRecent = q === '' && group === null && (recent ?? []).length > 0
 
   return (
-    <div className="screen screen--stacked" style={{ paddingBottom: 0 }}>
+    <div className="screen screen--stacked">
       <TopBar title="Exercise Detail" />
       <div className="flex flex-col w-full">
         {/* Header */}

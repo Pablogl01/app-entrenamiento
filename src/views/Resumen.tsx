@@ -82,7 +82,7 @@ export function Resumen() {
   }
 
   return (
-    <div className="screen screen--stacked" style={{ paddingBottom: 0 }}>
+    <div className="screen screen--stacked">
       <TopBar title="Session Summary" />
       <div className="flex flex-col w-full pb-10">
         {/* Celebration Hero Status */}
