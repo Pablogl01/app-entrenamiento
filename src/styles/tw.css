@@ -1,0 +1,288 @@
+/* tw.css — subconjunto de utilidades que replica las clases de las maquetas
+   de Stitch (Tailwind con la config del DESIGN exportado). Sirve para portar
+   cada pantalla 1:1: mismos espaciados, radios, superficies y tipos.
+
+   Espaciado: xxs 2 · xs 4 · sm 8 · md 12 · base 16 · lg 20 · xl 24 · 2xl 32.
+   Radios (config de la maqueta): rounded 2 · lg 4 · xl 8 · full 12.
+   Superficies MD3: sc-lowest → sc-low → sc → sc-high → sc-highest. */
+
+/* ---- layout ---- */
+.flex { display: flex; }
+.grid { display: grid; }
+.block { display: block; }
+.flex-col { flex-direction: column; }
+.flex-1 { flex: 1 1 0%; }
+.flex-none { flex: none; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-baseline { align-items: baseline; }
+.items-end { align-items: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.w-full { width: 100%; }
+.min-w-0 { min-width: 0; }
+.relative { position: relative; }
+.absolute { position: absolute; }
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; scrollbar-width: none; }
+.overflow-x-auto::-webkit-scrollbar { display: none; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nowrap { white-space: nowrap; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.grid-cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.col-span-2 { grid-column: span 2 / span 2; }
+.col-span-3 { grid-column: span 3 / span 3; }
+.col-span-4 { grid-column: span 4 / span 4; }
+
+/* ---- espaciado ---- */
+.gap-1 { gap: 4px; }
+.gap-1p5 { gap: 6px; }
+.gap-xxs { gap: 2px; }
+.gap-xs { gap: 4px; }
+.gap-sm { gap: 8px; }
+.gap-md { gap: 12px; }
+.gap-base { gap: 16px; }
+.gap-lg { gap: 20px; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-2p5 { padding: 10px; }
+.p-3 { padding: 12px; }
+.p-xs { padding: 4px; }
+.p-sm { padding: 8px; }
+.p-md { padding: 12px; }
+.p-base { padding: 16px; }
+.p-lg { padding: 20px; }
+.px-1 { padding-left: 4px; padding-right: 4px; }
+.px-1p5 { padding-left: 6px; padding-right: 6px; }
+.px-2 { padding-left: 8px; padding-right: 8px; }
+.px-2p5 { padding-left: 10px; padding-right: 10px; }
+.px-3 { padding-left: 12px; padding-right: 12px; }
+.px-sm { padding-left: 8px; padding-right: 8px; }
+.px-md { padding-left: 12px; padding-right: 12px; }
+.px-base { padding-left: 16px; padding-right: 16px; }
+.px-gutter { padding-left: 16px; padding-right: 16px; }
+.py-0p5 { padding-top: 2px; padding-bottom: 2px; }
+.py-1 { padding-top: 4px; padding-bottom: 4px; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.py-xxs { padding-top: 2px; padding-bottom: 2px; }
+.py-xs { padding-top: 4px; padding-bottom: 4px; }
+.py-sm { padding-top: 8px; padding-bottom: 8px; }
+.py-md { padding-top: 12px; padding-bottom: 12px; }
+.pt-1 { padding-top: 4px; }
+.pt-xs { padding-top: 4px; }
+.pt-sm { padding-top: 8px; }
+.pt-md { padding-top: 12px; }
+.pb-sm { padding-bottom: 8px; }
+.pb-md { padding-bottom: 12px; }
+.pb-10 { padding-bottom: 40px; }
+.mt-0p5 { margin-top: 2px; }
+.mt-1 { margin-top: 4px; }
+.mt-xs { margin-top: 4px; }
+.mt-sm { margin-top: 8px; }
+.mt-md { margin-top: 12px; }
+.mt-base { margin-top: 16px; }
+.mt-lg { margin-top: 20px; }
+.mt-xl { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; }
+.mb-xxs { margin-bottom: 2px; }
+.mb-xs { margin-bottom: 4px; }
+.mb-sm { margin-bottom: 8px; }
+.mb-md { margin-bottom: 12px; }
+.mb-base { margin-bottom: 16px; }
+.my-xxs { margin-top: 2px; margin-bottom: 2px; }
+.-ml-sm { margin-left: -8px; }
+.-mr-2 { margin-right: -8px; }
+.-mt-2 { margin-top: -8px; }
+
+/* ---- tamaños ---- */
+.w-2 { width: 8px; } .h-2 { height: 8px; }
+.w-1p5 { width: 6px; } .h-1p5 { height: 6px; }
+.w-6 { width: 24px; } .h-6 { height: 24px; }
+.w-7 { width: 28px; } .h-7 { height: 28px; }
+.w-8 { width: 32px; } .h-8 { height: 32px; }
+.w-9 { width: 36px; } .h-9 { height: 36px; }
+.w-10 { width: 40px; } .h-10 { height: 40px; }
+.w-11 { width: 44px; } .h-11 { height: 44px; }
+.w-12 { width: 48px; } .h-12 { height: 48px; }
+.w-14 { width: 56px; } .h-14 { height: 56px; }
+.w-16 { width: 64px; } .h-16 { height: 64px; }
+.w-20 { width: 80px; } .h-20 { height: 80px; }
+.h-1p5 { height: 6px; }
+.h-9 { height: 36px; }
+.w-touch { width: 44px; } .h-touch { height: 44px; }
+.min-h-touch { min-height: 44px; }
+
+/* ---- radios (config de la maqueta) ---- */
+.rounded { border-radius: 2px; }
+.rounded-lg { border-radius: 4px; }
+.rounded-xl { border-radius: 8px; }
+.rounded-full { border-radius: 12px; }
+.rounded-circle { border-radius: 9999px; }
+
+/* ---- superficies y colores MD3 ---- */
+.bg-surface { background: var(--md-surface); }
+.bg-sc-lowest { background: var(--md-sc-lowest); }
+.bg-sc-low { background: var(--md-sc-low); }
+.bg-sc { background: var(--md-sc); }
+.bg-sc-high { background: var(--md-sc-high); }
+.bg-sc-highest { background: var(--md-sc-highest); }
+.bg-bright { background: var(--md-bright); }
+.bg-primary { background: var(--md-primary); }
+.bg-volt { background: var(--md-primary-fixed); }
+.bg-volt-10 { background: color-mix(in srgb, var(--md-primary-fixed) 10%, transparent); }
+.bg-volt-15 { background: color-mix(in srgb, var(--md-primary-fixed) 15%, transparent); }
+.text-primary { color: var(--md-primary); }
+.text-on-primary { color: var(--md-on-primary); }
+.text-on-surface { color: var(--md-on-surface); }
+.text-on-surface-variant { color: var(--md-on-surface-variant); }
+.text-secondary { color: var(--md-secondary); }
+.text-secondary-fixed { color: var(--md-secondary-fixed); }
+.text-secondary-fixed-dim { color: var(--md-secondary-fixed-dim); }
+.text-outline { color: var(--md-outline); }
+.text-volt { color: var(--md-primary-fixed); }
+.text-on-volt { color: var(--md-on-primary-fixed); }
+.text-error { color: var(--md-error); }
+.border-outline-variant { border: 1px solid var(--md-outline-variant); }
+.border-volt { border: 1px solid var(--md-primary-fixed); }
+.border-volt-30 { border: 1px solid color-mix(in srgb, var(--md-primary-fixed) 30%, transparent); }
+.border-t-volt-30 { border-top: 1px solid color-mix(in srgb, var(--md-primary-fixed) 30%, transparent); }
+.opacity-70 { opacity: 0.7; }
+.opacity-85 { opacity: 0.85; }
+.opacity-60 { opacity: 0.6; }
+
+/* Sombras de la maqueta (Tailwind por defecto). En oscuro apenas se ven; van
+   porque la maqueta las lleva. */
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+
+/* ---- tipos de la maqueta (config Stitch) ---- */
+.type-display-lg { font-family: var(--font-display); font-size: 48px; line-height: 52px; font-weight: 700; letter-spacing: -0.03em; }
+.type-display-sm { font-family: var(--font-display); font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; }
+.type-headline-lg { font-family: var(--font-display); font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -0.02em; }
+.type-headline-md { font-family: var(--font-display); font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.type-headline-sm { font-family: var(--font-display); font-size: 18px; line-height: 24px; font-weight: 600; }
+.type-body-lg { font-family: var(--font-ui); font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: -0.01em; }
+.type-body-md { font-family: var(--font-ui); font-size: 15px; line-height: 21px; font-weight: 400; }
+.type-body-sm { font-family: var(--font-ui); font-size: 13px; line-height: 17px; font-weight: 400; letter-spacing: 0.01em; }
+.type-metric-xl { font-family: var(--font-data); font-size: 40px; line-height: 44px; font-weight: 600; letter-spacing: -0.04em; }
+.type-metric-md { font-family: var(--font-data); font-size: 20px; line-height: 24px; font-weight: 500; letter-spacing: -0.02em; }
+.type-label-md { font-family: var(--font-data); font-size: 13px; line-height: 17px; font-weight: 600; letter-spacing: 0.05em; }
+.type-label-sm { font-family: var(--font-data); font-size: 11px; line-height: 13px; font-weight: 600; letter-spacing: 0.08em; }
+.uppercase { text-transform: uppercase; }
+.tracking-tight { letter-spacing: -0.025em; }
+.tracking-wide { letter-spacing: 0.025em; }
+.tracking-wider { letter-spacing: 0.05em; }
+.tracking-widest { letter-spacing: 0.1em; }
+.font-normal { font-weight: 400; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ---- micro-interacción de la maqueta ---- */
+.press { transition: transform 60ms linear; }
+.press:active { transform: scale(0.98); }
+.press-95:active { transform: scale(0.95); }
+
+/* botón de icono cuadrado, tal cual la maqueta */
+.ibtn { display: inline-flex; align-items: center; justify-content: center; color: var(--md-on-surface); }
+.ibtn:active { color: var(--md-primary-fixed); }
+
+/* input desnudo dentro de un lecho */
+.bare-input { background: transparent; border: none; outline: none; text-align: center; color: inherit; }
+.bare-input:focus { color: var(--md-primary-fixed); }
+
+/* ---- añadidos para Hoy, Rutinas y Resumen ---- */
+.rounded-md { border-radius: 6px; }
+.space-y-xxs > * + * { margin-top: 2px; }
+.space-y-xs > * + * { margin-top: 4px; }
+.space-y-sm > * + * { margin-top: 8px; }
+.space-y-md > * + * { margin-top: 12px; }
+.space-y-lg > * + * { margin-top: 20px; }
+.pb-24 { padding-bottom: 96px; }
+.pb-lg { padding-bottom: 20px; }
+.pb-xxs { padding-bottom: 2px; }
+.pt-lg { padding-top: 20px; }
+.pt-base { padding-top: 16px; }
+.mb-lg { margin-bottom: 20px; }
+.mb-xl { margin-bottom: 24px; }
+.-mt-xs { margin-top: -4px; }
+.py-2px { padding-top: 2px; padding-bottom: 2px; }
+.h-3px { height: 3px; }
+.w-48 { width: 192px; } .h-48 { height: 192px; }
+.-right-12 { right: -48px; } .-top-12 { top: -48px; }
+.top-0 { top: 0; } .left-0 { left: 0; } .right-0 { right: 0; } .bottom-0 { bottom: 0; }
+.z-10 { z-index: 10; } .z-30 { z-index: 30; }
+.sticky { position: sticky; }
+.pointer-events-none { pointer-events: none; }
+.blur-3xl { filter: blur(64px); }
+.shrink-0 { flex-shrink: 0; }
+.inline-flex { display: inline-flex; }
+.max-w-70 { max-width: 70%; }
+.grid-cols-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.text-on-primary-container { color: var(--md-on-primary-container); }
+.text-primary-fixed-dim { color: var(--md-primary-fixed-dim); }
+.font-medium { font-weight: 500; }
+.font-black { font-weight: 900; }
+.bg-surface-90 { background: color-mix(in srgb, var(--md-surface) 90%, transparent); }
+.glow-volt { box-shadow: 0 0 24px -6px rgba(200, 243, 34, 0.35); }
+.glow-volt-20 { box-shadow: 0 0 20px rgba(200, 243, 34, 0.2); }
+.glow-line { box-shadow: 0 0 12px rgba(200, 243, 34, 0.8); }
+.shadow-black-30 { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3); }
+.shadow-black-40 { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4); }
+.min-w-nav { min-width: 68px; }
+.justify-around { justify-content: space-around; }
+.h-full { height: 100%; }
+.w-full-img > img { width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0.85; display: block; }
+
+@keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+.ping { position: relative; }
+.ping::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: inherit; animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* ---- añadidos para Calendario y Progreso ---- */
+.gap-y-xs { row-gap: 4px; }
+.gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-0p5 { gap: 2px; }
+.h-36 { height: 144px; } .h-28 { height: 112px; } .h-24 { height: 96px; }
+.w-1 { width: 4px; } .h-1 { height: 4px; }
+.w-5 { width: 20px; } .h-5 { height: 20px; }
+.text-9 { font-size: 10px; line-height: 13px; } .text-10 { font-size: 11px; line-height: 13px; } .text-14 { font-size: 15px; line-height: 19px; }
+.rounded-sm { border-radius: 2px; } .rounded-t-sm { border-top-left-radius: 2px; border-top-right-radius: 2px; }
+.border-t-dashed { border-top: 1px dashed var(--md-outline); }
+.border-t-dashed-variant { border-top: 1px dashed var(--md-outline-variant); }
+.opacity-30 { opacity: 0.3; } .opacity-40 { opacity: 0.4; } .opacity-50 { opacity: 0.5; } .opacity-80 { opacity: 0.8; }
+.bg-secondary-container { background: var(--md-secondary-container); }
+.bg-outline { background: var(--md-outline); } .bg-outline-variant { background: var(--md-outline-variant); }
+.bg-on-surface-variant { background: var(--md-on-surface-variant); }
+.shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
+.ml-1 { margin-left: 4px; } .ml-auto { margin-left: auto; } .pl-2 { padding-left: 8px; } .pr-xs { padding-right: 4px; } .pb-6 { padding-bottom: 24px; } .py-3 { padding-top: 12px; padding-bottom: 12px; }
+.pt-2 { padding-top: 8px; } .top-6 { top: 24px; } .top-1 { top: 4px; } .right-1 { right: 4px; } .p-0p5 { padding: 2px; }
+.leading-snug { line-height: 1.375; }
+.line-clamp-1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.h-1px { height: 1px; } .mx-md { margin-left: 12px; margin-right: 12px; } .pl-xl { padding-left: 24px; }
+.text-primary-dim { color: var(--md-primary-fixed-dim); }
+.glow-dot { box-shadow: 0 0 8px var(--md-primary-fixed); }
+.glow-bar { box-shadow: 0 0 12px rgba(200, 243, 34, 0.35); }
+.glow-bar-10 { box-shadow: 0 0 10px rgba(200, 243, 34, 0.4); }
+.select-none { user-select: none; }
+.select-overlay { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.font-mono-ish { font-family: var(--font-data); }
+.pb-2xl { padding-bottom: 32px; }
+.w-12 { width: 48px; } .h-12 { height: 48px; }
+
+/* Por debajo de 360px los dos lechos de la serie en curso van en columna. */
+@media (max-width: 359px) {
+  .set-grid.grid-cols-2 { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Los botones de la maqueta centran su texto (Tailwind no lo alinea a la izquierda). */
+button.rounded, button.rounded-lg, button.rounded-xl, button.rounded-full { text-align: center; }

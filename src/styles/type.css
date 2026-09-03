@@ -1,72 +1,110 @@
-/* Escala tipográfica (DESIGN.md §3). Todo alineado a la izquierda. */
+/* Escala tipográfica (DESIGN.md v2.2 §3). Tres familias, roles separados:
+   Inter para todo (v2.4). Todo alineado a la izquierda. */
 
-.t-hero {
+.t-display {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: var(--display-hero-size);
-  line-height: var(--display-hero-lh);
+  font-size: var(--display-size);
+  line-height: var(--display-lh);
   letter-spacing: -0.03em;
-}
-
-.t-xl {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 112%;
-  font-size: var(--display-xl-size);
-  line-height: var(--display-xl-lh);
-  letter-spacing: -0.02em;
   text-transform: uppercase;
   overflow-wrap: break-word;
 }
 
-.t-title {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--title-size);
-  line-height: 1.2;
+.t-h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--h1-size);
+  line-height: var(--h1-lh);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
-.t-item {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--item-size);
-  line-height: 1.25;
+.t-h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--h2-size);
+  line-height: var(--h2-lh);
+  letter-spacing: -0.02em;
+}
+
+.t-h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: var(--h3-size);
+  line-height: var(--h3-lh);
 }
 
 .t-body {
   font-family: var(--font-ui);
   font-weight: 400;
   font-size: var(--body-size);
-  line-height: 1.5;
+  line-height: var(--body-lh);
+  letter-spacing: 0;
 }
 
-.t-info {
+.t-body-sm {
   font-family: var(--font-ui);
-  font-weight: 500;
-  font-size: var(--info-size);
-  line-height: 1.3;
+  font-weight: 400;
+  font-size: var(--body-sm-size);
+  line-height: var(--body-sm-lh);
 }
 
-.t-data {
+.t-caption {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: var(--caption-size);
+  line-height: var(--caption-lh);
+}
+
+.t-metric-xl {
+  font-family: var(--font-data);
+  font-weight: 600;
+  font-size: var(--metric-xl-size);
+  line-height: var(--metric-xl-lh);
+  letter-spacing: -0.04em;
+}
+
+.t-metric {
   font-family: var(--font-data);
   font-weight: 500;
-  font-size: var(--data-size);
-  line-height: 1.2;
+  font-size: var(--metric-size);
+  line-height: var(--metric-lh);
+  letter-spacing: -0.02em;
 }
 
-.t-datalg {
+.t-metric-sm {
   font-family: var(--font-data);
-  font-weight: 500;
-  font-size: var(--data-lg-size);
-  line-height: 1;
+  font-weight: 600;
+  font-size: var(--metric-sm-size);
+  line-height: var(--metric-sm-lh);
+  letter-spacing: -0.01em;
 }
 
-/* Exclusivo de la rejilla del calendario. */
-.t-micro {
-  font-family: var(--font-ui);
-  font-weight: 500;
-  font-size: var(--micro-size);
-  line-height: 1.2;
+.t-label {
+  font-family: var(--font-data);
+  font-weight: 600;
+  font-size: var(--label-size);
+  line-height: var(--label-lh);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.t-label-sm {
+  font-family: var(--font-data);
+  font-weight: 600;
+  font-size: var(--label-sm-size);
+  line-height: var(--label-sm-lh);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 359px) {
+  .t-h2 { font-size: 20px; line-height: 26px; }
+  .t-display { font-size: 32px; line-height: 36px; }
 }
 
 .soft { color: var(--ink-soft); }
+.mute { color: var(--ink-mute); }
+.volt { color: var(--volt-ink); }

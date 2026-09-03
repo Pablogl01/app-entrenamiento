@@ -1,8 +1,9 @@
 import type { MuscleGroup } from '../db/types'
 
 /**
- * Marca geométrica derivada del grupo muscular (DESIGN.md §4): trazo único de
- * 2px --ink sobre --panel-deep, sin relleno. Nunca un hueco ni un placeholder.
+ * Marca geométrica derivada del grupo muscular (DESIGN.md v2 §5): trazo único
+ * de 2px --ink sobre el lecho --well, sin relleno. No hay fotos de ejercicio:
+ * no existen offline y una imagen rota o un gris de relleno son peores.
  */
 const PATHS: Record<MuscleGroup, string> = {
   pecho: 'M24 10a14 14 0 1 1 0 28a14 14 0 1 1 0-28M10 24h28',
@@ -22,10 +23,10 @@ interface Props {
   size?: number
 }
 
-export function ExerciseMark({ group, size = 44 }: Props) {
+export function ExerciseMark({ group, size = 28 }: Props) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
-      <path d={PATHS[group]} fill="none" stroke="var(--ink)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={PATHS[group]} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

@@ -112,6 +112,14 @@ Se precarga con **50-80 ejercicios comunes**. Una app vacía es inservible.
 
 Tabla independiente: el pesaje ocurre por la mañana, no en el gimnasio, y no pertenece a ninguna sesión. Genérica desde el principio para poder añadir cintura o % de grasa sin migrar.
 
+### 3.6b Campos añadidos en la v2.1
+
+- `sets.rpe` (6–10, paso 0,5) **sustituye a `rir`**; migración `rpe = 10 − rir`. `sets.velocity` (m/s) existe sin fuente de datos.
+- `routine_exercises` y `session_exercises`: `target_rpe` y **`rest_seconds`** (vuelve; el temporizador existe).
+- `sessions.rating` pasa a RPE global 1–10 (los 1–5 se multiplican por 2); `paused_at`, `paused_ms` (el cronómetro descuenta pausas) y `planned_sets` (series de trabajo planificadas al cerrar, para la adherencia).
+- `exercises.image`: clave de la foto empaquetada, null = marca geométrica.
+- `body_metrics.sleep_hours` y `recovery`: preparados, sin entrada.
+
 ### 3.7 `settings` y `outbox`
 
 `settings`: fila única con unidades, incrementos por defecto y preferencias de aviso.
@@ -119,6 +127,14 @@ Tabla independiente: el pesaje ocurre por la mañana, no en el gimnasio, y no pe
 `outbox`: cola de hechos pendientes de enviar al servidor (ver §6.2), con reintento.
 
 ---
+
+### 3.8 `cycles` y `cycle_blocks`
+
+Ciclo (mesociclo) con `name`, `goal` (`fuerza` · `volumen` · `hipertrofia` · `descarga`), `start_date`, `archived`; uno activo como máximo. Bloques con `position`, `name`, `weeks`, `goal`. Derivados: semana actual, bloque actual y microciclo (semana dentro del bloque). Dan nombre a las semanas en Hoy, Rutinas y la sesión en vivo.
+
+### 3.9 `schedule_overrides`
+
+Reasignación de un día programado: `routine_id`, `from_date`, `to_date` (null = anulado). `scheduledOn(fecha)` aplica las reasignaciones; el calendario muestra el origen como «pospuesta» y el destino como programado.
 
 ## 4. Vistas
 
@@ -144,19 +160,21 @@ La pantalla que decide si la app sobrevive.
 
 **Estructura:** scroll vertical, una tarjeta por ejercicio. La actual expandida, el resto colapsadas mostrando nombre y `4×8-10`. Se descarta el patrón "un ejercicio a la vez con swipe" porque en el gimnasio el orden salta constantemente (máquina ocupada, se va a otra cosa, vuelve). Ver la lista completa permite decidir. Incluye reordenar arrastrando y saltar ejercicio.
 
-**Filas de series:** cada serie aparece prellenada en gris con lo de la última vez (`60 kg × 10`). La fila tiene tres zonas:
+**Filas de series:** cada serie aparece prellenada con lo de la última vez (`60 kg × 10`). La tabla es compacta (filas de 56px con nº, previo, carga, reps y casilla) y **una sola serie está «en curso»**: la primera pendiente, o la que se toque. Esa serie se expande en un bloque grande con dos steppers y el botón de completar (DESIGN.md v2 §4):
 
 | Zona | Gesto | Qué hace |
 |---|---|---|
-| Columna del número de serie | toque | Confirma la serie tal cual |
-| Cifras de peso y reps | toque | Abre el teclado numérico |
-| `+` (48px) | toque | Sube el peso un `min_increment` |
+| Fila pendiente | toque | Pasa a ser la serie en curso |
+| `−` / `+` de carga (48px) | toque | Baja o sube un `min_increment` |
+| `−` / `+` de reps (48px) | toque | Baja o sube una repetición (5 s en ejercicios de tiempo) |
+| Cifra de carga o reps | toque | Abre el teclado numérico sobre ese campo |
+| «Completar serie N» | toque | Confirma la serie tal cual está |
 
-Confirmar una serie que repite lo anterior sigue siendo **un toque**. No hay botón `−`: con teclado en la cifra bajar peso ya tiene camino, y a 320px no caben dos botones de 48px más una zona de confirmar usable. Una fila ya confirmada no responde al toque.
+Confirmar una serie que repite lo anterior sigue siendo **un toque**. El `−` vuelve (la v1 lo quitó por espacio) porque la serie en curso expandida tiene sitio para dos botones de 48px incluso a 320px. Una fila ya confirmada no responde al toque. RIR, «al fallo» y «borrar» viven a la vista dentro del bloque de la serie en curso; desaparece la pulsación larga.
 
 **Calentamiento:** botón para añadir series marcadas como tal, visualmente apagadas. No cuentan para volumen ni PRs.
 
-**Temporizador de descanso: descartado.** No hay barra de descanso, y confirmar una serie no arranca ninguna cuenta. De ahí que `rest_seconds` haya quedado huérfano (§3.2).
+**Temporizador de descanso (v2.1, revierte la decisión de la v1.6):** al completar una serie en la sesión en vivo arranca una cuenta atrás con el `rest_seconds` del ejercicio, con «+30 s» y «Saltar»; vibra al terminar. **Pausa:** la sesión se puede pausar; el cronómetro descuenta las pausas. **Cola:** la sesión en vivo (`/entrenar`) muestra el ejercicio en curso, el siguiente en cola con intercambio y el resto reordenable; Hoy solo anuncia la sesión y enlaza a ella. **Calculadora de discos** por lado a partir de la barra y los discos de Ajustes.
 
 **Inicio de sesión:** la sesión empieza **al pulsar el botón**. Las series que se rellenen antes son borrador y el botón sigue diciendo "Empezar sesión" hasta que se pulsa.
 
@@ -228,10 +246,17 @@ La valoración cuesta un toque y meses después explica los estancamientos mejor
 
 Parece relleno y contiene decisiones transversales:
 
+- **Apariencia:** modo de color `system` / `dark` / `light` (`settings.theme`). Por defecto sigue al sistema.
+- **Ciclo** (enlace), **meta de peso corporal** (línea objetivo en las gráficas), **descanso por defecto**, **barra y discos** para la calculadora (v2.1).
+
 - **Unidades** (kg/lb) e **incrementos por defecto**. Atraviesan cada input de peso, deben existir el día uno.
 - **Peso corporal:** unidad y si Hoy lo pide.
 - **Notificaciones** (§6.4).
 - **Exportar / backup** (§6.5).
+
+### 4.11 Ciclo
+
+Pantalla apilada `/ciclo`. Sin ciclo: nombre, objetivo y fecha de inicio; se crea con tres bloques (acumulación 3, intensificación 2, descarga 1). Con ciclo: nombre editable, objetivo, fecha, «Semana N de M · Bloque X · Microciclo Y», bloques reordenables (nombre, semanas, objetivo) y cierre del ciclo. Alcanzable desde Rutinas, Hoy y Ajustes.
 
 ### 4.10 Primer arranque
 
@@ -368,6 +393,8 @@ Con un usuario, no construir cuentas: token largo generado en el primer arranque
 ## 7. Fuera de alcance de la v1
 
 Superseries, dropsets, cardio, fotos de progreso, medidas corporales adicionales, cuentas de usuario, sync multidispositivo, rotación por ciclos (Push/Pull/Legs girando cada N entrenamientos independientemente del día).
+
+**Con interfaz pero sin fuente de datos (v2.1):** velocidad media propulsiva (hace falta un encoder de barra), sueño y recuperación medida (hace falta pulsera). La recuperación que se muestra es una estimación por horas desde la última sesión frente a una ventana de 24/48/72 h según su RPE.
 
 Todo ello es añadible sin romper el modelo gracias a tres decisiones tomadas de antemano: el campo `kind` en `sets`, la tabla `body_metrics` genérica, y `routine_schedules` como tabla aparte.
 

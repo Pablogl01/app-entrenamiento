@@ -1,465 +1,367 @@
 # DESIGN.md — App de registro de entrenamiento
 
-Sistema de diseño. Se lee **antes** de escribir cualquier UI.
+Sistema de diseño «Kinetic Nordic Craft». Se lee **antes** de escribir cualquier UI.
 Complementa `especificaciones-app-entrenamiento.md`, que define el comportamiento. Este documento define el aspecto.
 
-**Versión:** 1.5 · septiembre 2026
+**Versión:** 2.4 · septiembre 2026. Sustituye por completo a la v1.x (crema, material fotográfico, verde funcional). Las maquetas de origen y los dos DESIGN exportados de Stitch están en `docs/stitch/`; el plan de implementación en `docs/rediseno-v2-plan.md`.
 
 ---
 
 ## 0. Brief en una frase
 
-Herramienta personal de registro de entrenamiento para un solo usuario. Densa y eficiente como una herramienta de software, pero en clima cálido y con materiales reales. Vive en dos contextos físicos opuestos: el baño a las 8:00 recién despierto, y el gimnasio a las 19:00 con prisa y manos sudadas.
+Herramienta personal de registro de entrenamiento para un solo usuario. Precisión de instrumento de laboratorio con materiales minerales cálidos: carbón y hueso en oscuro, caliza y grafito en claro, y **un solo acento volt** que señala lo que importa. Vive en dos contextos físicos opuestos: el baño a las 8:00 recién despierto, y el gimnasio a las 19:00 con prisa y manos sudadas.
 
-**La decisión estructural de la que cuelga todo lo demás:** la app es densa en Hoy, Calendario, Progreso y Rutinas, y **rompe deliberadamente la escala** al entrar en modo de registro de series. Ese salto de escala es el elemento memorable del producto. No es una inconsistencia: es la respuesta a los dos contextos.
+**La decisión estructural de la que cuelga todo lo demás:** la app es densa en todas partes y **rompe la escala en un único sitio**: el bloque de la serie en curso. Cifra a 40px, steppers de 48 y un botón volt de 56. Todo lo que lo rodea es compacto y callado. Ese contraste es el elemento memorable del producto.
 
 ---
 
 ## 1. Color
 
-Paleta base — seis valores, nombrados. No se introducen colores nuevos sin actualizar este archivo.
+Tokens semánticos, independientes del modo. Ningún componente sabe si está en oscuro o en claro: usa el token. No se introducen colores nuevos sin actualizar este archivo y `tokens.css`.
 
-| Token | Hex | Uso |
-|---|---|---|
-| `--paper` | `#FAF8F4` | Fondo de app y de la hoja que scrollea |
-| `--panel` | `#EDE6D9` | Tarjetas y bloques de contenido |
-| `--panel-deep` | `#DED5C4` | Panel de la ilustración dentro de la tarjeta, campos de input |
-| `--ink` | `#14100C` | Texto principal, botones de acción |
-| `--ink-soft` | `#6A645A` | Texto secundario, datos de apoyo, chevrons |
-| `--rule` | `#D9D1C1` | Hairlines, separadores, bordes de 1px |
+| Token | Oscuro | Claro | Uso |
+|---|---|---|---|
+| `--bg` | `#121315` | `#f8f7f4` | Lienzo |
+| `--surface` | `#1b1c1e` | `#ffffff` | Tarjetas, barras |
+| `--surface-hi` | `#25282e` | `#eae7e0` | Filas activas, botón secundario, pista del segmentado, paneles interiores |
+| `--well` | `#0d0e10` | `#f2f0eb` | Lecho de inputs y de la marca de ejercicio |
+| `--ink` | `#e3e2e4` | `#111315` | Texto principal y cifras |
+| `--ink-soft` | `#b9b5aa` | `#575a5e` | Texto secundario, unidades |
+| `--ink-mute` | `#7b828e` | `#8c8f94` | Etiquetas, ejes, histórico, estados pendientes |
+| `--rule` | `rgba(230,225,214,.08)` | `#e5e3dc` | Hairline estructural |
+| `--rule-strong` | `rgba(230,225,214,.14)` | `#dbd8cf` | Borde de botón secundario |
+| `--volt` | `#c8f322` | `#c0eb1e` | El acento |
+| `--on-volt` | `#141517` | `#111315` | Texto sobre volt |
+| `--volt-edge` | `rgba(200,243,34,.35)` | `#9ec412` | Borde de fila hecha, de botón primario, de tarjeta activa |
+| `--volt-tint` | `rgba(200,243,34,.12)` | `#f4fcd4` | Fondo de chip de estado / PR |
+| `--volt-ink` | `#c8f322` | `#4d6100` | Texto volt legible sobre superficie |
+| `--alert` | `#ff4a4a` | `#e53935` | Solo destructivo |
 
-`--ink` es un negro templado en cálido, no `#000` ni un gris azulado. Tiene una razón: sobre una base crema, un negro neutro se lee azulado y frío. Es una decisión, no chrome por defecto.
+### El acento
 
-### Acento
+**Uno solo**, `--volt`, y significa exactamente cuatro cosas:
 
-**Uno solo.** `--go` `#1E8E3E`.
+1. **Acción primaria** (Iniciar sesión, Completar serie, Cerrar, Crear).
+2. **Hecho** (casilla de serie confirmada, día completado en el calendario, chip «Hecha»).
+3. **Récord** (bloque de PRs, chip PR en el desglose).
+4. **Dato vivo** (punto de la barra superior con sesión en curso, línea de la gráfica, último punto, cronómetro).
 
-Significa **completado**. Nada más. Aparece exactamente en:
+No colorea títulos, iconos de sección ni metadatos. Cuando se dude, no es volt. El botón «Finalizar entrenamiento» es secundario mientras queden series y **pasa a volt cuando todas están hechas**: el color señala que hay algo hecho detrás.
 
-- Serie confirmada (la fila cambia de estado)
-- PR del día
-- Punto de día hecho en el calendario
-- Botón cuando pasa a "Finalizar sesión"
+`--alert` aparece solo al pulsar una acción destructiva (borrar sesión, archivar rutina). Un día programado y no hecho **nunca** es rojo: es `--ink-mute` sobre `--surface`.
 
-Las acciones son `--ink`, no verde. "Empezar sesión" es negro; al pulsarlo el mismo botón pasa a verde y dice "Finalizar sesión". El color señala que hay algo hecho detrás.
+### Modo
 
-`--go-bright` `#3FBF52` existe solo para rellenos y puntos sobre fondos oscuros, donde el verde oscuro no se ve. Nunca para texto.
-
-**El acento es independiente del material.** La cabecera cambia de color según el tipo de rutina; si el acento dependiera de ella, unos días chocaría. Se queda fijo.
+El modo lo decide `<html data-theme="dark|light">`. Un script inline en `index.html` lo resuelve antes del primer pintado con el ajuste guardado en `localStorage` o `prefers-color-scheme`; `src/lib/theme.ts` lo mantiene y `settings.theme` (`system` / `dark` / `light`) lo persiste. Ajustes → Apariencia lo cambia.
 
 ---
 
-## 2. Material
+## 2. Profundidad
 
-El sistema visual que hace que esta app no se parezca a nada generado. **El material dice qué tipo de día es antes de leer una palabra.**
+Sin material fotográfico. La profundidad la dan **capas de superficie** (`--bg` → `--surface` → `--surface-hi` → `--well` hacia dentro) y **hairlines**.
 
-### Mapeo
-
-| `routine_type` | Familia de material |
-|---|---|
-| `strength` | Hormigón, piedra natural, hierro |
-| `mobility` | Arena, agua, hierba |
-| `null` (sin tipo, o día sin entreno) | Neutro: piedra clara, sin carga |
-
-Requiere un campo nuevo: **`routine_type` en `routines`**, de selección manual al crear la plantilla. No se infiere de los grupos musculares — falla justo en los casos raros, y el usuario sabe perfectamente qué es cada rutina.
-
-### Reglas del material — no negociables
-
-1. **Fotografía real de material, nunca un degradado.** Un degradado coral o terracota plano es el cliché exacto que estamos evitando. La textura tiene grano, dirección y sombra propia.
-2. **Tratamiento idéntico en todas.** Mismo recorte, misma escala, misma capa de oscurecido (`rgba(20,16,12,.42)` encima). Deben ser intercambiables sin retocar el layout.
-3. **Oscuras y sucias, no limpias y saturadas.** El texto blanco encima pasa 4.5:1 **sin excepciones**. Si una textura no llega, se descarta la textura, no se baja el contraste.
-4. **Solo en el bloque de cabecera.** Nunca detrás de una gráfica de e1RM, de una lista de series o de una tabla. Ensucia la lectura del dato, que es lo único que la app tiene que hacer bien.
-5. **Empaquetadas en la app, no servidas.** En el gimnasio no hay cobertura y nada del flujo de entrenar puede depender de la red. WebP, subset, presupuesto de ~80 KB por textura.
-6. **Tres o cuatro, no una por grupo muscular.** El punto 5 pone el techo. Arrancar con: `stone`, `iron`, `sand`, `neutral`.
+- **Sombras:** ninguna en oscuro. En claro, solo la micro-sombra de tarjeta `--card-shadow` (`0 1px 3px rgba(17,19,21,.04), 0 4px 12px rgba(17,19,21,.02)`).
+- **Halo volt** `--halo`: exclusivo del bloque activo (serie en curso, tarjeta de sesión en curso, bloque de PRs). Nunca en reposo.
+- **Blur:** no. La barra superior es opaca.
+- **Degradados:** uno solo, el relleno `--chart-fill` bajo la línea de una gráfica. Jamás en fondos, botones o tarjetas.
 
 ---
 
 ## 3. Tipografía
 
-Dos familias, con roles claramente separados.
+Una familia, Inter variable, auto-alojada en WOFF2 con subset latino (48 KB). Sin Google Fonts CDN: la app arranca sin red.
 
 | Rol | Familia | Por qué |
 |---|---|---|
-| Display | **Archivo** (variable: `wght` 100-900, `wdth` 62-125) | Grotesca ancha; en 800 y mayúsculas aguanta encima de una textura sin necesitar caja ni sombra |
-| Texto y UI | **IBM Plex Sans** | Carácter propio (terminales con muesca, la 'a', la 'g') sin ser Inter; cifras tabulares reales |
-| Datos numéricos | **IBM Plex Mono** | Misma superfamilia, contraste claro de rol; alineación vertical de columnas de peso y reps |
+| Display, títulos y nombres de ejercicio | **Inter** (variable 100–900, usada en 700–800) | Es la que se ve en las capturas de Stitch: los títulos llevan Inter 800 forzada con tracking −0.03em |
+| Texto, cifras, unidades y etiquetas | **Inter** (la misma) | La serif que se veía en las capturas de Stitch era un fallback del navegador y a 10-12px no se leía. Pablo decidió (2026-09-03, v2.4) Inter para todo, con los tamaños pequeños un punto por encima de la maqueta: etiquetas 11 y 13, texto 13 y 15 |
 
-**Auto-alojadas en WOFF2 con subset.** Sin Google Fonts CDN: la app tiene que arrancar y funcionar sin red.
+Una sola familia. Inter tiene cifras tabulares (`tabular-nums` global), así que los pesos siguen alineándose en vertical. Los pesos intermedios (500/600) vuelven a estar disponibles.
 
-### Escala (móvil, base 380px)
+### Escala
 
-| Token | Tamaño / interlineado | Familia y peso |
-|---|---|---|
-| `display-hero` | 72 / 0.90 / `-0.03em` | Archivo 800, tabular — solo el número de tendencia kg/semana |
-| `display-xl` | 40 / 0.90 / `-0.02em` | Archivo 800, `wdth 112`, **mayúsculas** — solo el nombre de la rutina en cabecera |
-| `title` | 20 / 1.20 | Plex Sans 600 |
-| `item` | 16 / 1.25 | Plex Sans 600 — nombre de ejercicio |
-| `body` | 15 / 1.50 | Plex Sans 400 |
-| `info` | 13 / 1.30 | Plex Sans 500 |
-| `data` | 13 / 1.20 | Plex Mono 500, tabular |
-| `data-lg` | 24 / 1.00 | Plex Mono 500, tabular — peso y reps en la fila de serie |
-| `micro` | 11 / 1.20 | Plex Sans 500 — mínimo absoluto, solo en la rejilla del calendario |
+| Clase | Fuente / peso | Tamaño / interlineado / tracking | Uso |
+|---|---|---|---|
+| `.t-display` | Inter 800 | 36 / 40 / −0.03em, mayúsculas | Nombre de rutina (Hoy, Rutinas, sesión pasada, editor), «SESIÓN COMPLETADA», «MIS RUTINAS» |
+| `.t-h1` | Inter 800 | 28 / 34 / −0.02em, mayúsculas | Título de pantalla raíz o apilada, mes del calendario, nombre de rutina en tarjeta |
+| `.t-h2` | Inter 700 | 22 / 28 / −0.02em | Título de bloque («Entreno de hoy», «Peso corporal») y nombre de pestaña en la barra |
+| `.t-h3` | Inter 700 | 18 / 24 / −0.01em | Nombre de ejercicio, título de fila, título de barra apilada |
+| `.t-body` | Inter 400 | 16 / 24 | Texto |
+| `.t-body-sm` | Inter 400 | 14 / 20 | Subtítulos, veredictos dentro de tarjeta |
+| `.t-caption` | Inter 400 | 12 / 16 | Pies, avisos, ayudas |
+| `.t-metric-xl` | Inter 600 | 40 / 44 / −0.04em | Peso corporal, cifra de la serie en curso, cifras del resumen |
+| `.t-metric` | Inter 500 | 20 / 24 / −0.02em | Carga y reps en la tabla, estadísticas de tarjeta, cronómetro |
+| `.t-metric-sm` | Inter 600 | 15 / 20 | Columna «previo», subtítulo `3×8-10 · 1/3`, chips de dato |
+| `.t-label` | Inter 600 | 13 / 17 / +0.05em, mayúsculas | Etiquetas de sección, texto de botón, segmentado |
+| `.t-label-sm` | Inter 600 | 11 / 13 / +0.08em, mayúsculas | Unidades (KG, REPS), tags de estado, barra inferior, cabecera de tabla |
 
-Salto de 40 a 72 en el display, y de 16 a 24 en los datos al entrar en Entrenando. Los saltos son grandes a propósito.
+Por debajo de 360px: `.t-display` baja a 32/36 y `.t-h2` a 20/26.
 
-### Reglas tipográficas
+### Reglas
 
-- **Todo alineado a la izquierda.** Sin excepciones, incluido el número de tendencia. El centrado es el default y aquí no aporta.
-- **Longitud de línea por debajo de 80 caracteres.** Solo afecta a notas y veredictos; el resto es interfaz.
-- **Mayúsculas permitidas como titular, prohibidas como etiqueta.** `TORSO SUPERIOR` en la cabecera es un titular y funciona. Un `PROGRESO` diminuto con tracking encima de una sección es el tic más reconocible del diseño generado.
-- **"Día de entreno" encima del nombre de la rutina va en caja normal, sin tracking, sin color de acento.** Es un eyebrow por posición, pero lleva información real: distingue día de entreno de día de descanso. Que se lea como información y no como decoración.
-- **Mono para cifras, nunca para etiquetas.** `60 kg × 10` en mono es funcional. Una etiqueta de sección en mono es chrome de plantilla.
-- **`font-variant-numeric: tabular-nums`** en todo lo que sea número. Los pesos se comparan en vertical.
-- Sin acentuar una sola palabra del titular en cursiva, negrita o color.
-
-### `display-xl` va a dos líneas
-
-Medido con la fuente real a 40px / `wght 800` / `wdth 112`: "TORSO SUPERIOR" ocupa **422px**, contra 348 disponibles a 380 y 288 a 320. **No cabe en una línea en ninguna de las dos anchuras**, y casi ningún nombre de dos palabras lo hará.
-
-**Dos líneas son la regla, no la excepción.** La palabra suelta más larga de un nombre plausible —"SUPERIOR", 246px— cabe en las dos anchuras, así que el corte por palabra resuelve el caso general. Interlineado 0.90 para que las dos líneas se lean como una sola masa tipográfica en la esquina inferior izquierda; a 0.95 se separan.
-
-**El eje `wdth` no se toca para hacer hueco.** Bajar a `wdth 90` mete "TORSO SUPERIOR" en una línea a 380, pero la grotesca ancha es una de las tres cosas que §7 identifica como lo que nos separa del cliché. Se comprime el nombre, no la tipografía.
-
-**Y no se trunca nunca.** Para el nombre de una sola palabra imposible —`ACONDICIONAMIENTO` mide 525px— se previene en el origen: **el editor limita el nombre de la rutina a lo que cabe en dos líneas**, con contador. Puntos suspensivos en el único elemento memorable de la app no son una solución.
+- **`tabular-nums` en todo** (regla global). Los pesos se comparan en vertical.
+- **Mayúsculas con tracking solo como etiqueta o botón** (`.t-label`, `.t-label-sm`). Nunca en texto corrido.
+- **Inter en mayúsculas solo como titular** (display, h1). `.t-h2` y `.t-h3` van en caja normal.
+- **Las unidades van pegadas a la cifra** en `.t-label-sm` y `--ink-soft`: `70 KG`, `88,7 KG`.
+- **Todo alineado a la izquierda**, salvo las cifras dentro de un stepper (centradas en su lecho) y las columnas numéricas de la tabla (reps centradas, casilla a la derecha).
+- Sin cursivas, sin acentuar una palabra del titular en color.
 
 ---
 
 ## 4. Estructura y espaciado
 
-**Escala de espaciado:** 4 · 8 · 12 · 16 · 24 · 40 · 64.
+**Rejilla de 4.** `--sp-1..8` = 4 · 8 · 12 · 16 · 20 · 24 · 32 · 48. Margen lateral 16. Entre tarjetas de una lista 8 (`.stack--tight`); entre bloques 20 (`.stack`); en Ajustes 32 (`.stack--loose`).
 
-**Radios — codifican jerarquía, no son un valor único repetido:**
+**Radios codifican jerarquía:** 4 controles, inputs, chips, botones · 8 tarjetas · 12 hojas · pill **solo** para la barra de progreso y los puntos de estado.
 
-| Elemento | Radio |
-|---|---|
-| Hoja sobre la cabecera | 20 (solo esquinas superiores) |
-| Tarjeta | 14 |
-| Control, input, botón | 10 |
-| Punto de estado | pill |
-
-**Separación:** las cosas se separan por **fondo tintado y hairlines**, no por sombra. Cero `box-shadow` en toda la app. Una sombra gris suave debajo de cada bloque es el kit de cards por defecto.
-
-**Aire:** 8px entre tarjetas de la misma lista (denso). 40px entre bloques distintos (respiro). El contraste entre esos dos números es lo que hace que se lea eficiente en lugar de vacía.
-
-### Hoy — día de entreno
-
-```
-┌──────────────────────────────┐
-│                              │  ← material a sangre, según routine_type
-│   Día de entreno             │     min 240px / 34vh
-│   TORSO SUPERIOR             │     texto blanco, abajo-izquierda
-│                              │
-╭──────────────────────────────╮  ← hoja --paper, radio 20 arriba,
-│  ┌────┬───────────────────┐  │     solapa -20px sobre la cabecera
-│  │ ▟▚ │ Press banca    ⌄  │  │
-│  │    │ 4×8-10 · 0/4      │  │  ← tarjeta 88px, gap 8
-│  └────┴───────────────────┘  │
-│  ┌────┬───────────────────┐  │
-│  │ ▟▚ │ Remo con barra ⌄  │  │
-│  │    │ 4×8-10 · 0/4      │  │
-│  └────┴───────────────────┘  │
-│           ...                │
-│                              │
-│  ┌────────────────────────┐  │
-│  │    Empezar sesión      │  │  ← --ink; pasa a --go / "Finalizar"
-│  └────────────────────────┘  │
-╰──────────────────────────────╯
-```
-
-La hoja solapada resuelve el layout entero: la cabecera con material sostiene el titular, y la lista scrollea por encima.
-
-### Hoy — dos bloques, y el plegado como conmutador
-
-Hoy tiene **dos bloques y siempre están los dos**: peso y entreno. El que corresponde al momento del día está abierto; el otro es una **fila de 72px sobre `--paper`, sin relleno, con hairline arriba y abajo** y su chevron a la derecha. Cambiar de contexto es tocar la fila plegada.
-
-**No hay control de conmutación.** Ni segmentado, ni pestañas, ni pill. Es la misma gramática de plegado que ya tienen las tarjetas de ejercicio, así que no añade componente ni vocabulario nuevo. Un segmentado sobre la cabecera obliga a poner una superficie propia encima del material —chrome sobre la fotografía— y sobre la lista mete una banda que compite con el borde solapado de la hoja, que es el elemento estructural del que cuelga el layout.
-
-**La fila plegada lleva dato, no solo etiqueta.** `Peso de hoy` / `sin registrar · 78,4 kg ayer`. `Entreno de hoy` / `6 ejercicios · 0/22 series`. Una fila que solo dice el nombre del bloque obliga a abrirla para saber si hace falta.
-
-**Orden por defecto según la hora:** por la mañana manda peso; a partir de media tarde manda el entreno. A las 15:00, sin pesaje ni entreno hechos, **manda el entreno**.
-
-El bloque de peso abierto es: título en `title`, campo `--panel-deep` de 64px con el valor de ayer como marcador en `--ink-soft`, sparkline debajo (puntos diarios finos en `--ink-soft`, media de 7 días en trazo de 2px `--ink`) y el veredicto en `body`, conclusión primero. **El número de tendencia en `display-hero` no aparece en Hoy**: es de Progreso. Aquí basta el sparkline y la frase.
-
-### Hoy — día sin rutina programada
-
-Solo el bloque de peso. Sin fila de entreno y sin selector de plantillas.
-
-`display-xl` sigue reservado al nombre de la rutina, y ese día no hay nombre, así que **el titular grande no existe**: material `neutral`, cabecera a 160px y "Día de descanso" en `title` blanco, abajo-izquierda. El día de descanso se nota por ser estructuralmente más ligero, no por un aviso. Los huecos no regañan (§6).
-
-Consecuencia asumida: una sesión improvisada se arranca desde Rutinas, no desde Hoy.
-
-### Tarjeta de ejercicio, expandida
-
-```
-┌──────────┬──────────────────────────┐
-│    ▟▚    │  Press banca          ⌃  │   88px
-│          │  4×8-10 · 2/4            │
-├──────────┴──────────────────────────┤
-│  cal   40 kg × 10          −    +   │   64px, opacidad .55
-├─────────────────────────────────────┤
-│▎ 1     60 kg × 10          −    +   │   64px, filo --go
-├─────────────────────────────────────┤
-│  3     60 kg × 10          −    +   │   64px, propuesto
-└─────────────────────────────────────┘
-```
-
-Las filas de serie ocupan **el ancho completo de la tarjeta**, no la columna derecha. Separadas por hairline, sin radio propio. Motivo: así todos los pesos comparten borde izquierdo y se comparan en vertical, que es el trabajo de las cifras tabulares. Metidas en la columna derecha, la fila de 64px se queda sin sitio para los dos botones de 48px.
-
-### Tarjeta de ejercicio, colapsada
-
-```
-┌──────────┬──────────────────────────┐
-│          │  Press banca          ⌄  │   88px de alto
-│    ▟▚    │  4×8-10 · 2/4            │
-│          │                          │
-└──────────┴──────────────────────────┘
-   33%                67%
---panel-deep          --panel
-```
-
-- Ilustración: `grid-template-columns: 33% 1fr`. El panel de la ilustración **sangra hasta los bordes** de la tarjeta (`overflow: hidden` en la tarjeta, cero padding en el panel). No es una imagen con marco dentro de una caja.
-- Columna derecha: nombre en `item`, y debajo `4×8-10 · 2/4` en `data` / `--ink-soft`. Sin ese segundo dato hay que ir expandiendo tarjetas una a una para saber por dónde vas.
-- Chevron 16px `--ink-soft` a la derecha, rota 180° al expandir. Es la única affordance de despliegue; nada de texto "ver más".
-- Reordenable arrastrando. El asa es la tarjeta entera en pulsación larga, no un icono de tres rayas.
-
-### Ilustraciones de ejercicio
-
-- Línea de trazo único, 2px, `--ink` sobre `--panel-deep`. Sin relleno, sin sombra, sin color.
-- Mismo viewBox para todas. La figura ocupa el 70% de la altura del panel, centrada.
-- Solo la figura y el aparato. Sin suelo, sin fondo, sin líneas de movimiento.
-- **Estado sin ilustración obligatorio.** Los ejercicios que crea el usuario no tienen una. En su lugar, una marca geométrica derivada de `muscle_group`, en el mismo panel y a la misma escala. Nunca un hueco, un icono de imagen rota ni un placeholder gris.
-
-### Registro de series — la ruptura de escala
-
-Aquí y solo aquí la app deja de ser densa. Se usa de pie, entre series, con prisa.
-
-- Fila de serie: **64px de alto**, no 40.
-- Peso y reps en `data-lg` (24px).
-- Botón `+`: **48×48px** de área táctil real, a la derecha. Sube el peso en pasos de `min_increment`. No confirma.
-- **No hay botón `−`.** Con teclado en la cifra, bajar peso ya tiene camino, y a 320px la columna de confirmar más las cifras más dos botones de 48px no caben con un objetivo usable.
-
-**Las tres zonas de la fila**, de izquierda a derecha:
-
-| Zona | Gesto | Qué hace |
-|---|---|---|
-| Columna del número de serie | toque | Confirma la serie tal cual está propuesta |
-| Cifras de peso y reps | toque | Abre el teclado numérico sobre ese campo |
-| `+` | toque | Sube el peso un `min_increment` |
-
-El número de serie **es** el control de confirmar: el dato que ya estaba ahí, no un checkbox añadido. El filo `--go` aparece en ese mismo borde, debajo del dedo. Un hairline vertical `--rule` separa el confirmar del editar; no es adorno, marca el límite entre dos gestos.
-
-Una fila ya confirmada no responde al toque. Deshacer una serie hecha por un roce es peor que tener que ir a editarla a propósito.
-- Prellenado con la última vez en `--ink-soft`. Al confirmar, el valor pasa a `--ink` y aparece `--go` en el borde izquierdo de la fila. La diferencia entre propuesto y confirmado tiene que ser evidente de reojo.
-- Series de calentamiento (`kind = 'warmup'`): mismo tamaño, opacidad 0.55, sin acento verde al confirmar. No cuentan para volumen ni PRs y se tiene que ver.
-
-### Calendario
-
-Vista densa y plana. **Sin cabecera de material:** la textura dice de qué tipo es un día, y en una rejilla mensual hay treinta días de tipos distintos, así que cualquier material ahí sería decorativo. Arranca directamente en `--paper`.
-
-Mes en `title` con el año en `data` a la derecha. Iniciales de los días en minúscula (`l m x j v s d`): en mayúscula serían una etiqueta en caja alta, prohibida en §7.
-
-**El punto de estado va debajo del número, nunca detrás.** El círculo de color con el número dentro es el patrón por defecto de cualquier calendario y además obliga a pelear el contraste del número contra el relleno. Separados, el número se lee siempre igual y el punto solo carga el estado.
-
-Celda de 48px, que es también el objetivo táctil del día. **Por debajo de 360px la rejilla sangra hasta los bordes de la pantalla**, sin padding lateral: con los 16px de margen la celda se queda en 41,1px de ancho a 320, por debajo del mínimo táctil de 44 de §8. A sangre son 45,7px. Punto de 8px:
-
-| Estado | Punto |
-|---|---|
-| Hecha | Relleno `--go` |
-| Programada y no hecha (pasado) | Relleno `--rule` |
-| Programada hoy | Anillo de 1px `--ink-soft` |
-| Programada a futuro | Anillo de 1px `--rule` |
-| Sin nada | Nada. La ausencia no se dibuja |
-
-**La distinción es relleno contra anillo**, no sólido contra punteado: a 8px un punteado no se resuelve y "futuro" y "hueco pasado" se confunden. Relleno significa que el día ya pasó; anillo, que está por venir. Hoy destaca por el peso del número **y** por el tono del anillo.
-
-Lista cronológica debajo, a 40px. Filas de 72px con hairline: fecha en `data`, nombre en `item`, metadatos en `data` / `--ink-soft`, y chevron a la derecha, que es la única señal de que la fila se abre. Una sesión programada y no hecha aparece en la lista con el nombre en `--ink-soft` y "programada, sin hacer" como metadato. Nunca en rojo.
-
-### Progreso
-
-**Sin título de pantalla.** La pestaña activa ya dice dónde estás; un `title` "Progreso" repite la palabra dos veces en la misma vista.
-
-Orden: feed de veredictos en texto plano arriba, luego peso corporal, luego por ejercicio. El número grande queda en segundo lugar y funciona precisamente por eso: llega después de tres líneas tranquilas.
-
-`display-hero` (72px) aparece **aquí y solo aquí**, en el número de tendencia kg/semana, alineado a la izquierda, con su unidad y ventana en `info` debajo. No se tiñe: bajar de peso puede ser bueno o malo según el objetivo, y `--go` significa "completado", nada más. La interpretación la da el veredicto en texto.
-
-Nada de rejilla de tarjetas de métricas y nada de envoltorio de tarjeta alrededor de las gráficas. Las gráficas van desnudas sobre `--paper`.
-
-Mejores series en filas de 48px con hairline: reps en `--ink-soft` a la izquierda, peso en `--ink` a la derecha. Alineados a la derecha para que las cifras se comparen en vertical.
-
-### Gráficas
-
-- **Ninguna gráfica sin eje.** Rejilla de hairlines `--rule`, valores del eje y referencia temporal. Un trazo suelto sobre el papel no es una gráfica, es un adorno con forma de dato.
-- **Etiquetas de eje en `data` (13px mono), nunca en `micro`.** `micro` es exclusivo de la rejilla del calendario.
-- **Lo medido va en trazo sólido de 2px `--ink`. Lo calculado o proyectado va discontinuo de 1px `--ink-soft`.** Una proyección con el mismo peso que los datos reales es una mentira gráfica. Un hairline vertical `--rule` marca dónde acaban los datos y empieza el cálculo.
-- Dato diario con ruido: puntos finos `--ink-soft`. Media móvil: el trazo grueso.
-- **Cada gráfica lleva su frase encima**, conclusión primero. Sin ella, Progreso se convierte en cuatro gráficas y ningún veredicto, y ahí se cae el argumento de por qué esta app no es como las otras cincuenta.
-- Selector de rango: fila de opciones en `info` con subrayado de 2px `--ink` en la activa, reutilizando la gramática de la barra de navegación. Sin segmentado.
-
-**Línea de seguimiento previsto** (e1RM): prolonga la regresión de la ventana de §5.3 de las especificaciones. Solo se dibuja **con 4 puntos o más**, igual que el veredicto; con tres sesiones la recta es ruido con aspecto de certeza. Cuando hay estancamiento sale horizontal, así que el dibujo y el mensaje dicen lo mismo y no hace falta teñir nada.
-
-**Mensaje de estancamiento:** va donde van los demás veredictos, en texto plano, sin banda de color, sin icono y sin distintivo. Si el estancamiento se destaca y el progreso no, la pantalla se convierte en una pantalla de regañinas.
-
-**Cumplimiento de sesiones por semana:** barras `--ink` de sesiones hechas y **una sola** línea discontinua de objetivo. Sin rojo, sin porcentaje y sin barra fantasma del ideal detrás de cada semana. Una semana incompleta se lee como barra más corta, no como falta marcada.
-
-### Rutinas — lista
-
-Filas de hairline de 80px, no tarjetas. Nombre en `item`, `6 ejercicios · lun y jue` en `data` / `--ink-soft`, chevron a la derecha.
-
-**La última vez realizada va en columna propia alineada a la derecha**, en `data` tabular. Es el dato que delata las plantillas zombis, y en columna se leen de un barrido: `hace 3 días` sobre `hace 8 meses` no necesita ningún aviso encima. Metida dentro de una tarjeta, hay que buscarla plantilla por plantilla. El default aquí eran tarjetas con una pastilla de colores para los días asignados.
-
-**Por debajo de 360px la columna derecha abrevia:** `3 d`, `5 sem`, `8 mes`. La fila completa mide 281px de contenido contra 260 disponibles a 320; con la columna abreviada baja a 223. Sigue siendo `data` tabular y sigue leyéndose en vertical, que era toda la función.
-
-Sin título de pantalla: la pestaña activa ya lo dice. `Crear rutina` en `--ink` al final de la lista.
-
-### Rutinas — editor
-
-**El editor es el bloque de cabecera de esa rutina.** Ahí se resuelve `routine_type`: el selector cambia el material que estás mirando a tamaño real, en su sitio legítimo. El selector en sí es **texto** —`Fuerza` · `Movilidad` · `Sin tipo`, con el subrayado de 2px de la barra de navegación—, nunca muestras de textura: tres cuadraditos de piedra en una fila son material convertido en adorno, contra la regla 4 de §2.
-
-El nombre se edita tocándolo en la cabecera, con la misma gramática que la cifra en la fila de serie: se toca el valor y se escribe encima.
-
-Fila colapsada: nombre en `item` y `4×8-10` en `data`. **Sin tiempo de descanso.** Las especificaciones ponían `4×8-10 · 2min` como ejemplo, pero el temporizador se descartó y pedirle al usuario que configure un campo que nadie consume es peor que no tenerlo.
-
-Se despliega una fila a la vez, en controles de 64px con hairline: `Series` con `−` / `+` de 44px, y `Reps` como dos cifras de `8` a `10`. **Aquí el `−` sí existe**: se eliminó de la fila de serie por espacio a 320px, no del sistema. Esta es una pantalla sentada y con calma.
-
-Las cifras editables llevan fondo `--panel-deep`, que es el token de "aquí se escribe".
-
-**No hay botón de guardar.** Se guarda al cambiar, que es lo coherente con IndexedDB como fuente de verdad. El aviso de que editar la plantilla no cambia las sesiones ya hechas sale **al hacer el primer cambio**, no como pie de página permanente: al final de un scroll largo lo ve justo quien no lo necesita.
+**Alturas:** barra superior e inferior 64 (+ safe area) · fila de ejercicio 72 · fila compacta de serie 56 · CTA 56 · táctil mínimo 44 · steppers de la serie en curso 48 · casilla de serie 28.
 
 ### Barra superior
 
-**Las cuatro pantallas raíz no la tienen.** Hoy, Calendario, Progreso y Rutinas ya llevan la barra inferior y no hay dónde volver; una cabecera de navegación ahí mete un elemento vacío encima del material, que es lo que sostiene el titular. La barra aparece solo en pantallas apiladas: editor, catálogo, detalle de ejercicio, sesión pasada, resumen, ajustes.
+Fija, opaca, `--bg`, hairline inferior solo al scrollear. Existe en **todas** las pantallas.
 
-**Solo lleva navegación, nunca el título.** Un título centrado en la barra es el default de todo sistema operativo y contradice el "todo alineado a la izquierda" de §3. El título vive en el contenido, a `title` completo.
+- **Raíz:** punto volt 8px (pulsa con sesión en curso) + nombre de la pestaña en `.t-h2`. A la derecha, campana (→ Ajustes, bloque de avisos) y acceso a Ajustes en círculo `--ink`.
+- **Apilada:** flecha atrás 44px + título en `.t-h3` mayúsculas + acción opcional en texto `.t-label` («Editar» / «Hecho»).
 
-56px de alto. Chevron `‹` en un objetivo de 44px.
+### Barra inferior
 
-| Fondo | Chevron | Hairline |
-|---|---|---|
-| Material | Blanco, **sin superficie propia detrás** | No |
-| `--paper` | `--ink` | Abajo, solo cuando hay contenido pasando por detrás |
+`--surface`, hairline arriba, 64 + safe area. Cuatro destinos con icono 22 y etiqueta `.t-label-sm`; la activa en `--volt-ink`. Las pantallas apiladas la esconden.
 
-Sobre material la capa de `rgba(20,16,12,.42)` ya garantiza el contraste; un círculo translúcido debajo del chevron sería glassmorphism (§7).
+### Hoy
 
-La acción de la derecha, cuando existe, va **en texto** en `item`: "Editar" se entiende, un lápiz hay que adivinarlo.
+```
+┌──────────────────────────────────────┐
+│ ● Hoy                        🔔   ⚙ │
+├──────────────────────────────────────┤
+│ [📅 SEMANA 2/4]  [⚖ SIN PESAR HOY]   │  chips de dato real
+│ ┌──────────────────────────────────┐ │
+│ │ ● DÍA DE ENTRENO      4 EJ · 12 S│ │  tag · resumen mono
+│ │ TORSO                            │ │  .t-display, dos líneas como regla
+│ │ SUPERIOR                         │ │
+│ │ Sesión programada para hoy       │ │
+│ │ [▶ INICIAR SESIÓN         ] [⚙]  │ │  volt · editor de la rutina
+│ └──────────────────────────────────┘ │
+│ Entreno de hoy                   ◔0% │  .t-h2 + anillo de progreso
+│ 4 ejercicios · 12 series             │
+│ ┌ tarjetas de ejercicio (8px) ─────┐ │
+│ [⊕ AÑADIR EJERCICIO]                 │  secundario
+│ ┌ Peso corporal ── compacto ───────┐ │
+└──────────────────────────────────────┘
+```
 
-En una sesión pasada, el eyebrow de la cabecera lleva la fecha, en el mismo hueco donde Hoy pone "Día de entreno". Coherente por posición: ahí va siempre qué día es esto. **Solo la fecha:** si el eyebrow acumula duración u otros datos, deja de ser el sitio donde se lee qué día es esto.
+- **Dos bloques, siempre los dos, y el orden lo marca la hora:** antes de las 15:00 sin pesaje, la tarjeta de peso va primero y abierta (input en lecho enfocado, sparkline, veredicto); después, la sesión va primero y el peso queda **compacto** (cifra + chip; tocar la cabecera lo despliega). No hay conmutador.
+- **Sesión en curso:** la tarjeta hero pasa a `.card--active` (halo), el tag dice «SESIÓN EN CURSO» con punto que pulsa, el cronómetro va a la derecha en `.t-metric`, y una barra de progreso pill volt muestra `hechas/total`. Al final de la lista aparece «FINALIZAR ENTRENAMIENTO».
+- **Sesión hecha:** tag «SESIÓN HECHA», botones «Ver resumen» y reabrir.
+- **Día sin rutina:** sin hero ni lista; solo la tarjeta de peso completa. Sesión improvisada desde Rutinas.
+- Los chips de arriba solo llevan datos reales: sesiones de la semana contra programadas, y peso de hoy o «sin pesar».
 
-**Las pantallas apiladas esconden la barra inferior.** Tienen chevron y una salida propia, no cuatro destinos.
+### Sesión en vivo (`/entrenar`)
+
+Pantalla apilada propia; Hoy solo la anuncia. Cuatro bloques, en este orden:
+
+1. **Banner** `.card--active`: chip «SESIÓN EN CURSO» (pulsa) o «EN PAUSA» o «PREVIA»; botones pausa y ⋮ (añadir ejercicio · notas y RPE · descartar); nombre en `.t-display` a ancho completo; debajo, «Semana N · {bloque}» del ciclo a la izquierda y el cronómetro (descuenta pausas) a la derecha; «PROGRESO TOTAL · 7 / 12 SERIES (58%)» con barra pill volt.
+2. **Descanso**: aparece al completar una serie con el `rest_seconds` del ejercicio. Anillo volt de 56, «DESCANSO SUGERIDO» + chip «RPE meta», `mm:ss restantes` a 32px mono, y una fila con «+30 s» y «Saltar». Vibra al llegar a cero y se apaga. Nunca suena.
+3. **Ejercicio en curso**: chip sólido «SERIE PRINCIPAL» + «i de N ejercicios», nombre `.t-h2`, «{equipo} · {n} series de trabajo · Descanso {m} min», icono de regla que abre la **calculadora de discos**; tres tiles Target (kg) · RPE meta · Ant.; la tabla de series con la serie en curso; pie con «Calculadora de discos (x kg / lado)» y «Añadir serie».
+4. **Siguiente en cola**: nombre, «Carga proyectada: x kg · RPE y», botón de intercambio que lo trae al frente, y la cola restante con asa de arrastre. Los ejercicios hechos quedan en una lista compacta con casilla volt y «+ serie».
+
+Cierre: «Añadir ejercicio» y «Notas / RPE» a media anchura (la hoja de notas lleva RPE global 1–10 en rejilla 5×2 y notas), y «Finalizar entrenamiento», secundario hasta que todas las series están hechas.
+
+### Tarjeta de ejercicio y tabla de series
+
+```
+┌──────────────────────────────────────┐
+│ ▯ Press banca              70 KG  ⌄  │  72px · marca en lecho · último peso
+│   3×8-10 · 1/3             ÚLTIMO    │
+├──────────────────────────────────────┤
+│ Nº   PREVIO     CARGA    REPS        │  .t-label-sm --ink-mute
+│ (1)  70×10      70 KG     10    [✓]  │  56px, borde --volt-edge, casilla volt
+│ ┌──────────────────────────────────┐ │
+│ │ (2) SERIE EN CURSO   ANT. 70×9   │ │  --surface-hi + halo
+│ │ CARGA (KG)                  ±2,5 │ │  incremento real del ejercicio
+│ │ [−] [        70 KG        ] [+]  │ │  48 · .t-metric-xl · 48
+│ │ REPETICIONES                     │ │
+│ │ [−] [         9           ] [+]  │ │
+│ │ [ ✓ COMPLETAR SERIE 2          ] │ │  volt 56
+│ │ RIR [−] 2 [+]  · Al fallo · Borrar│ │  extras a la vista
+│ └──────────────────────────────────┘ │
+│ (3)  70×8       70 KG      8    [ ]  │  pendiente: --ink-mute; toque → en curso
+├──────────────────────────────────────┤
+│ ⊕ Añadir serie        Calentamiento  │
+└──────────────────────────────────────┘
+```
+
+- **Una sola serie en curso por tarjeta**: la primera pendiente o la que se toque. Solo en sesión activa o en edición de sesión pasada; en lectura, la tabla es toda compacta.
+- **Columna PREVIO:** la serie del mismo índice en la última sesión terminada (`lastPerformance`). Formato compacto `70×10` para caber a 320px.
+- **Steppers:** carga ±`min_increment`, reps ±1, tiempo ±5 s. Tocar la cifra abre el teclado numérico. Ejercicios sin carga no tienen stepper de carga.
+- **Hecha:** casilla volt con check de 2.5px, borde `--volt-edge`, cifras en `--ink`. La fila no responde al toque: deshacer por roce es peor que editar a propósito.
+- **Calentamiento:** índice «C», opacidad .55, sin volt al confirmar. No cuenta para volumen ni PRs.
+- Los extras (RPE en pasos de 0,5, al fallo, borrar) viven dentro del bloque en curso. Desaparece la pulsación larga. Una fila hecha muestra su RPE bajo las reps en 9px volt.
+- Reordenable arrastrando con pulsación larga sobre la tarjeta entera.
+
+### Calendario
+
+Tarjeta de mes (`.t-h1` + chip de año + botones 44), tres métricas del mes (adherencia, hechas con delta contra el mes anterior, pendientes), rejilla en tarjeta y lista de sesiones como tarjetas.
+
+- **El punto va debajo del número.** Volt = hecha; `--ink-mute` = programada; `--rule-strong` = programada y sin hacer. Hoy: celda `--surface-hi`. La ausencia no se dibuja (punto transparente que conserva la altura).
+- Tocar un día filtra la lista a ese día; volver a tocarlo, la libera.
+- La adherencia cuenta solo días ya pasados (y hoy si está hecha). Un día programado en curso no es un fallo.
+- Tarjeta «Próxima sesión» con el siguiente día programado y la hora del aviso si está activo.
+
+### Progreso
+
+«MÉTRICAS» en `.t-label` + «PROGRESO» en `.t-h1`. Segmentado de rango con la opción activa en volt. Tres tarjetas:
+
+1. **Peso corporal:** cifra actual `.t-metric-xl`, chip de tendencia kg/semana, gráfica (puntos diarios `--ink-mute`, media de 7 días en volt con relleno), veredicto en `.t-body-sm` al cierre.
+2. **Frecuencia:** sesiones esta semana contra objetivo, siete columnas L–D (volt hecha, `--surface-hi` programada, punteado sin nada), barras de 8 semanas con la línea de objetivo discontinua, veredicto.
+3. **Sobrecarga progresiva:** selector nativo dentro de un panel, veredicto (o caja «modelo en calibración» si faltan sesiones), gráfica de e1RM con proyección discontinua y hairline donde acaban los datos, e1RM de las tres últimas sesiones en columnas (la última en volt), mejor e1RM y mejor peso, volumen por sesión, mejores series por reps, y al final los veredictos de los demás ejercicios.
+
+**Cada gráfica lleva su frase.** Los veredictos son la voz del producto (§6) y van dentro de la tarjeta a la que pertenecen.
+
+### Gráficas
+
+- **Ninguna gráfica sin eje.** Rejilla de hairlines `--rule`, valores en `.chart-label` (mono 10px, `--ink-mute`), fecha inicial y final; la final en `--ink`.
+- **Lo medido: volt 2px con relleno `--chart-fill` → transparente.** Lo calculado o proyectado: discontinuo 1px `--ink-mute`, con hairline vertical `--rule-strong` donde empieza.
+- Dato diario con ruido: puntos 1.5px `--ink-mute`. Último punto: círculo volt de 4px con borde `--surface`.
+- Barras: pista `--surface-hi` completa detrás y relleno volt hasta el valor; una sola línea de objetivo discontinua.
+
+### Rutinas
+
+Fila de estado en `.t-label-sm` (rutinas · sesiones/semana · hechas esta semana), «MIS RUTINAS» en `.t-display` con el botón volt «Crear» a la derecha, y una tarjeta por rutina:
+
+- Chip de estado (`TOCA HOY` volt sólido · `HECHA HOY` volt tint · «hace N días» neutro · «Nunca»), días en `--ink-mute`, nombre en `.t-h1`, `N ejercicios · tres primeros nombres`, marca del primer ejercicio en lecho 56.
+- **La de hoy lleva filo superior volt de 2px**, tres métricas (series, ejercicios, última vez) y «INICIAR SESIÓN» en volt con `⋮` al editor. Las demás: «EDITAR» secundario y `▶` para entrenarla hoy.
+- Al final, «SESIÓN VACÍA» secundario y un enlace de texto a Ajustes.
+
+### Editor de rutina
+
+Tarjeta de cabecera con segmentado FUERZA / MOVILIDAD / SIN TIPO, nombre en `.t-display` tocable (límite 24 caracteres, contador) y el aviso «editar no cambia sesiones hechas» tras el primer cambio. Una tarjeta por ejercicio con fold de steppers pequeños (series, reps mín, reps máx) y «Quitar». «AÑADIR EJERCICIO» secundario, tarjeta de días asignados (siete casillas 44, activa volt), «ENTRENAR HOY» volt y «Archivar rutina» en texto.
+
+### Catálogo
+
+«LIBRERÍA» + título `.t-h1`, botón «Crear propio» en chip volt, buscador en lecho con icono, chips de grupo muscular (activo volt tint), franja horizontal de recientes con la última serie en `--volt-ink`, y una tarjeta por ejercicio (marca, nombre, grupo, chip de carga) con `+` a la derecha que pasa a check volt al seleccionar. CTA fijo «AÑADIR N EJERCICIOS».
+
+### Detalle de ejercicio
+
+Título `.t-h1` con chips de grupo y carga, dos tarjetas de métrica (mejor e1RM, mejor peso), gráfica, récords por reps, histórico y datos (incremento con stepper, notas en lecho).
+
+### Sesión pasada
+
+Barra apilada con la fecha y «Editar» / «Hecho». Tarjeta con chip «HECHA · 12/12 SERIES», nombre en `.t-display` y tres métricas. Tarjetas de ejercicio en lectura; en edición se comportan como en Hoy. «REPETIR ESTA SESIÓN» secundario; en edición, fecha y «Borrar sesión».
 
 ### Resumen post-sesión
 
-Pantalla de recompensa, y donde más tira el default: confeti, tres tarjetas de métricas en fila, estrellas y un "¡Buen trabajo!" arriba. Nada de eso entra.
+Pantalla de recompensa. Chip volt con series y ejercicios, número de registro, «SESIÓN COMPLETADA» en `.t-display`, y una rejilla 2×2 de métricas (duración, volumen con delta contra la sesión anterior de la misma rutina, series válidas, ejercicios).
 
-**La recompensa no es un número grande, son los PRs.** `display-hero` está confinado a Progreso, así que volumen y duración van en `data-lg` (24px). Y §6 prohíbe emoji, así que la valoración son cifras del 1 al 5, no caras ni estrellas.
+- **La recompensa son los PRs.** Bloque `.card--active` con trofeo en volt, «Dos récords hoy», una fila por récord con el e1RM nuevo, el anterior y el delta en chip. **Si no hay PRs, el bloque no existe.**
+- **Desglose:** una tarjeta por ejercicio con series hechas, `BLOQUE 01 · grupo` (aquí la numeración sí es una secuencia real), chips `SET n / 70×10`, la mejor serie del ejercicio con PR en volt tint, volumen.
+- **Valoración 1–5** en cinco cuadrados (activo volt) y notas en lecho. Guardar como plantilla si la sesión fue improvisada.
+- **«CERRAR»** en volt. No guarda nada: todo se guardó al escribir, y el botón no lo finge.
 
-Orden: PRs, cifras, valoración, notas.
+### Ajustes
 
-**PRs del día:** una tarjeta con una fila de 72px por récord, cada una con el filo de 3px `--go` de la serie confirmada. Es el segundo y último sitio de la app donde aparece el verde. Nombre en `item`, `e1RM 82,5 kg · antes 80,0` en `data`, y la diferencia contra el récord anterior a la derecha en `data-lg`. El titular del bloque es la conclusión —"Dos récords hoy"—, no un "PRs" seco encima de una lista.
-
-**Si no hay PRs, el bloque no existe.** No aparece "Ningún récord hoy": se lee como suspenso, y una sesión normal es la mayoría de las sesiones.
-
-**Cifras:** filas de 56px con hairline, etiqueta en `body` a la izquierda y valor en `data-lg` a la derecha. Alineadas a la derecha para que se comparen en vertical. Nada de rejilla de tarjetas de métricas.
-
-**Valoración:** cinco objetivos de 48px en `--panel-deep` con la cifra en `data-lg` / `--ink-soft`; la elegida pasa a fondo `--ink` con la cifra en `--paper`. Sin verde: `--go` significa completado, no "buena sesión".
-
-**Notas:** campo `--panel-deep` de 88px mínimo, con un ejemplo real como marcador, no "Escribe aquí".
-
-`Cerrar` en `--ink` al final. No guarda nada —todo se guarda al escribir—, solo cierra, y el nombre lo dice sin fingir.
+Cabecera «PARÁMETROS» / «AJUSTES» con chip de versión. Secciones con etiqueta mono y punto volt: **Apariencia** (segmentado Sistema / Oscuro / Claro), **Unidad de peso** (dos opciones de 56px), **Incrementos por defecto** (filas título + descripción + stepper pequeño, sin icono para que el texto respire), **Peso corporal y avisos** (toggles volt, chips de hora, bloque de estado del push en texto sincero), **Datos y copia** (sincronizar, exportar, importar).
 
 ---
 
-## 5. Movimiento
+## 5. Componentes
 
-- **Una sola secuencia orquestada:** al abrir Hoy, la cabecera aparece y las tarjetas entran escalonadas con `animation-delay`. Ocurre una vez por sesión de app.
-- El resto del movimiento responde a una acción del usuario y muestra qué ha cambiado: expandir tarjeta (plegado a 220 ms), confirmar serie (el filo `--go` crece desde arriba, 200 ms), arrastrar para reordenar.
-- **Cambio de vista (v1.7):** entra solo la vista nueva — fundido de 140 ms entre pestañas, deslizamiento corto de 200 ms al apilar y de 180 ms al volver. La vista vieja no se anima y nada dura más de 220 ms.
-- **Gesto lateral (v1.8):** en las pestañas raíz, deslizar en horizontal cambia de pestaña y la animación sigue la dirección del gesto. Umbral de 60px con dominancia clara sobre el eje vertical; el gesto no roba el scroll de los selectores de texto ni los campos de escritura.
-- **Prohibido:** fade-and-slide-up en cada sección al scrollear, y transición de hover en cada tarjeta. Es el default y se lee como generado.
-- `prefers-reduced-motion` respetado en todo.
+**Regla de la v2.3:** una pantalla que tiene maqueta en `docs/stitch/` se construye con las clases de `src/styles/tw.css` siguiendo la maqueta bloque a bloque. Los componentes de abajo quedan para las pantallas sin maqueta y para la lógica compartida (`SetTable`, `StepperBare`, `Icon`).
+
+- **Botones** `.btn` (56px, mono mayúsculas, radio 4, `scale(.98)` en 60ms lineal al pulsar): `--primary` volt con borde `--volt-edge`; `--secondary` `--surface-hi` con borde `--rule-strong`; `--ghost` texto `--ink-soft` que pasa a `--alert` al pulsar; `--square` 56×56 solo icono; `--sm` 44.
+- **Tarjeta** `.card`: `--surface`, borde `--rule`, radio 8, padding 16. `--active` con `--volt-edge` y halo; `--today` con filo superior volt; `--flush` sin padding.
+- **Panel** `.panel` y **tile** `.tile`: `--surface-hi`, radio 4, para métricas dentro de tarjeta. `.tile--card` es una tarjeta pequeña de métrica.
+- **Chips** `.chip`: 3×8, radio 4, `.t-label-sm`. Neutro `--surface-hi`; `--volt` tint con borde; `--solid` volt; `--line` solo borde.
+- **Segmentado** `.seg`: pista `--surface-hi`, opción activa volt. Sustituye al selector subrayado.
+- **Campo** `.field` / `.numfield`: lecho `--well`; en foco, borde `--ink` y anillo 2px volt sobre `--surface`.
+- **Stepper** `.stepper`: `[−] valor [+]`, botones 48 (`--sm`: 44/36), valor en lecho centrado; tocar la cifra la edita.
+- **Toggle**: pista `--surface-hi`, activo volt con pomo `--on-volt`.
+- **Casilla de serie** `.setcheck`: 28, radio 4; hecha = volt con check 2.5px.
+- **Marca de ejercicio** `.mark`: lecho `--well` 48 (56 `--lg`, 36 `--sm`) con el trazo geométrico del grupo muscular en `currentColor`. Sin fotos: no existen offline.
+- **Anillo** `.ring` y **barra** `.progress`: pista `--surface-hi`, relleno volt. Solo para la sesión de hoy.
+- **Iconos** `Icon.tsx`: trazo 2px, 24×24, dibujados a mano. Sin fuente de iconos.
 
 ---
 
-## 6. Escritura
+## 6. Movimiento
 
-- Frases en caja normal, verbos activos, sin relleno.
-- El botón dice lo que pasa: "Empezar sesión", "Finalizar sesión". La acción conserva el nombre en todo el flujo.
-- **Los veredictos son la voz del producto.** Conclusión primero, en texto plano: "Press militar: e1RM plano desde hace 5 semanas". Sin emoji, sin signos de exclamación, sin motivación.
-- **Los huecos no regañan.** Una sesión programada y no hecha es `--rule` sobre `--paper`. Nunca rojo. Se van a saltar días y una app que llena el calendario de rojo se abandona.
-- Sin `→` pegado al texto de botones y enlaces.
+- **Una sola secuencia orquestada:** al abrir Hoy, la tarjeta hero entra y las de ejercicio escalonan con `animation-delay`. Una vez por sesión de app.
+- El resto responde a una acción: fold de tarjeta (220 ms), casilla que se rellena y borde que pasa a volt (180 ms), barra de progreso (200 ms), botones con `scale(.98)` en 60 ms lineal (respuesta mecánica, sin curvas blandas).
+- **Cambio de vista:** fundido de 140 ms entre pestañas, deslizamiento de 200 ms al apilar y 180 ms al volver; el gesto lateral anima en su dirección.
+- **Pulso** solo en el punto de «sesión en curso» (barra superior, tag de la hero).
+- **Prohibido:** animar al scrollear, hover con transición en cada tarjeta, glow permanente.
+- `prefers-reduced-motion` apaga todo.
+
+---
+
+## 7. Escritura
+
+- Frases en caja normal, verbos activos, sin relleno. Las etiquetas en mono mayúsculas son etiquetas, no frases.
+- El botón dice lo que pasa: «Iniciar sesión», «Completar serie 2», «Finalizar entrenamiento», «Cerrar». Nunca «Guardar» cuando ya está guardado.
+- **Los veredictos son la voz del producto.** Conclusión primero, texto plano, dentro de su tarjeta: «Press militar: e1RM plano desde hace 5 semanas». Sin emoji, sin exclamaciones, sin motivación.
+- **Los huecos no regañan.** Un día programado y no hecho es `--ink-mute`, nunca rojo. Sin «ningún récord hoy»: si no hay, el bloque no existe.
+- **Ningún dato inventado.** La app no mide RPE, racha, recuperación, velocidad ni sueño; ninguna pantalla los muestra. Cada hueco de una maqueta se rellena con un dato real o se quita.
 - Los estados vacíos invitan a actuar; los errores dicen qué pasó y cómo arreglarlo, sin disculparse.
 
 ---
 
-## 7. Lista negra
+## 8. Lista negra
 
-Cada línea es un tic reconocible de interfaz generada. Ninguna aparece en este proyecto.
+Cada línea es un tic reconocible de interfaz generada o una regresión a la v1. Ninguna aparece en este proyecto.
 
 **Tipografía**
-- Inter, Roboto, Open Sans, Lato, fuentes de sistema
-- Space Grotesk (es la convergencia por defecto del propio modelo)
-- Etiquetas en MAYÚSCULAS con tracking encima de las secciones
-- Una palabra del titular acentuada en cursiva, negrita o color
-- Mono para etiquetas decorativas
+- Cualquier familia distinta de Inter: Roboto, Open Sans, Space Grotesk, Syne, Hanken Grotesk, JetBrains Mono, Times
+- Cursivas; una palabra del titular acentuada en color
+- Mayúsculas con tracking fuera de `.t-label` / `.t-label-sm`, o en Hanken
 
 **Color y superficie**
-- Degradados de cualquier tipo. La profundidad la da el material, no un gradiente.
-- Crema `#F4F1EA` + serif de display + acento terracota `#D97757`. **Es el cliché número uno del diseño generado, y nuestra paleta es peligrosamente cercana.** Lo que nos separa: la textura es material fotografiado y no un naranja plano, el display es una grotesca ancha y no un serif editorial, y el acento es un verde funcional y no un terracota decorativo. Esas tres cosas son las que impiden que esto se convierta en el cliché. No se negocian.
-- `box-shadow` en cualquier elemento
-- Un único `border-radius` para todo
-- Morado o azul-morado en ningún sitio
+- Volt fuera de sus cuatro usos (acción primaria, hecho, récord, dato vivo)
+- Un segundo acento. Morado o azul en ningún sitio
+- Rojo para un hueco o una sesión no hecha
+- Sombras difusas en oscuro; en claro, cualquier sombra distinta de `--card-shadow`
+- Halo volt en reposo
 - Glassmorphism, blur de fondo
-- Más de un color de acento
+- Degradados fuera del relleno de una gráfica
+- Material fotográfico, texturas, fotos de ejercicio
 
 **Estructura**
-- Contenido troceado en tarjetas redondeadas idénticas cuando no lo pide la jerarquía
-- Marcadores numerados `01 / 02 / 03`. Solo si el contenido es realmente una secuencia; aquí no lo es en ningún sitio.
-- Metadatos unidos con puntos medios como adorno (`A · B · C`). El `·` de `4×8-10 · 2/4` sí separa dos datos reales.
-- Rejillas de tres columnas de features
-- Rejilla de tarjetas de métricas encima de una pantalla de datos
-- Proyecciones o cálculos dibujados con el mismo peso que los datos medidos
-- Componentes de shadcn sin tunear
+- Un único `border-radius` para todo
+- Marcadores numerados salvo en el desglose del resumen, donde el orden es real
+- Metadatos unidos con puntos medios como adorno. El `·` de `3×8-10 · 1/3` separa dos datos reales
+- Rejilla de tarjetas de métricas encima de una pantalla de datos, salvo las que llevan dato real y frase (mes del calendario, resumen)
+- Proyecciones dibujadas con el mismo peso que los datos medidos
+- Datos que la app no mide: RPE, racha, recuperación, velocidad, sueño, mesociclos, meta de peso, calculadora de discos, temporizador de descanso
+- Cualquier recurso servido desde un CDN
 
 ---
 
-## 8. Suelo de calidad
+## 9. Suelo de calidad
 
-- Responsive hasta 320px. La tarjeta de ejercicio es lo primero que se rompe: comprobarla ahí. **Y el titular de cabecera es lo segundo, pero se rompe también a 380.** El navegador parte la línea por su cuenta y la rotura pasa desapercibida en una captura: medir el ancho de la cadena con la fuente real, no confiar en que se vea bien.
-- Foco de teclado visible, con contorno de 2px `--ink`.
-- Contraste: texto normal 4.5:1, texto grande 3:1. Texto blanco sobre material, verificado por textura.
+- Responsive hasta 320px, **en los dos modos**. La tarjeta de ejercicio con la serie en curso es lo primero que se rompe: comprobarla ahí. `scripts/shots.mjs` captura las pantallas a 380 y 320 en oscuro, a 380 en claro, y la sesión en curso; `?theme=light|dark` fuerza el modo.
+- Foco de teclado visible: anillo de 2px volt.
+- Contraste: texto normal 4.5:1, texto grande 3:1. `--volt-ink` en claro es `#4d6100` precisamente porque el volt puro no llega sobre blanco.
 - `prefers-reduced-motion` respetado.
-- Objetivos táctiles de 44px mínimo en la app, 48px en registro de series.
+- Objetivos táctiles de 44px mínimo; 48px en los steppers de la serie en curso.
+- Ningún hex fuera de `tokens.css`.
 
 ---
 
-## 9. Decisiones abiertas
+## 10. Decisiones abiertas
 
-Ninguna. Las siete de la v1.5 se cerraron en la v1.6:
+Ninguna. Las cuatro del flujo v2.1 se cerraron el 2026-09-03: velocidad, recuperación y sueño con interfaz pero sin fuente de datos (la recuperación se estima por tiempo y RPE); RPE sustituye a RIR; foto por ejercicio con hueco previsto; ciclo con bloques configurables.
 
-1. **`routine_type`** — añadido al modelo de datos (`routines.routine_type`), selección manual en la cabecera del editor.
-2. **`rest_seconds`** — borrado del modelo. El temporizador se descartó y ninguna pantalla lo consumía.
-3. **Días asignados** — bloque propio al final del editor, debajo del `+` de añadir ejercicio (no entre los ejercicios y el `+`, que rompe la lectura): siete objetivos de 44px (`l m x j v s d`), el activo con relleno `--ink` y la letra en `--paper`.
-4. **Cifras editables** — unificadas: la zona de cifras de la fila de serie lleva también fondo `--panel-deep`. El token de "aquí se escribe" es el mismo en toda la app.
-5. **Barra de navegación inferior** — confirmada la provisional: 56px, hairline arriba, etiquetas de texto en `info` sin iconos, activa en `--ink` con subrayado de 2px.
-6. **Sesión improvisada** — desde Rutinas: fila `Sesión vacía` al final de la lista (crea una sesión sin plantilla y lleva a Hoy) y acción `Entrenar hoy` en el editor de cada rutina, que la entrena fuera de su día programado.
-7. **Veredicto de estancamiento** — sin consejo. Solo el hecho, en texto plano, como el resto de veredictos.
-
-### Cerradas en la v1.1
-
-- **Inicio de sesión:** empieza **al pulsar el botón**. Las series que se rellenen antes son borrador; el botón sigue diciendo "Empezar sesión" hasta que se pulsa.
-- **Hoy a las 15:00:** manda el entreno.
-- **Hoy sin rutina:** solo el bloque de peso.
-- **Conmutador peso/entreno:** no existe como control; es el plegado de los dos bloques.
+Las anteriores: Las cuatro del rediseño se cerraron el 2026-09-03 antes de codificar: oscuro y claro según el sistema; Syne + Hanken Grotesk + JetBrains Mono en ambos; fila de serie con steppers y «Completar serie»; barra superior en las pantallas raíz.
 
 ---
 
-## 10. Changelog
+## 11. Changelog
 
-- **2026-09-02** — v1.8. Deslizamiento lateral entre pestañas raíz, con animación direccional. Selección múltiple en el catálogo al añadir ejercicios (círculo que se rellena en `--ink`, CTA fijo abajo).
-- **2026-09-02** — v1.7. Movimiento implementado y acotado: transiciones de cambio de vista (fundido entre pestañas, deslizamiento al apilar/volver), plegado animado de tarjetas y filas de editor, filo `--go` que crece al confirmar. Todo ≤220 ms, bajo `prefers-reduced-motion`.
-- **2026-09-02** — v1.6. Se cierran las siete decisiones abiertas de §9 para la implementación: `rest_seconds` borrado, barra inferior confirmada, cifras editables unificadas con `--panel-deep`, días asignados al final del editor, sesión improvisada desde Rutinas (`Sesión vacía` + `Entrenar hoy`), veredicto de estancamiento sin consejo.
-- **2026-09-02** — v1.5. Barrido a 320px midiendo con las fuentes reales. Tres correcciones: `display-xl` va a dos líneas con interlineado 0.90 y el editor limita el nombre de la rutina; la columna derecha de Rutinas abrevia por debajo de 360px; la rejilla del calendario sangra a los bordes por debajo de 360px para conservar los 44px táctiles.
-- **2026-09-02** — v1.4. Resumen post-sesión definido: los PRs son la recompensa y el segundo sitio donde aparece el verde. El eyebrow de cabecera queda restringido a la fecha. Las pantallas apiladas esconden la barra inferior.
-- **2026-09-02** — v1.3. Rutinas y su editor definidos; `routine_type` se elige en la cabecera del propio editor. Nueva subsección de barra superior: no existe en las pantallas raíz y nunca lleva el título. El editor pierde el botón de guardar y el tiempo de descanso.
-- **2026-09-02** — v1.2. Calendario y Progreso definidos. Nueva subsección de gráficas: eje obligatorio, medido sólido contra calculado discontinuo, línea de seguimiento previsto y cumplimiento semanal. Etiquetas de eje corregidas a `data`; `micro` vuelve a ser exclusivo del calendario.
-- **2026-09-02** — v1.1. Hoy queda definida en sus tres estados (mañana, tarde, día de descanso). Se cierran las decisiones 2, 3 y 5 de la v1.0. Se descarta el control de conmutación en favor del plegado de bloques. Se fija la anatomía de la tarjeta expandida: filas de serie a ancho completo. `display-hero` queda confinado a Progreso. Filas de serie: el número de serie pasa a ser el control de confirmar, la cifra abre teclado, y se elimina el botón `−`.
-- **2026-09-02** — v1.0. Dirección inicial: base crema, material fotográfico por tipo de rutina, acento verde único, Archivo + IBM Plex, ruptura de escala en registro de series.
+- **2026-09-03** — v2.4. Inter para todo: la serif de la captura no se leía a 10-12px. Tamaños pequeños de la maqueta un punto arriba (etiquetas 11/13, texto 13/15). Tinos sale del bundle.
+
+- **2026-09-03** — v2.3 «posiciones y tamaños de Stitch». Por decisión de Pablo, las ocho pantallas se portan 1:1 desde el HTML de las maquetas: mismos contenedores, espaciados (2/4/8/12/16/20), radios (2/4/8/12), superficies MD3 (`--md-sc-lowest` → `--md-sc-highest`) y tipos (`.type-*`). Se añade `src/styles/tw.css`, un subconjunto de utilidades que replica las clases de Stitch, y los tokens semánticos (`--bg`, `--surface`, `--ink`…) pasan a apuntar a la paleta MD3 de la maqueta. Barra superior con punto + nombre de pestaña + campana + avatar; barra inferior con etiquetas en mayúsculas. Las cuatro pantallas sin maqueta (ciclo, editor de rutina, detalle de ejercicio, sesión pasada) conservan los componentes de la v2.1 sobre la misma paleta.
+
+- **2026-09-03** — v2.2. Tipografía calcada de las capturas de Stitch por decisión de Pablo: Inter 800/700 en display, títulos y nombres; Times New Roman del sistema (Tinos de reserva) en texto, cifras y etiquetas. Syne, Hanken Grotesk y JetBrains Mono salen del bundle.
+
+- **2026-09-03** — v2.1 «el flujo completo». Sesión en vivo como pantalla propia con banner, pausa, cronómetro, temporizador de descanso, tiles Target / RPE meta / Ant., calculadora de discos, siguiente en cola con intercambio y cola reordenable, hoja de notas y RPE global. RPE sustituye a RIR en la serie. Hoy: chips racha / semana / recuperación estimada, «~N min estimados», tarjeta de contexto del ciclo, sparkline de 7 días con meta, filas con objetivo, tarjeta de descanso nocturno sin datos. Resumen: adherencia, RPE medio con banda, descansos medios, desglose con RPE, recuperación estimada con ventana y anillo, sensaciones 1–10, «Guardar en calendario y cerrar» con estado real de la copia. Rutinas: fila de ciclo, cinco estados de tarjeta, tiles volumen / series / estimado, última mejor serie con RPE. Ciclo con bloques configurables (pantalla nueva). Calendario: reasignar día y sesiones pospuestas. Progreso: meta de peso, filtro por grupo, carga efectiva, PR actual con RPE, velocidad sin datos. Biblioteca: hueco de foto y última serie por fila. Ajustes: ciclo, meta de peso, descanso por defecto, barra y discos.
+
+- **2026-09-03** — v2.0 «Kinetic Nordic Craft». Rediseño completo a partir de las maquetas de Stitch: dos modos de color con tokens semánticos, acento volt con cuatro usos, Syne + Hanken Grotesk + JetBrains Mono auto-alojadas, iconos SVG propios, barra superior en raíz, tarjetas con hairline, tabla de series compacta con bloque de serie en curso (steppers −/+ y «Completar serie»), calendario con métricas del mes, progreso en tres tarjetas con veredicto propio, rutinas en tarjetas con filo volt para la de hoy, resumen con rejilla 2×2 y desglose, apariencia en Ajustes. Fuera: material fotográfico, texturas, Archivo/Plex, verde funcional, hoja solapada, fila de 64px con el número como confirmar.
+- **2026-09-02** — v1.0–v1.8. Dirección inicial (crema, material fotográfico por tipo de rutina, acento verde único, Archivo + IBM Plex) y su implementación completa. Archivada en el historial de git.

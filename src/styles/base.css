@@ -12,15 +12,29 @@ body {
   padding: 0;
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-ui);
   font-size: var(--body-size);
-  line-height: 1.5;
+  line-height: var(--body-lh);
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
 }
 
 #root {
   min-height: 100dvh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
 }

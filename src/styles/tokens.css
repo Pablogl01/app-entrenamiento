@@ -1,82 +1,178 @@
 /* tokens.css — App de registro de entrenamiento
-   Fuente de verdad: DESIGN.md v1.5, secciones 1, 3 y 4.
-   Ningún componente escribe un hex a mano. */
+   Fuente de verdad: DESIGN.md v2.0 «Kinetic Nordic Craft», secciones 1, 3 y 4.
+   Ningún componente escribe un hex a mano.
+
+   El modo lo fija `<html data-theme="light|dark">`: un script inline en
+   index.html lo resuelve antes del primer pintado (ajuste guardado o
+   preferencia del sistema) y src/lib/theme.ts lo mantiene. */
 
 :root {
-  /* ---- Color (DESIGN.md §1) ---- */
-  --paper: #FAF8F4;
-  --panel: #EDE6D9;
-  --panel-deep: #DED5C4;
-  --ink: #14100C;
-  --ink-soft: #6A645A;
-  --rule: #D9D1C1;
+  color-scheme: light;
 
-  /* Acento único. Significa "completado", nada más. */
-  --go: #1E8E3E;
-  /* Solo para rellenos y puntos sobre fondos oscuros. Nunca para texto. */
-  --go-bright: #3FBF52;
+  /* ---- Paleta MD3 de la maqueta, modo claro (DESIGN_modo_claro) ---- */
+  --md-surface: #faf9f6;
+  --md-sc-lowest: #ffffff;
+  --md-sc-low: #f4f3f0;
+  --md-sc: #efeeeb;
+  --md-sc-high: #e9e8e5;
+  --md-sc-highest: #e3e2df;
+  --md-bright: #faf9f6;
+  --md-on-surface: #1a1c1a;
+  --md-on-surface-variant: #444934;
+  --md-outline: #757962;
+  --md-outline-variant: #c5c9ae;
+  --md-primary: #111315;          /* títulos y cifras grandes (type-primary del DESIGN claro) */
+  --md-on-primary: #ffffff;
+  --md-primary-fixed: #c0eb1e;
+  --md-on-primary-fixed: #171e00;
+  --md-on-primary-container: #526700;
+  --md-primary-fixed-dim: #9ec412;
+  --md-secondary: #5d5e61;
+  --md-secondary-fixed: #1a1c1e;
+  --md-secondary-fixed-dim: #5d5e61;
+  --md-secondary-container: #e2e2e5;
+  --md-error: #ba1a1a;
 
-  /* Capa de oscurecido sobre el material fotográfico. No negociable: el
-     texto blanco encima pasa 4.5:1 con esta capa aplicada. */
-  --material-scrim: rgba(20, 16, 12, 0.42);
-  --on-material: #FFFFFF;
-  --on-material-soft: rgba(255, 255, 255, 0.86);
+  /* ---- Tokens semánticos, mapeados a la paleta de arriba ---- */
+  --bg: var(--md-surface);
+  --surface: var(--md-sc);
+  --surface-lo: var(--md-sc-low);
+  --surface-hi: var(--md-sc-high);
+  --surface-top: var(--md-sc-highest);
+  --well: var(--md-sc-lowest);
+  --ink: var(--md-on-surface);
+  --ink-strong: var(--md-primary);
+  --ink-soft: var(--md-secondary);
+  --ink-mute: var(--md-outline);
+  --rule: #e5e3dc;
+  --rule-strong: #dbd8cf;
+
+  /* Acento único. Acción primaria, serie hecha, PR, dato vivo. Nada más. */
+  --volt: var(--md-primary-fixed);
+  --on-volt: var(--md-on-primary-fixed);
+  --volt-edge: #9ec412;
+  --volt-tint: #f4fcd4;
+  --volt-ink: #4d6100;
+
+  /* Solo destructivo: borrar sesión, archivar. Nunca para un hueco. */
+  --alert: #e53935;
+
+  --halo: 0 0 0 2px var(--volt), 0 4px 16px rgba(192, 235, 30, 0.28);
+  --card-shadow: 0 1px 3px rgba(17, 19, 21, 0.04), 0 4px 12px rgba(17, 19, 21, 0.02);
+  --chart-fill: rgba(192, 235, 30, 0.3);
+  --chart-fill-0: rgba(192, 235, 30, 0);
+  --scrim: rgba(17, 19, 21, 0.45);
 
   /* ---- Tipografía (DESIGN.md §3) ---- */
-  /* Auto-alojadas en WOFF2 con subset. Sin CDN: la app arranca sin red. */
-  --font-display: "Archivo", sans-serif;
-  --font-ui: "IBM Plex Sans", sans-serif;
-  --font-data: "IBM Plex Mono", monospace;
+  /* Una sola familia (decisión de Pablo, v2.4): Inter en títulos, texto,
+     cifras y etiquetas. La serif de la captura de Stitch era un fallback y a
+     10-12px no se leía. */
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-ui: "Inter", system-ui, sans-serif;
+  --font-data: "Inter", system-ui, sans-serif;
 
-  --display-hero-size: 72px;   /* solo tendencia kg/semana, solo en Progreso */
-  --display-hero-lh: 0.90;
-  --display-xl-size: 40px;     /* solo nombre de rutina en cabecera */
-  --display-xl-lh: 0.90;       /* 0.90 porque va a dos líneas, ver §3 */
-  --title-size: 20px;
-  --item-size: 16px;
-  --body-size: 15px;
-  --info-size: 13px;
-  --data-size: 13px;
-  --data-lg-size: 24px;
-  --micro-size: 11px;          /* exclusivo de la rejilla del calendario */
+  --display-size: 36px;    /* nombre de rutina, «SESIÓN COMPLETADA» */
+  --display-lh: 40px;
+  --h1-size: 28px;         /* título de pantalla raíz */
+  --h1-lh: 34px;
+  --h2-size: 22px;         /* título de bloque */
+  --h2-lh: 28px;
+  --h3-size: 18px;         /* nombre de ejercicio, título de fila */
+  --h3-lh: 24px;
+  --body-size: 16px;
+  --body-lh: 24px;
+  --body-sm-size: 14px;
+  --body-sm-lh: 20px;
+  --caption-size: 12px;
+  --caption-lh: 16px;
+  --metric-xl-size: 40px;  /* peso corporal, tendencia, cifra de la serie activa */
+  --metric-xl-lh: 44px;
+  --metric-size: 20px;     /* peso y reps en la tabla, estadísticas */
+  --metric-lh: 24px;
+  --metric-sm-size: 15px;  /* columna «previo», chips de dato */
+  --metric-sm-lh: 20px;
+  --label-size: 13px;      /* etiquetas de sección y botones */
+  --label-lh: 16px;
+  --label-sm-size: 11px;   /* unidades, tags, barra inferior */
+  --label-sm-lh: 12px;
 
-  /* ---- Espaciado (DESIGN.md §4) ---- */
+  /* ---- Espaciado (DESIGN.md §4): rejilla de 4 ---- */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
   --sp-4: 16px;
-  --sp-5: 24px;
-  --sp-6: 40px;
-  --sp-7: 64px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 48px;
 
-  /* ---- Radios: codifican jerarquía, no son un valor único ---- */
-  --radius-sheet: 20px;   /* solo esquinas superiores */
-  --radius-card: 14px;
-  --radius-control: 10px;
+  /* ---- Radios: 4 controles · 8 tarjetas · 12 hojas · pill solo tags y barras ---- */
+  --radius-control: 4px;
+  --radius-card: 8px;
+  --radius-sheet: 12px;
   --radius-pill: 999px;
 
   /* ---- Alturas fijadas por el diseño ---- */
-  --h-header-min: 240px;      /* cabecera con material en día de entreno */
-  --h-header-rest: 160px;     /* día de descanso: sin titular grande */
-  --h-card: 88px;             /* tarjeta de ejercicio colapsada */
-  --h-set-row: 64px;          /* ruptura de escala: no 40 */
-  --h-row: 72px;              /* fila de bloque plegado, PR, lista */
-  --h-bar: 56px;              /* barra superior e inferior */
-  --h-cta: 52px;
-  --touch: 44px;              /* mínimo en la app */
-  --touch-set: 48px;          /* mínimo en registro de series */
+  --h-bar: 64px;            /* barra superior e inferior */
+  --h-row: 72px;            /* fila de ejercicio, fila de lista */
+  --h-set-row: 56px;        /* fila compacta de la tabla de series */
+  --h-cta: 56px;
+  --touch: 44px;            /* mínimo en la app */
+  --touch-set: 48px;        /* steppers de la serie activa */
+  --check: 28px;            /* casilla de serie */
 
   --hairline: 1px;
   --focus-ring: 2px;
 }
 
-/* Cero box-shadow en toda la app. La separación la dan el fondo tintado y
-   los hairlines. No se añade ninguna sombra a esta hoja. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
+  /* Paleta MD3 de la maqueta, modo oscuro (DESIGN oscuro, tal cual) */
+  --md-surface: #121315;
+  --md-sc-lowest: #0d0e10;
+  --md-sc-low: #1b1c1e;
+  --md-sc: #1f2022;
+  --md-sc-high: #292a2c;
+  --md-sc-highest: #343537;
+  --md-bright: #38393b;
+  --md-on-surface: #e3e2e4;
+  --md-on-surface-variant: #c5c9ad;
+  --md-outline: #8f937a;
+  --md-outline-variant: #444934;
+  --md-primary: #ffffff;
+  --md-on-primary: #293500;
+  --md-primary-fixed: #c8f322;
+  --md-on-primary-fixed: #171e00;
+  --md-on-primary-container: #576c00;
+  --md-primary-fixed-dim: #aed500;
+  --md-secondary: #cbc6bc;
+  --md-secondary-fixed: #e7e2d7;
+  --md-secondary-fixed-dim: #cbc6bc;
+  --md-secondary-container: #49473f;
+  --md-error: #ffb4ab;
+
+  --rule: rgba(230, 225, 214, 0.08);
+  --rule-strong: rgba(230, 225, 214, 0.14);
+
+  --volt-edge: rgba(200, 243, 34, 0.35);
+  --volt-tint: rgba(200, 243, 34, 0.12);
+  --volt-ink: #c8f322;
+
+  --alert: #ff4a4a;
+
+  --halo: 0 0 24px -6px rgba(212, 255, 50, 0.18), 0 0 0 1px var(--volt-edge);
+  --card-shadow: none;
+  --chart-fill: rgba(200, 243, 34, 0.3);
+  --chart-fill-0: rgba(200, 243, 34, 0);
+  --scrim: rgba(10, 11, 12, 0.85);
+}
+
+/* Cifras tabulares en todo: los pesos se comparan en vertical. */
 * { font-variant-numeric: tabular-nums; }
 
 :focus-visible {
-  outline: var(--focus-ring) solid var(--ink);
+  outline: var(--focus-ring) solid var(--volt);
   outline-offset: 2px;
 }
 

@@ -12,7 +12,7 @@ export default defineConfig({
       filename: 'sw.ts',
       registerType: 'autoUpdate',
       injectManifest: {
-        // Precache completo: fuentes y texturas incluidas. La app arranca sin red.
+        // Precache completo: fuentes y fotos de ejercicio incluidas. La app arranca sin red.
         globPatterns: ['**/*.{js,css,html,woff2,webp,svg,png}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
@@ -23,8 +23,8 @@ export default defineConfig({
         lang: 'es',
         display: 'standalone',
         start_url: '/',
-        background_color: '#FAF8F4',
-        theme_color: '#FAF8F4',
+        background_color: '#121315',
+        theme_color: '#121315',
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },

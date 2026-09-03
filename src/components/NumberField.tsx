@@ -11,8 +11,8 @@ interface Props {
   ariaLabel: string
 }
 
-/** Cifra editable: se toca el valor y se escribe encima (fondo --panel-deep). */
-export function NumberField({ value, onCommit, suffix, placeholder = '—', className = 't-data', ariaLabel }: Props) {
+/** Cifra editable: se toca el valor y se escribe encima (lecho --well). */
+export function NumberField({ value, onCommit, suffix, placeholder = '—', className = 't-metric-sm', ariaLabel }: Props) {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,7 +42,7 @@ export function NumberField({ value, onCommit, suffix, placeholder = '—', clas
             if (e.key === 'Escape') setEditing(false)
           }}
         />
-        {suffix !== undefined && <span className="soft">{suffix}</span>}
+        {suffix !== undefined && <span className="t-label-sm soft">{suffix}</span>}
       </span>
     )
   }
@@ -56,8 +56,8 @@ export function NumberField({ value, onCommit, suffix, placeholder = '—', clas
         setEditing(true)
       }}
     >
-      {value === null ? <span className="soft">{placeholder}</span> : fmtNum(value)}
-      {suffix !== undefined && <span className="soft">&nbsp;{suffix}</span>}
+      {value === null ? <span className="mute">{placeholder}</span> : fmtNum(value)}
+      {suffix !== undefined && <span className="t-label-sm soft">&nbsp;{suffix}</span>}
     </button>
   )
 }

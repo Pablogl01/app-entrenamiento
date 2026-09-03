@@ -11,11 +11,15 @@ import { EjercicioDetalle } from './views/EjercicioDetalle'
 import { SesionPasada } from './views/SesionPasada'
 import { Resumen } from './views/Resumen'
 import { Ajustes } from './views/Ajustes'
+import { Entrenar } from './views/Entrenar'
+import { Ciclo } from './views/Ciclo'
+import { getSettings } from './db/db'
 import { cleanupStaleDrafts, syncCatalog } from './db/repo'
 import { seedDemo } from './db/demo'
 import { initOutbox } from './lib/outbox'
 import { ensureSubscription } from './lib/push'
 import { dailyBackupIfDue } from './lib/backup'
+import { applyTheme } from './lib/theme'
 
 /** La vista nueva entra: fundido entre pestañas, deslizamiento al apilar.
  *  Un cambio por gesto lateral anima en la dirección del deslizamiento. */
@@ -43,7 +47,7 @@ function RootLayout() {
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     const target = e.target as HTMLElement
     // no robar el gesto a lo que ya se desliza o se escribe
-    if (target.closest('.seltext, input, textarea, select')) {
+    if (target.closest('.hscroll, .chips, .recent-strip, input, textarea, select')) {
       start.current = null
       return
     }
@@ -91,7 +95,12 @@ function StackedLayout() {
 function App() {
   useEffect(() => {
     const boot = async () => {
-      if (new URLSearchParams(window.location.search).has('demo')) await seedDemo()
+      const params = new URLSearchParams(window.location.search)
+      if (params.has('demo')) await seedDemo()
+      const settings = await getSettings()
+      // ?theme=light|dark fuerza el modo para las capturas de verificación.
+      const forced = params.get('theme')
+      applyTheme(forced === 'light' || forced === 'dark' ? forced : settings.theme)
       await syncCatalog()
       await cleanupStaleDrafts()
       initOutbox()
@@ -118,6 +127,8 @@ function App() {
           <Route path="/sesion/:id" element={<SesionPasada />} />
           <Route path="/resumen/:id" element={<Resumen />} />
           <Route path="/ajustes" element={<Ajustes />} />
+          <Route path="/entrenar" element={<Entrenar />} />
+          <Route path="/ciclo" element={<Ciclo />} />
         </Route>
       </Routes>
     </BrowserRouter>

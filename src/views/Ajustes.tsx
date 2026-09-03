@@ -1,33 +1,111 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Link, useLocation } from 'react-router-dom'
 import { getSettings, patchSettings } from '../db/db'
+import { cycleState } from '../db/repo'
 import { downloadExport, importSnapshot, uploadBackup } from '../lib/backup'
 import { enablePush, pushStatus, sendTestNotification, syncPrefs, type PushStatus } from '../lib/push'
-import { fmtRelative } from '../lib/format'
-import { isoOf } from '../lib/dates'
+import { applyTheme } from '../lib/theme'
+import { fmtNum } from '../lib/format'
 import { TopBar } from '../components/TopBar'
-import { Toggle } from '../components/Toggle'
-import { NumberField } from '../components/NumberField'
-import type { LoadType } from '../db/types'
+import { Icon, type IconName } from '../components/Icon'
+import type { LoadType, Theme } from '../db/types'
+import { goalLabel } from './Ciclo'
 
-const LOAD_LABELS: { key: LoadType; label: string }[] = [
-  { key: 'barbell', label: 'Barra' },
-  { key: 'dumbbell', label: 'Mancuernas' },
-  { key: 'machine', label: 'Máquina' },
-  { key: 'cable', label: 'Polea' },
-  { key: 'bodyweight', label: 'Corporal (lastre)' },
+const LOAD_LABELS: { key: LoadType; label: string; hint: string; icon: IconName }[] = [
+  { key: 'barbell', label: 'Barra olímpica', hint: 'Discos estándar', icon: 'dumbbell' },
+  { key: 'dumbbell', label: 'Mancuernas', hint: 'Incremento en par', icon: 'dumbbell' },
+  { key: 'machine', label: 'Máquina', hint: 'Selector de placas', icon: 'layers' },
+  { key: 'cable', label: 'Polea', hint: 'Ladrillos guía', icon: 'grid' },
+  { key: 'bodyweight', label: 'Corporal (lastre)', hint: 'Cinturón de dominadas/fondos', icon: 'user' },
 ]
+
+const THEMES: { key: Theme; label: string }[] = [
+  { key: 'system', label: 'Sistema' },
+  { key: 'dark', label: 'Oscuro' },
+  { key: 'light', label: 'Claro' },
+]
+
+/** Cabecera de sección de la maqueta: punto volt + título en label-md + pista a la derecha. */
+function SectionHead({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className="flex items-center justify-between px-xxs">
+      <h2 className="type-label-md uppercase tracking-wider text-on-surface-variant flex items-center gap-xs">
+        <span className="w-1p5 h-1p5 rounded-full bg-volt" />
+        {title}
+      </h2>
+      <span className="type-label-sm text-on-surface-variant">{hint}</span>
+    </div>
+  )
+}
+
+/** Interruptor de la maqueta: w-12 h-7, pomo de 20 en on-primary-container. */
+function MockToggle({ checked, onChange, label, small = false }: { checked: boolean; onChange: (v: boolean) => void; label: string; small?: boolean }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      className={`${small ? 'w-10 h-6 p-0p5' : 'w-12 h-7 p-1'} rounded-full flex items-center flex-none ${checked ? 'bg-volt' : 'bg-sc-highest'}`}
+      onClick={() => onChange(!checked)}
+    >
+      <div className={`w-5 h-5 rounded-full shadow-sm ${checked ? 'ml-auto' : ''}`} style={{ background: checked ? 'var(--md-on-primary-container)' : 'var(--md-on-surface-variant)', transition: 'all 0.15s' }} />
+    </button>
+  )
+}
+
+/** Stepper de la maqueta: fondo sc-high, botones de 32 y cifra metric-md centrada. */
+function MockStepper({ value, unit, step, min, onCommit, label, integer = false }: { value: number | null; unit: string; step: number; min: number; onCommit: (n: number) => void; label: string; integer?: boolean }) {
+  return (
+    <div className="flex items-center bg-sc-high rounded-lg p-xxs flex-none">
+      <button type="button" className="w-8 h-8 flex items-center justify-center rounded text-on-surface press press-95" aria-label={`Bajar ${label}`} onClick={() => onCommit(Math.max(min, Math.round(((value ?? min) - step) * 100) / 100))}>
+        <Icon name="minus" size={16} />
+      </button>
+      <span className="type-metric-md px-sm text-center text-on-surface font-semibold nowrap" style={{ minWidth: 68 }}>
+        {value === null ? '—' : integer ? value : fmtNum(value)} {unit}
+      </span>
+      <button type="button" className="w-8 h-8 flex items-center justify-center rounded text-on-surface press press-95" aria-label={`Subir ${label}`} onClick={() => onCommit(Math.round(((value ?? min) + step) * 100) / 100)}>
+        <Icon name="plus" size={16} />
+      </button>
+    </div>
+  )
+}
+
+function Row({ icon, iconVolt = false, title, hint, hintVolt = false, children }: { icon: IconName; iconVolt?: boolean; title: string; hint: string; hintVolt?: boolean; children: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between p-md gap-sm">
+      <div className="flex items-center gap-md min-w-0">
+        <div className={`w-8 h-8 rounded bg-sc-high flex items-center justify-center flex-none ${iconVolt ? 'text-volt' : 'text-on-surface'}`}>
+          <Icon name={icon} size={18} />
+        </div>
+        <div className="flex flex-col min-w-0">
+          <span className="type-body-md font-medium text-on-surface">{title}</span>
+          <span className={`type-label-sm ${hintVolt ? 'text-primary-dim' : 'text-on-surface-variant'}`}>{hint}</span>
+        </div>
+      </div>
+      {children}
+    </div>
+  )
+}
 
 export function Ajustes() {
   const settings = useLiveQuery(getSettings)
+  const cycle = useLiveQuery(() => cycleState(), [])
+  const location = useLocation()
   const [push, setPush] = useState<PushStatus | null>(null)
   const [testResult, setTestResult] = useState<string | null>(null)
   const [importResult, setImportResult] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const avisosRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     void pushStatus().then(setPush)
   }, [])
+
+  useEffect(() => {
+    if (location.hash === '#avisos' && settings !== undefined) avisosRef.current?.scrollIntoView({ block: 'start' })
+  }, [location.hash, settings])
 
   if (settings === undefined) return null
 
@@ -52,172 +130,301 @@ export function Ajustes() {
   }
 
   const inc = settings.increments
+  const unit = settings.unit
+  const lastSync = settings.last_backup_at === null ? 'nunca' : new Date(settings.last_backup_at).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="screen screen--stacked">
-      <TopBar />
-      <div className="pad">
-        <h1 className="t-title">Ajustes</h1>
+    <div className="screen screen--stacked" style={{ paddingBottom: 0 }}>
+      <TopBar title="Ajustes" />
+      <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
+        <div className="flex flex-col w-full gap-lg pb-2xl">
+          {/* Header */}
+          <div className="flex items-center justify-between pt-xs">
+            <div className="flex flex-col">
+              <span className="type-label-sm uppercase tracking-wider text-primary-dim">Parámetros del sistema</span>
+              <h1 className="type-headline-sm uppercase tracking-tight text-on-surface">Ajustes</h1>
+            </div>
+            <span className="type-label-sm px-sm py-xxs rounded bg-sc-high text-on-surface-variant uppercase">v2.2-nordic</span>
+          </div>
 
-        <section style={{ marginTop: 'var(--sp-5)' }}>
-          <p className="t-body">Unidad de peso</p>
-          <div className="seltext" style={{ marginTop: 'var(--sp-3)' }}>
-            {(['kg', 'lb'] as const).map((u) => (
-              <button key={u} className={`t-info${settings.unit === u ? ' active' : ''}`} onClick={() => void patchSettings({ unit: u })}>
-                {u}
+          {/* Apariencia */}
+          <section className="flex flex-col gap-sm">
+            <SectionHead title="Apariencia" hint="Modo de color" />
+            <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" aria-label="Modo de color">
+              {THEMES.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="radio"
+                  aria-checked={settings.theme === t.key}
+                  className={`flex-1 h-touch rounded-lg flex items-center justify-center gap-xs type-label-md uppercase ${settings.theme === t.key ? 'bg-volt text-on-primary-container shadow-sm' : 'text-on-surface-variant'}`}
+                  onClick={() => {
+                    applyTheme(t.key)
+                    void patchSettings({ theme: t.key })
+                  }}
+                >
+                  <span className={settings.theme === t.key ? 'font-bold' : ''}>{t.label}</span>
+                  {settings.theme === t.key && <Icon name="check" size={16} />}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Unidad */}
+          <section className="flex flex-col gap-sm">
+            <SectionHead title="Unidad de peso" hint="Global" />
+            <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" aria-label="Unidad">
+              {(['kg', 'lb'] as const).map((u) => (
+                <button
+                  key={u}
+                  type="button"
+                  role="radio"
+                  aria-checked={unit === u}
+                  className={`flex-1 h-touch rounded-lg flex items-center justify-center gap-xs type-label-md uppercase ${unit === u ? 'bg-volt text-on-primary-container shadow-sm' : 'text-on-surface-variant'}`}
+                  onClick={() => void patchSettings({ unit: u })}
+                >
+                  <span className={unit === u ? 'font-bold' : ''}>{u === 'kg' ? 'Kilogramos (kg)' : 'Libras (lb)'}</span>
+                  {unit === u && <Icon name="check" size={16} />}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Ciclo */}
+          <section className="flex flex-col gap-sm">
+            <SectionHead title="Ciclo de entrenamiento" hint={cycle ? `Semana ${cycle.week}` : 'Ninguno'} />
+            <Link to="/ciclo" className="flex flex-col rounded-xl bg-sc-low overflow-hidden shadow-sm">
+              <Row icon="layers" iconVolt title={cycle ? cycle.cycle.name : 'Crear un ciclo'} hint={cycle ? `${goalLabel(cycle.cycle.goal)} · ${cycle.blocks.length} bloques · semana ${cycle.week} de ${cycle.totalWeeks}` : 'Da nombre a las semanas: bloques y microciclos'}>
+                <Icon name="chevron-right" size={20} className="text-on-surface-variant" />
+              </Row>
+            </Link>
+          </section>
+
+          {/* Incrementos */}
+          <section className="flex flex-col gap-sm">
+            <div className="flex flex-col px-xxs gap-xxs">
+              <SectionHead title="Incrementos por defecto" hint="Paso de carga" />
+              <p className="type-body-sm text-on-surface-variant">Para ejercicios nuevos. Cada ejercicio guarda el suyo propio en su ficha táctica.</p>
+            </div>
+            <div className="flex flex-col rounded-xl bg-sc-low overflow-hidden shadow-sm">
+              {LOAD_LABELS.map(({ key, label, hint, icon }, i) => (
+                <div key={key}>
+                  {i > 0 && <div className="h-1px bg-sc mx-md" />}
+                  <Row icon={icon} iconVolt title={label} hint={hint}>
+                    <MockStepper value={inc[key]} unit={unit} step={0.5} min={0.25} label={`incremento ${label}`} onCommit={(n) => void patchSettings({ increments: { ...inc, [key]: n } })} />
+                  </Row>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Meta de peso y equipo */}
+          <section className="flex flex-col gap-sm">
+            <SectionHead title="Meta de peso y equipo" hint="Sesión en vivo" />
+            <div className="flex flex-col rounded-xl bg-sc-low overflow-hidden shadow-sm">
+              <Row icon="weight" iconVolt title="Meta de peso corporal" hint={settings.body_weight_goal === null ? 'Sin meta: dibuja la línea objetivo' : 'Línea objetivo en las gráficas'}>
+                <div className="flex items-center gap-xs">
+                  <MockStepper value={settings.body_weight_goal} unit={unit} step={0.5} min={30} label="meta de peso" onCommit={(n) => void patchSettings({ body_weight_goal: n })} />
+                  {settings.body_weight_goal !== null && (
+                    <button type="button" className="w-8 h-8 rounded bg-sc-high flex items-center justify-center text-on-surface-variant" aria-label="Quitar meta" onClick={() => void patchSettings({ body_weight_goal: null })}>
+                      <Icon name="close" size={16} />
+                    </button>
+                  )}
+                </div>
+              </Row>
+              <div className="h-1px bg-sc mx-md" />
+              <Row icon="clock" title="Descanso por defecto" hint="Arranca al completar una serie">
+                <MockStepper value={settings.default_rest_seconds} unit="s" step={15} min={15} integer label="descanso por defecto" onCommit={(n) => void patchSettings({ default_rest_seconds: Math.max(15, n) })} />
+              </Row>
+              <div className="h-1px bg-sc mx-md" />
+              <Row icon="ruler" title="Peso de la barra" hint="Para la calculadora de discos">
+                <MockStepper value={settings.bar_weight} unit={unit} step={2.5} min={0} label="peso de la barra" onCommit={(n) => void patchSettings({ bar_weight: n })} />
+              </Row>
+              <div className="h-1px bg-sc mx-md" />
+              <div className="flex flex-col gap-sm p-md">
+                <div className="flex items-center gap-md">
+                  <div className="w-8 h-8 rounded bg-sc-high flex items-center justify-center text-on-surface flex-none">
+                    <Icon name="calculator" size={18} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="type-body-md font-medium text-on-surface">Discos disponibles</span>
+                    <span className="type-label-sm text-on-surface-variant">Por lado. Toca para quitar o añadir.</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-xs overflow-x-auto hscroll">
+                  {[25, 20, 15, 10, 5, 2.5, 1.25, 0.5].map((plate) => {
+                    const on = settings.plates.includes(plate)
+                    return (
+                      <button
+                        key={plate}
+                        type="button"
+                        className={`shrink-0 px-md py-xs rounded-full type-label-md ${on ? 'bg-volt text-on-volt font-semibold' : 'bg-sc-high text-secondary'}`}
+                        aria-pressed={on}
+                        onClick={() => void patchSettings({ plates: on ? settings.plates.filter((x) => x !== plate) : [...settings.plates, plate].sort((a, b) => b - a) })}
+                      >
+                        {fmtNum(plate)}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Peso corporal y recordatorios */}
+          <section ref={avisosRef} id="avisos" className="flex flex-col gap-sm" style={{ scrollMarginTop: 72 }}>
+            <SectionHead title="Peso corporal y recordatorios" hint={settings.notif_weight_enabled || settings.notif_train_enabled ? 'Alertas activas' : 'Sin alertas'} />
+            <div className="flex flex-col gap-sm">
+              <div className="p-md rounded-xl bg-sc-low flex flex-col gap-sm">
+                <div className="flex items-center justify-between gap-sm">
+                  <div className="flex items-center gap-md min-w-0">
+                    <div className="w-8 h-8 rounded bg-sc-high flex items-center justify-center text-on-surface flex-none">
+                      <Icon name="weight" size={18} />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="type-body-md font-medium text-on-surface">Pedir el peso por la mañana</span>
+                      <span className="type-label-sm text-primary-dim">Registro diario en ayunas</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-sm">
+                    <input
+                      type="time"
+                      aria-label="Hora del aviso de peso"
+                      className="type-label-md px-sm py-xxs rounded bg-sc-high text-on-surface font-semibold"
+                      style={{ border: 'none', outline: 'none', width: 78 }}
+                      value={settings.notif_weight_time}
+                      onChange={(e) => {
+                        void patchSettings({ notif_weight_time: e.target.value })
+                        void syncPrefs()
+                      }}
+                    />
+                    <MockToggle
+                      checked={settings.notif_weight_enabled}
+                      label="Aviso de peso"
+                      onChange={(v) => {
+                        void patchSettings({ notif_weight_enabled: v, weigh_prompt: v || settings.weigh_prompt })
+                        void syncPrefs()
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="p-md rounded-xl bg-sc-low flex flex-col gap-md">
+                <div className="flex items-center justify-between gap-sm">
+                  <div className="flex items-center gap-md min-w-0">
+                    <div className="w-8 h-8 rounded bg-sc-high flex items-center justify-center text-on-surface flex-none">
+                      <Icon name="bell" size={18} />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="type-body-md font-medium text-on-surface">Aviso de entreno</span>
+                      <span className="type-label-sm text-on-surface-variant">Alerta previa de sesión</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-sm">
+                    <input
+                      type="time"
+                      aria-label="Hora del aviso de entreno"
+                      className="type-label-md px-sm py-xxs rounded bg-sc-high text-on-surface font-semibold"
+                      style={{ border: 'none', outline: 'none', width: 78 }}
+                      value={settings.notif_train_time}
+                      onChange={(e) => {
+                        void patchSettings({ notif_train_time: e.target.value })
+                        void syncPrefs()
+                      }}
+                    />
+                    <MockToggle
+                      checked={settings.notif_train_enabled}
+                      label="Aviso de entreno"
+                      onChange={(v) => {
+                        void patchSettings({ notif_train_enabled: v })
+                        void syncPrefs()
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="pt-xs pl-xl flex items-center justify-between">
+                  <div className="flex items-center gap-sm">
+                    <Icon name="calendar" size={18} className="text-primary-dim" />
+                    <span className="type-body-sm text-on-surface">Solo los días con sesión programada</span>
+                  </div>
+                  <MockToggle
+                    small
+                    checked={settings.notif_only_scheduled}
+                    label="Solo días programados"
+                    onChange={(v) => {
+                      void patchSettings({ notif_only_scheduled: v })
+                      void syncPrefs()
+                    }}
+                  />
+                </div>
+              </div>
+              {push !== null && (
+                <div className="p-md rounded-xl bg-sc-low flex flex-col gap-sm">
+                  {!push.supported && <p className="type-body-sm text-on-surface-variant">Este navegador no soporta avisos push.</p>}
+                  {push.supported && !push.standalone && <p className="type-body-sm text-on-surface-variant">La app no está instalada en la pantalla de inicio. Sin eso, en iOS los avisos no llegan: Compartir → Añadir a pantalla de inicio.</p>}
+                  {push.supported && push.permission === 'denied' && <p className="type-body-sm text-on-surface-variant">El permiso está denegado a nivel de sistema. Se reactiva en los ajustes del navegador o de iOS.</p>}
+                  {push.supported && push.permission === 'granted' && push.subscribed && <p className="type-body-sm text-volt">Suscripción activa en este dispositivo.</p>}
+                  {push.supported && (push.permission === 'default' || (push.permission === 'granted' && !push.subscribed)) && (
+                    <button type="button" className="w-full h-touch rounded-lg bg-sc-high text-on-surface type-label-md uppercase tracking-wider flex items-center justify-center gap-sm press" onClick={() => void onEnablePush()}>
+                      <Icon name="bell" size={18} />
+                      <span>{push.permission === 'default' ? 'Activar avisos en este dispositivo' : 'Reactivar la suscripción'}</span>
+                    </button>
+                  )}
+                  {push.supported && push.permission === 'granted' && push.subscribed && (
+                    <button type="button" className="w-full h-touch rounded-lg bg-sc-high text-on-surface type-label-md uppercase tracking-wider flex items-center justify-center gap-sm press" onClick={() => void onTest()}>
+                      Enviar aviso de prueba
+                    </button>
+                  )}
+                  {testResult !== null && <p className="type-body-sm text-on-surface-variant">{testResult}</p>}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Datos */}
+          <section className="flex flex-col gap-sm">
+            <SectionHead title="Gestión de datos y copia" hint="Local primero" />
+            <div className="rounded-xl bg-sc-low p-md flex flex-col gap-md shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-md">
+                  <div className="w-9 h-9 rounded bg-sc-high flex items-center justify-center text-volt flex-none">
+                    <Icon name="sync" size={20} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="type-body-md font-medium text-on-surface">Copia en el servidor</span>
+                    <span className="type-label-sm text-on-surface-variant">
+                      Última sincronización: <strong className="text-on-surface font-semibold">{lastSync}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button type="button" className="w-full h-touch rounded-lg bg-sc-high text-on-surface type-label-md uppercase tracking-wider flex items-center justify-center gap-sm press" onClick={() => void uploadBackup().then((ok) => setImportResult(ok ? 'Copia subida.' : 'El servidor no respondió.'))}>
+                <Icon name="sync" size={18} />
+                <span>Sincronizar ahora</span>
               </button>
-            ))}
-          </div>
-        </section>
-
-        <section style={{ marginTop: 'var(--sp-6)' }}>
-          <p className="t-body">Incrementos por defecto</p>
-          <p className="t-info soft" style={{ marginTop: 4 }}>
-            Para ejercicios nuevos. Cada ejercicio guarda el suyo.
-          </p>
-          {LOAD_LABELS.map(({ key, label }) => (
-            <div key={key} className="row">
-              <span className="row__main t-body">{label}</span>
-              <NumberField
-                value={inc[key]}
-                suffix={settings.unit}
-                ariaLabel={`Incremento ${label}`}
-                onCommit={(n) => void patchSettings({ increments: { ...inc, [key]: n } })}
-              />
-            </div>
-          ))}
-        </section>
-
-        <section style={{ marginTop: 'var(--sp-6)' }}>
-          <p className="t-body">Peso corporal</p>
-          <div className="row">
-            <span className="row__main t-body">Hoy pide el peso por la mañana</span>
-            <Toggle checked={settings.weigh_prompt} onChange={(v) => void patchSettings({ weigh_prompt: v })} ariaLabel="Pedir peso" />
-          </div>
-        </section>
-
-        <section style={{ marginTop: 'var(--sp-6)' }}>
-          <p className="t-body">Avisos</p>
-
-          {/* Bloque de estado sincero (especificaciones §6.4). */}
-          {push !== null && (
-            <div style={{ marginTop: 'var(--sp-3)' }}>
-              {!push.supported && <p className="t-info soft">Este navegador no soporta avisos push.</p>}
-              {push.supported && !push.standalone && (
-                <p className="t-info soft">
-                  La app no está instalada en la pantalla de inicio. Sin eso, en iOS los avisos no llegan: Compartir →
-                  Añadir a pantalla de inicio.
-                </p>
-              )}
-              {push.supported && push.permission === 'denied' && (
-                <p className="t-info soft">
-                  El permiso está denegado a nivel de sistema. La app no puede volver a pedirlo: se reactiva en los
-                  ajustes del navegador o de iOS.
-                </p>
-              )}
-              {push.supported && push.permission === 'granted' && push.subscribed && (
-                <p className="t-info soft">Suscripción activa en este dispositivo.</p>
-              )}
-              {push.supported && push.permission === 'default' && (
-                <button className="btn-text" onClick={() => void onEnablePush()}>
-                  Activar avisos en este dispositivo
+              <div className="grid grid-cols-2 gap-sm pt-xs">
+                <button type="button" className="h-touch rounded-lg bg-sc-high text-on-surface p-sm flex items-center justify-center gap-xs type-label-sm uppercase tracking-wider press" onClick={() => void downloadExport()}>
+                  <Icon name="download" size={18} className="text-primary-dim" />
+                  <span>Exportar a JSON</span>
                 </button>
-              )}
-              {push.supported && push.permission === 'granted' && !push.subscribed && (
-                <button className="btn-text" onClick={() => void onEnablePush()}>
-                  Reactivar la suscripción
+                <button type="button" className="h-touch rounded-lg bg-sc-high text-on-surface p-sm flex items-center justify-center gap-xs type-label-sm uppercase tracking-wider press" onClick={() => fileRef.current?.click()}>
+                  <Icon name="upload" size={18} className="text-on-surface-variant" />
+                  <span>Importar desde JSON</span>
                 </button>
-              )}
+              </div>
+              <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={(e) => void onImport(e.target.files?.[0])} />
+              {importResult !== null && <p className="type-body-sm text-on-surface-variant">{importResult}</p>}
             </div>
-          )}
+          </section>
 
-          <div className="row" style={{ marginTop: 'var(--sp-3)' }}>
-            <span className="row__main t-body">Peso: ¿cuánto pesas hoy?</span>
-            <input
-              type="time"
-              aria-label="Hora del aviso de peso"
-              className="t-data time-input"
-              value={settings.notif_weight_time}
-              onChange={(e) => {
-                void patchSettings({ notif_weight_time: e.target.value })
-                void syncPrefs()
-              }}
-            />
-            <Toggle
-              checked={settings.notif_weight_enabled}
-              onChange={(v) => {
-                void patchSettings({ notif_weight_enabled: v })
-                void syncPrefs()
-              }}
-              ariaLabel="Aviso de peso"
-            />
-          </div>
-          <div className="row">
-            <span className="row__main t-body">Entreno: hoy toca</span>
-            <input
-              type="time"
-              aria-label="Hora del aviso de entreno"
-              className="t-data time-input"
-              value={settings.notif_train_time}
-              onChange={(e) => {
-                void patchSettings({ notif_train_time: e.target.value })
-                void syncPrefs()
-              }}
-            />
-            <Toggle
-              checked={settings.notif_train_enabled}
-              onChange={(v) => {
-                void patchSettings({ notif_train_enabled: v })
-                void syncPrefs()
-              }}
-              ariaLabel="Aviso de entreno"
-            />
-          </div>
-          <div className="row">
-            <span className="row__main t-body">Solo los días con sesión programada</span>
-            <Toggle
-              checked={settings.notif_only_scheduled}
-              onChange={(v) => {
-                void patchSettings({ notif_only_scheduled: v })
-                void syncPrefs()
-              }}
-              ariaLabel="Solo días programados"
-            />
-          </div>
-
-          <button className="btn-text" style={{ marginTop: 'var(--sp-3)' }} onClick={() => void onTest()}>
-            Enviar aviso de prueba
-          </button>
-          {testResult !== null && <p className="t-info soft">{testResult}</p>}
-        </section>
-
-        <section style={{ marginTop: 'var(--sp-6)' }}>
-          <p className="t-body">Datos</p>
-          <div className="row">
-            <span className="row__main t-body">Copia en el servidor</span>
-            <span className="t-data soft">
-              {settings.last_backup_at === null ? 'nunca' : fmtRelative(isoOf(new Date(settings.last_backup_at)))}
+          <div className="flex items-center justify-center py-xs text-center">
+            <span className="type-label-sm text-on-surface-variant uppercase tracking-widest flex items-center gap-xs">
+              <Icon name="bolt" size={14} />
+              Entrenamiento · v2.2 · local-first
             </span>
           </div>
-          <button className="btn-text" onClick={() => void uploadBackup().then((ok) => setImportResult(ok ? 'Copia subida.' : 'El servidor no respondió.'))}>
-            Subir copia ahora
-          </button>
-          <button className="btn-text" onClick={() => void downloadExport()}>
-            Exportar a JSON
-          </button>
-          <button className="btn-text" onClick={() => fileRef.current?.click()}>
-            Importar desde JSON
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json"
-            style={{ display: 'none' }}
-            onChange={(e) => void onImport(e.target.files?.[0])}
-          />
-          {importResult !== null && <p className="t-info soft">{importResult}</p>}
-        </section>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }

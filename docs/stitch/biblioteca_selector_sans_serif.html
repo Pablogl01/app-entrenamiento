@@ -1,0 +1,347 @@
+<!DOCTYPE html><html class="dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=hankenGrotesk:wght@100..900&amp;family=jetbrainsMono:wght@100..900&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-secondary": "#323029", "primary-fixed-dim": "#aed500", "secondary-fixed-dim": "#cbc6bc", "surface-container-highest": "#343537", "on-background": "#e3e2e4", "secondary-container": "#49473f", "surface-dim": "#121315", "on-primary-fixed-variant": "#3d4d00", "surface-container-low": "#1b1c1e", "secondary": "#cbc6bc", "primary-fixed": "#c8f322", "on-primary-fixed": "#171e00", "outline-variant": "#444934", "primary-container": "#c8f322", "on-error": "#690005", "on-tertiary": "#2a313b", "inverse-on-surface": "#303032", "outline": "#8f937a", "on-secondary-fixed": "#1d1c15", "tertiary": "#ffffff", "on-primary": "#293500", "tertiary-container": "#dce3f0", "on-tertiary-fixed": "#151c26", "surface-container-high": "#292a2c", "on-primary-container": "#576c00", "surface-container-lowest": "#0d0e10", "inverse-surface": "#e3e2e4", "error": "#ffb4ab", "on-tertiary-fixed-variant": "#404752", "inverse-primary": "#526600", "tertiary-fixed-dim": "#c0c7d4", "on-error-container": "#ffdad6", "on-surface-variant": "#c5c9ad", "surface-tint": "#aed500", "on-surface": "#e3e2e4", "background": "#121315", "primary": "#ffffff", "error-container": "#93000a", "surface": "#121315", "tertiary-fixed": "#dce3f0", "surface-container": "#1f2022", "on-secondary-fixed-variant": "#49473f", "secondary-fixed": "#e7e2d7", "surface-bright": "#38393b", "on-tertiary-container": "#5e6570", "on-secondary-container": "#b9b5aa", "surface-variant": "#343537" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "gutter-mobile": "1rem", "space-base": "1rem", "space-sm": "0.5rem", "space-3xl": "3rem", "space-lg": "1.25rem", "space-md": "0.75rem", "touch-target-min": "2.75rem", "space-xl": "1.5rem", "space-xxs": "0.125rem", "space-xs": "0.25rem", "space-2xl": "2rem", "margin-mobile": "1rem" }, "fontFamily": { "headline-sm": ["hankenGrotesk", "Inter", "sans-serif"], "body-md": ["hankenGrotesk", "Inter", "sans-serif"], "label-md": ["jetbrainsMono", "monospace"], "body-lg": ["hankenGrotesk", "Inter", "sans-serif"], "display-sm": ["hankenGrotesk", "Inter", "sans-serif"], "label-sm": ["jetbrainsMono", "monospace"], "headline-md": ["hankenGrotesk", "Inter", "sans-serif"], "headline-lg": ["hankenGrotesk", "Inter", "sans-serif"], "metric-xl": ["jetbrainsMono", "monospace"], "display-lg": ["hankenGrotesk", "Inter", "sans-serif"], "metric-md": ["jetbrainsMono", "monospace"], "body-sm": ["hankenGrotesk", "Inter", "sans-serif"] }, "fontSize": { "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "display-sm": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.08em", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "metric-xl": ["40px", { "lineHeight": "44px", "letterSpacing": "-0.04em", "fontWeight": "600" }], "display-lg": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "metric-md": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+      font-family: 'hankenGrotesk', 'Inter', system-ui, -apple-system, sans-serif;
+    }
+  </style>
+</head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.15)]"><div class="h-16 px-gutter-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Navigate Back" class="w-touch-target-min h-touch-target-min -ml-space-sm flex items-center justify-center text-on-surface hover:text-primary-fixed transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm uppercase tracking-tight text-on-surface font-bold">Exercise Detail</h1></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full pb-safe">
+<!-- Interactive Top Action / Quick Create Bar -->
+<div class="px-gutter-mobile pt-space-md pb-space-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Librería de Fuerza</span>
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface">Añadir Ejercicio</span>
+</div>
+<button class="h-touch-target-min px-space-md rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-primary-fixed flex items-center gap-space-xs transition-transform active:scale-95 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span class="font-label-md text-label-md uppercase tracking-wider font-semibold text-primary-fixed">Crear Propio</span>
+</button>
+</div>
+<!-- Prominent Tactile Search Engine -->
+<div class="px-gutter-mobile mb-space-md">
+<div class="relative flex items-center w-full bg-surface-container-low rounded-xl px-space-md py-space-xs shadow-sm focus-within:bg-surface-container">
+<span class="material-symbols-outlined text-secondary text-[22px] mr-space-sm select-none">search</span>
+<input aria-label="Buscar ejercicio" class="w-full bg-transparent text-on-surface placeholder:text-secondary font-body-md text-body-md outline-none py-space-sm" id="search-input" placeholder="Buscar ejercicio, músculo o equipo..." type="text">
+<button aria-label="Borrar búsqueda" class="hidden w-8 h-8 rounded-full bg-surface-container-highest text-secondary hover:text-on-surface items-center justify-center transition-all ml-space-xs" id="clear-search-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+<!-- Horizontal Filter Chips (Muscles) -->
+<div class="w-full overflow-x-auto no-scrollbar pl-gutter-mobile pr-gutter-mobile mb-space-lg flex items-center gap-space-xs">
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Todos
+    </button>
+<button class="filter-chip active shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-primary-fixed text-on-primary-fixed font-semibold transition-transform active:scale-95 flex items-center gap-space-xxs shadow-sm" type="button">
+<span class="">Pecho</span>
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary-fixed"></span>
+</button>
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Espalda
+    </button>
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Hombro
+    </button>
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Bíceps
+    </button>
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Tríceps
+    </button>
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Pierna
+    </button>
+<button class="filter-chip shrink-0 px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-high text-secondary hover:text-on-surface transition-colors" type="button">
+      Core
+    </button>
+</div>
+<!-- Frecuentes / Recientes Quick Selector -->
+<div class="px-gutter-mobile mb-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed animate-pulse"></span>
+<h2 class="font-label-sm text-label-sm text-secondary uppercase tracking-widest font-semibold">Recientes en tu ciclo</h2>
+</div>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim">Últimos 7 días</span>
+</div>
+<div class="grid grid-cols-3 gap-space-xs">
+<!-- Quick Card 1 -->
+<div class="relative bg-surface-container-low hover:bg-surface-container p-space-sm rounded-xl flex flex-col justify-between cursor-pointer transition-all active:scale-95 group">
+<div class="w-full h-16 rounded-lg overflow-hidden relative mb-space-xs">
+<img class="w-full h-full object-cover" data-alt="Athletic man performing heavy flat dumbbell bench press with black iron dumbbells on a leather bench, gym dark atmospheric interior lighting, chalk dust, cinematic contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDRUFPI_TSEgpAoM8q4DXXCVF7hakz6gM-vQOCnNlQt02Z_jxMryg8AUPGz2t3jfk0fN5GkOf0x6obaLWCWWzokhTFKenghP4ENT-HP9a_Xtnc0xRmhiBCputcuftH0SGjrJrftavRruQfQJt_XW8b7KZyA4RlJDWgH4ctrk1t1IQhPdqMtsMtd7lLHhPvdwgMj7m8UzP-t_oyNLz01FM1mj3L2NBB8bwYV_uE14eGbgTuejMsofaS">
+<span class="absolute top-1 right-1 bg-surface-container-lowest/80 text-primary-fixed p-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+</span>
+</div>
+<div>
+<span class="font-body-sm text-body-sm text-on-surface font-bold line-clamp-1">Press Plano</span>
+<span class="font-label-md text-label-sm text-secondary font-semibold tracking-tight">36 kg × 8</span>
+</div>
+</div>
+<!-- Quick Card 2 -->
+<div class="relative bg-surface-container-low hover:bg-surface-container p-space-sm rounded-xl flex flex-col justify-between cursor-pointer transition-all active:scale-95 group">
+<div class="w-full h-16 rounded-lg overflow-hidden relative mb-space-xs">
+<img class="w-full h-full object-cover" data-alt="Muscular male back doing cable lateral raises in high-end moody studio gym, moody kinetic lime glow accents, focused tension, matte textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALbj3WQak-Gm8qYOpOhHyecVOwPx3XBrV-8YWj4hQPnS0VGcfjfNZLCpV011_L4Vhb0R1kIMGDHTLHudPslaqXRv3fwBtMvyqXI4GMRnAwTI_p7C_B8GdOk9adeApaTfCHJBAwygFZcpW5XvSEUDlC0zqboprcyDkjDRrjObFNNWkYXnuwYRucLKlLhuS3uyc_3Xe4B3Izr6RdlCcj-KoIiJg5IzreKLeXwITZ4WFH6GAU8j7-FoGf">
+<span class="absolute top-1 right-1 bg-surface-container-lowest/80 text-secondary p-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">history</span>
+</span>
+</div>
+<div>
+<span class="font-body-sm text-body-sm text-on-surface font-bold line-clamp-1">Elevaciones Lat.</span>
+<span class="font-label-md text-label-sm text-secondary font-semibold tracking-tight">12.5 kg × 15</span>
+</div>
+</div>
+<!-- Quick Card 3 -->
+<div class="relative bg-surface-container-low hover:bg-surface-container p-space-sm rounded-xl flex flex-col justify-between cursor-pointer transition-all active:scale-95 group">
+<div class="w-full h-16 rounded-lg overflow-hidden relative mb-space-xs">
+<img class="w-full h-full object-cover" data-alt="Close up of weighted dip belt on athlete hanging from parallel bars, extreme arm triceps definition, moody gym slate interior, chalked metallic grip" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEhCXQqFHCEJ2JlKFYvPCMT2y2c1UudMOgF28IHwHWqKmnECZqFi75MJVf8o9pzLjOKq7_1ZQJFyTKPYHvaheZ1ZYPdrNvn4xNLZ8twIv3grRjhV1_rIsOwGfgYZ2c3sJ3kMt5eB7yDbDWXoYxqsmvh7DPwZD2_g3rwiI7gHuL9U9hnV-sZ6E3s6GYIgJP5q4xro4HcHp-30cTG6iYVaJmSZBWBaDDzyAd1I0TgoLzMnl45ZdLHucq">
+<span class="absolute top-1 right-1 bg-surface-container-lowest/80 text-primary-fixed p-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">military_tech</span>
+</span>
+</div>
+<div>
+<span class="font-body-sm text-body-sm text-on-surface font-bold line-clamp-1">Fondos Lastre</span>
+<span class="font-label-md text-label-sm text-secondary font-semibold tracking-tight">+20 kg × 6</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Exercise Telemetry List -->
+<div class="px-gutter-mobile flex flex-col gap-space-sm pb-space-2xl">
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest font-semibold">Ejercicios sugeridos</span>
+<span class="font-label-sm text-label-sm text-secondary font-label-md">5 disponibles</span>
+</div>
+<!-- Exercise Item 1 -->
+<div class="exercise-item relative bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex items-center justify-between transition-all active:scale-[0.99] group shadow-sm">
+<div class="flex items-center gap-space-md min-w-0 pr-space-xs">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Top-down detail of rubberized hexagonal dumbbells on a gym rubber mat, cold gym light, Nordic athletic minimal aesthetic, dark stones and metal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-o2RTeJLTZCfr0Y5sQPVs4j7sRagr439BHV7AOq_EEMBJkkaUV3SzQoApTHVtsBk6kZRMjhOWCadAmwMsgzLV4VIzrTA5dBAL0A2IejB_VoA4LTGjZM1LMbVGqU8E1wvASqf271xARisTjF0XCRxAw14Cw3c9v75IAGcAWG4SwBb2xG3uEHLsen4d-UGHF5lbNtsTJPXLr8pKfNcsbyHXt5V_sHhsrpo1BBPObzUOIV4s54SufOBK">
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs mb-space-xxs flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">Press de Banca c/ Mancuernas</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary truncate mb-space-xs">Pectoral mayor · Tríceps anterior</p>
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary text-label-sm font-label-sm uppercase">
+<span class="material-symbols-outlined text-[12px]">fitness_center</span>
+              Mancuernas
+            </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container text-primary-fixed text-label-sm font-label-md font-semibold tracking-tight"><span class="material-symbols-outlined text-[12px] text-primary-fixed">trophy</span>36 kg × 8 reps</span>
+</div>
+</div>
+</div>
+<button aria-label="Añadir Press de Banca con Mancuernas" class="add-exercise-btn w-touch-target-min h-touch-target-min rounded-xl bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-on-primary-fixed text-on-surface shrink-0 flex items-center justify-center transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+<!-- Exercise Item 2 -->
+<div class="exercise-item relative bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex items-center justify-between transition-all active:scale-[0.99] group shadow-sm">
+<div class="flex items-center gap-space-md min-w-0 pr-space-xs">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Close up shot of stainless steel dual pulley cable crossover machine, dark high-tech fitness studio with neon yellow telemetry indicators" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL3kEDruXFsPiWGAOwRVQgkjXds3P7YpFO4_bCySC6Rg4mAeDlnauyoYhlddfUay8OdXqq_sMEqcDhcZvbqzkd72Wgdtedj2ztG92dRho7_uuB2ElQaJXKxqUllqVIN3XwXPdtSJDMxexZsnT5RnBnHXRWRd6Cbiin2Q2akSCZ29QxPmFy2mZFfLuVCPAsA_hnRhxjvFLAVxi6LZ4JdzII_BXltyHncFbL380rt9R3wQPu1EVhhfTG">
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs mb-space-xxs flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">Aperturas en Polea Baja</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary truncate mb-space-xs">Pectoral superior clavicular</p>
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary text-label-sm font-label-sm uppercase">
+<span class="material-symbols-outlined text-[12px]">cable</span>
+              Polea / Cable
+            </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container text-secondary text-label-sm font-label-md font-semibold tracking-tight"><span class="material-symbols-outlined text-[12px]">history</span>14 kg × 12 reps</span>
+</div>
+</div>
+</div>
+<button aria-label="Añadir Aperturas en Polea Baja" class="add-exercise-btn w-touch-target-min h-touch-target-min rounded-xl bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-on-primary-fixed text-on-surface shrink-0 flex items-center justify-center transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+<!-- Exercise Item 3 -->
+<div class="exercise-item relative bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex items-center justify-between transition-all active:scale-[0.99] group shadow-sm">
+<div class="flex items-center gap-space-md min-w-0 pr-space-xs">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Heavy textured steel dip parallel bar bars in athletic cross-training facility, chalked surface, monochrome dark lighting with subtle warm tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw4MGUyzo-PtdcFRp-SoR9zDbz02D_RsqXZAHHktr-lSXpkxPRxygxREOACTKVsVuxJwmRkM-fu_be4imSXwdfqlLhKXOesQRUnt-sVxEL16rAeCq5bmNQ6nMDGLDetUpyhBaafeoa8kNdZWw06SGtKKvUgn8cqPTMoqE0tYsAl7VDX89k3-I3fszuOCRf3k2SUzyyGaQym1cCtrm2MhIMzFVmf9dpawOGECeoJZ3OzyCEpQ9jbO5R">
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs mb-space-xxs flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">Fondos en Paralelas</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-primary-fixed text-label-sm font-label-sm font-semibold">Lastre</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary truncate mb-space-xs">Pectoral inferior · Tríceps braquial</p>
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary text-label-sm font-label-sm uppercase">
+<span class="material-symbols-outlined text-[12px]">accessibility_new</span>
+              Corporal + Peso
+            </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container text-primary-fixed text-label-sm font-label-md font-semibold tracking-tight"><span class="material-symbols-outlined text-[12px] text-primary-fixed">trophy</span>+20 kg × 6 reps</span>
+</div>
+</div>
+</div>
+<button aria-label="Añadir Fondos en Paralelas" class="add-exercise-btn w-touch-target-min h-touch-target-min rounded-xl bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-on-primary-fixed text-on-surface shrink-0 flex items-center justify-center transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+<!-- Exercise Item 4 -->
+<div class="exercise-item relative bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex items-center justify-between transition-all active:scale-[0.99] group shadow-sm">
+<div class="flex items-center gap-space-md min-w-0 pr-space-xs">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Olympic steel barbell loaded with calibrated bumper plates sitting on a power rack in a dark modern strength lab, clean architectural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh-BZZ-wnn87y_dHYkqmoO2TE3thGENS8s-Wc7o79KepUYuBXuE7ksyg6rL02SZLbya6CodZHn3Wy4a0uR_bNC1RAQqOT7RFAm4DZoUfMkvqy4_XzP8VXvtwEKrNSbNzv7iUs7xtGv4fOMAZsWRRr_5j-KPOiixzLZNfyTjuvVXZg-OWSZR1zAT94IJwPYxhP21FtEMqx472zrVgw3n_y_a1431iSmXepkvzZ1qc2BLfdLRPTeFN2p">
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs mb-space-xxs flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">Press Militar con Barra</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary truncate mb-space-xs">Deltoides anterior · Core estabilizador</p>
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary text-label-sm font-label-sm uppercase">
+<span class="material-symbols-outlined text-[12px]">reorder</span>
+              Barra Olímpica
+            </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container text-secondary text-label-sm font-label-md font-semibold tracking-tight"><span class="material-symbols-outlined text-[12px]">history</span>60 kg × 8 reps</span>
+</div>
+</div>
+</div>
+<button aria-label="Añadir Press Militar con Barra" class="add-exercise-btn w-touch-target-min h-touch-target-min rounded-xl bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-on-primary-fixed text-on-surface shrink-0 flex items-center justify-center transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+<!-- Exercise Item 5 -->
+<div class="exercise-item relative bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex items-center justify-between transition-all active:scale-[0.99] group shadow-sm">
+<div class="flex items-center gap-space-md min-w-0 pr-space-xs">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Side deltoid exercise cable pulley handle metal fixture closeup with subtle kinetic yellow rim light, sleek athletic design" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABZvQW0GoHyb1uhGACRGxV1bAmGEbxtCGolzJdxt1pU4BqxreC8mjiNjtg_1QzpWCbY29_rAKPyS7ja-MBiN2tGw9qvi4_yNMpo8Sxh0XVmEyPDsmESpR7Jjg9nlCmDCAEA6UeBEYK0CCwZCtYG7yvL6NC3cq2DAi7-TITnSQVtVNXI11Khp7_qbTz3NHkYH5XeztZWDB_soKxkLiqKC5XBIOY4jzRIdvUXyuHkzyHbt4dV2R9sfYf">
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs mb-space-xxs flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">Elevaciones Laterales en Polea</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary truncate mb-space-xs">Deltoides lateral medial</p>
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary text-label-sm font-label-sm uppercase">
+<span class="material-symbols-outlined text-[12px]">cable</span>
+              Polea
+            </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded bg-surface-container text-secondary text-label-sm font-label-md font-semibold tracking-tight"><span class="material-symbols-outlined text-[12px]">history</span>12.5 kg × 15 reps</span>
+</div>
+</div>
+</div>
+<button aria-label="Añadir Elevaciones Laterales en Polea" class="add-exercise-btn w-touch-target-min h-touch-target-min rounded-xl bg-surface-container-high group-hover:bg-primary-fixed group-hover:text-on-primary-fixed text-on-surface shrink-0 flex items-center justify-center transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+</div>
+<!-- Bottom Floating Notification SnackBar (Hidden by default, triggered on add) -->
+<div class="fixed bottom-6 left-gutter-mobile right-gutter-mobile z-40 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none" id="toast-notification">
+<div class="bg-primary-fixed text-on-primary-fixed py-space-sm px-space-md rounded-xl flex items-center justify-between shadow-xl">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[22px]">check_circle</span>
+<span class="font-label-md text-label-md font-bold uppercase tracking-wide" id="toast-text">Ejercicio añadido a la rutina</span>
+</div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-fixed-variant">Listo</span>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const searchInput = document.getElementById('search-input');
+    const clearBtn = document.getElementById('clear-search-btn');
+    const exerciseItems = document.querySelectorAll('.exercise-item');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const toast = document.getElementById('toast-notification');
+    const toastText = document.getElementById('toast-text');
+    let toastTimeout = null;
+
+    // Search filter micro-interaction
+    if (searchInput && clearBtn) {
+      searchInput.addEventListener('input', function(e) {
+        const val = e.target.value.toLowerCase().trim();
+        if (val.length > 0) {
+          clearBtn.classList.remove('hidden');
+          clearBtn.classList.add('flex');
+        } else {
+          clearBtn.classList.add('hidden');
+          clearBtn.classList.remove('flex');
+        }
+
+        exerciseItems.forEach(item => {
+          const text = item.textContent.toLowerCase();
+          if (text.includes(val)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        clearBtn.classList.remove('flex');
+        exerciseItems.forEach(item => item.style.display = 'flex');
+        searchInput.focus();
+      });
+    }
+
+    // Interactive Muscle Filters
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', function() {
+        filterChips.forEach(c => {
+          c.classList.remove('bg-primary-fixed', 'text-on-primary-fixed', 'font-semibold');
+          c.classList.add('bg-surface-container-high', 'text-secondary');
+          const indicator = c.querySelector('span:last-child');
+          if (indicator && indicator.classList.contains('w-1.5')) {
+            indicator.remove();
+          }
+        });
+
+        this.classList.remove('bg-surface-container-high', 'text-secondary');
+        this.classList.add('bg-primary-fixed', 'text-on-primary-fixed', 'font-semibold');
+        
+        if (!this.querySelector('.w-1\\.5')) {
+          const dot = document.createElement('span');
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-on-primary-fixed ml-1';
+          this.appendChild(dot);
+        }
+      });
+    });
+
+    // Tactile Add to Workout Interaction
+    const addButtons = document.querySelectorAll('.add-exercise-btn');
+    addButtons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const parentCard = this.closest('.exercise-item');
+        const exerciseName = parentCard.querySelector('.font-headline-sm').innerText;
+        
+        // Button visual snap feedback
+        this.innerHTML = '<span class="material-symbols-outlined text-[24px] text-primary-fixed">done</span>';
+        this.classList.add('bg-surface-container-highest');
+        
+        setTimeout(() => {
+          this.innerHTML = '<span class="material-symbols-outlined text-[24px]">add</span>';
+          this.classList.remove('bg-surface-container-highest');
+        }, 1500);
+
+        // Kinetic Toast notification
+        if (toast) {
+          if (toastTimeout) clearTimeout(toastTimeout);
+          toastText.textContent = `Añadido: ${exerciseName}`;
+          toast.classList.remove('translate-y-24', 'opacity-0');
+          toast.classList.add('translate-y-0', 'opacity-100');
+
+          toastTimeout = setTimeout(() => {
+            toast.classList.add('translate-y-24', 'opacity-0');
+            toast.classList.remove('translate-y-0', 'opacity-100');
+          }, 2200);
+        }
+      });
+    });
+  })();
+</script></main>
+
+</body></html>

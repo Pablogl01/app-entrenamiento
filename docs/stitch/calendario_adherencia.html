@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=hankenGrotesk:wght@100..900&family=jetbrainsMono:wght@100..900&family=syne:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "background": "#121315", "surface": "#121315", "on-background": "#e3e2e4", "on-primary-fixed-variant": "#3d4d00", "on-secondary-fixed-variant": "#49473f", "surface-tint": "#aed500", "error-container": "#93000a", "surface-container": "#1f2022", "on-tertiary": "#2a313b", "surface-container-lowest": "#0d0e10", "on-secondary": "#323029", "primary": "#ffffff", "primary-container": "#c8f322", "surface-container-highest": "#343537", "on-primary-fixed": "#171e00", "on-error": "#690005", "on-tertiary-fixed-variant": "#404752", "on-tertiary-fixed": "#151c26", "surface-dim": "#121315", "on-secondary-fixed": "#1d1c15", "on-surface-variant": "#c5c9ad", "surface-container-high": "#292a2c", "tertiary": "#ffffff", "on-secondary-container": "#b9b5aa", "surface-variant": "#343537", "secondary-fixed": "#e7e2d7", "inverse-surface": "#e3e2e4", "outline": "#8f937a", "primary-fixed": "#c8f322", "on-primary-container": "#576c00", "tertiary-fixed-dim": "#c0c7d4", "surface-bright": "#38393b", "tertiary-container": "#dce3f0", "error": "#ffb4ab", "on-primary": "#293500", "on-error-container": "#ffdad6", "tertiary-fixed": "#dce3f0", "primary-fixed-dim": "#aed500", "inverse-primary": "#526600", "secondary-container": "#49473f", "surface-container-low": "#1b1c1e", "secondary": "#cbc6bc", "on-surface": "#e3e2e4", "outline-variant": "#444934", "on-tertiary-container": "#5e6570", "inverse-on-surface": "#303032", "secondary-fixed-dim": "#cbc6bc" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "gutter-mobile": "1rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "touch-target-min": "2.75rem", "space-2xl": "2rem", "space-base": "1rem", "margin-mobile": "1rem", "space-lg": "1.25rem", "space-xxs": "0.125rem", "space-md": "0.75rem", "space-xl": "1.5rem", "space-3xl": "3rem" }, fontFamily: { "body-md": ["hankenGrotesk"], "body-sm": ["hankenGrotesk"], "headline-lg": ["syne"], "display-sm": ["syne"], "metric-xl": ["jetbrainsMono"], "display-lg": ["syne"], "label-md": ["jetbrainsMono"], "headline-md": ["syne"], "metric-md": ["jetbrainsMono"], "body-lg": ["hankenGrotesk"], "headline-sm": ["hankenGrotesk"], "label-sm": ["jetbrainsMono"] }, fontSize: { "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "display-sm": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "metric-xl": ["40px", { "lineHeight": "44px", "letterSpacing": "-0.04em", "fontWeight": "600" }], "display-lg": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "metric-md": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.08em", "fontWeight": "500" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></div><span class="font-headline-md text-headline-md tracking-tight text-on-surface">Hoy</span></div><div class="flex items-center gap-space-sm"><button aria-label="Telemetry Alerts" class="w-touch-target-min h-touch-target-min flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-surface pt-16 pb-24 px-gutter-mobile flex flex-col relative"><div class="flex flex-col w-full gap-space-lg select-none">
+<!-- Dynamic Month Switcher Bar -->
+<div class="flex items-center justify-between bg-surface-container-low px-space-base py-space-md rounded-xl">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase">Septiembre</span>
+<span class="font-label-md text-label-md text-primary-container px-space-xs py-0.5 rounded bg-surface-container-highest">2026</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button aria-label="Mes anterior" class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-lg bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface-variant transition-transform" id="prev-month-btn">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button aria-label="Mes siguiente" class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-lg bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface-variant transition-transform" id="next-month-btn">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Telemetry Subheader: Adherence Metrics -->
+<div class="grid grid-cols-3 gap-space-xs">
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between">
+<div class="flex items-center gap-space-xxs">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Adherencia</span>
+</div>
+<div class="mt-space-xs flex items-baseline gap-space-xxs">
+<span class="font-metric-xl text-metric-xl text-on-surface font-semibold">92</span>
+<span class="font-label-md text-label-md text-primary-container">%</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant/80 mt-space-xxs">Objetivo: 85%</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between">
+<div class="flex items-center gap-space-xxs">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Hechas</span>
+</div>
+<div class="mt-space-xs flex items-baseline gap-space-xxs">
+<span class="font-metric-xl text-metric-xl text-on-surface font-semibold">14</span>
+<span class="font-label-md text-label-md text-on-surface-variant">ses</span>
+</div>
+<span class="font-body-sm text-body-sm text-primary-container mt-space-xxs">+2 vs ago</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between">
+<div class="flex items-center gap-space-xxs">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Pendientes</span>
+</div>
+<div class="mt-space-xs flex items-baseline gap-space-xxs">
+<span class="font-metric-xl text-metric-xl text-on-surface font-semibold">3</span>
+<span class="font-label-md text-label-md text-on-surface-variant">fase 2</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant/80 mt-space-xxs">Cierre 30 sep</span>
+</div>
+</div>
+<!-- Interactive Monthly Calendar Matrix -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm">
+<!-- Day Header -->
+<div class="grid grid-cols-7 text-center">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">L</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">M</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">X</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">J</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">V</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">S</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant font-medium">D</span>
+</div>
+<!-- Calendar Grid (Focusing on 2 Sep selected) -->
+<div class="grid grid-cols-7 gap-y-space-xs text-center" id="calendar-grid">
+<!-- Aug tail -->
+<button class="h-10 flex flex-col items-center justify-center rounded text-on-surface-variant/30 font-label-md text-label-md">31</button>
+<!-- Sep 1: Rescheduled/Rest -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md gap-0.5 relative group" data-day="1">
+<span>01</span>
+<span class="w-1 h-1 rounded-full bg-secondary-container"></span>
+</button>
+<!-- Sep 2: COMPLETED & CURRENT ACTIVE SELECTED -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded bg-surface-container-highest text-primary font-label-md text-label-md gap-0.5 relative" data-day="2" id="day-2-active">
+<span class="text-on-surface font-bold">02</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_8px_#c8f322]"></span>
+</button>
+<!-- Sep 3: Scheduled Tomorrow -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5 relative" data-day="3">
+<span>03</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<!-- Sep 4: Scheduled -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5 relative" data-day="4">
+<span>04</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<!-- Sep 5: Rest -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md" data-day="5">
+<span>05</span>
+</button>
+<!-- Sep 6: Rest -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md" data-day="6">
+<span>06</span>
+</button>
+<!-- Week 2 -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="7">
+<span>07</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="8">
+<span>08</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md" data-day="9">
+<span>09</span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="10">
+<span>10</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="11">
+<span>11</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md" data-day="12">
+<span>12</span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md" data-day="13">
+<span>13</span>
+</button>
+<!-- Week 3 -->
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="14">
+<span>14</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="15">
+<span>15</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="16">
+<span>16</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md" data-day="17">
+<span>17</span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface font-label-md text-label-md gap-0.5" data-day="18">
+<span>18</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md" data-day="19">
+<span>19</span>
+</button>
+<button class="calendar-day h-10 flex flex-col items-center justify-center rounded hover:bg-surface-container text-on-surface-variant font-label-md text-label-md" data-day="20">
+<span>20</span>
+</button>
+</div>
+<!-- Micro Legend Bar -->
+<div class="flex items-center justify-between pt-space-xs mt-space-xxs text-on-surface-variant">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm">Completada</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-label-sm text-label-sm">Programada</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm">Pospuesta</span>
+</div>
+</div>
+</div>
+<!-- Detail of the Selected Day -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary-container font-semibold">DETALLE DE SESIÓN</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Mié 2 de Septiembre</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">ID: SES-892</span>
+</div>
+<!-- Completed Session Card (Primary Delight Item) -->
+<div class="bg-surface-container-low p-space-base rounded-xl flex flex-col gap-space-md shadow-md">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-space-xxs">
+<span class="material-symbols-outlined text-[18px] text-primary-container">task_alt</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Pierna: Fuerza & Potencia</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sentadilla Trasera · Peso Muerto Rumano · Prensa 45°</span>
+</div>
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-space-xs py-1 rounded font-bold uppercase tracking-wider">
+          100% Hecho
+        </span>
+</div>
+<!-- Telemetry Strip -->
+<div class="grid grid-cols-3 gap-space-xs bg-surface-container p-space-sm rounded-lg">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Duración</span>
+<span class="font-metric-md text-metric-md text-on-surface font-semibold mt-0.5">58 <span class="text-label-sm text-on-surface-variant font-normal">min</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Ejercicios</span>
+<span class="font-metric-md text-metric-md text-on-surface font-semibold mt-0.5">6 <span class="text-label-sm text-on-surface-variant font-normal">bloques</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Volumen</span>
+<span class="font-metric-md text-metric-md text-primary-container font-semibold mt-0.5">9.400 <span class="text-label-sm text-on-surface-variant font-normal">kg</span></span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full h-touch-target-min bg-surface-container-high hover:bg-surface-variant active:scale-[0.99] transition-all rounded-lg flex items-center justify-between px-space-base text-on-surface">
+<span class="font-label-md text-label-md uppercase tracking-wider font-semibold">Ver resumen de cargas y RPE</span>
+<span class="material-symbols-outlined text-[20px] text-primary-container">arrow_forward</span>
+</button>
+</div>
+<!-- Next Scheduled Session Notification Card -->
+<div class="bg-surface-container-low p-space-base rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-space-base">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[22px]">schedule</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Próxima sesión · Mañana 18:30</span>
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Jue 3 sep · Pecho & Hombro</span>
+</div>
+</div>
+<button aria-label="Ajustar recordatorio" class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+</button>
+</div>
+<!-- Rescheduled Day Card (Historical Context) -->
+<div class="bg-surface-container-low p-space-base rounded-xl flex flex-col gap-space-sm opacity-85">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-secondary">update</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Mar 1 sep · Sesión Pospuesta</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase px-2 py-0.5 rounded bg-surface-container">Descanso Activo</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Movilidad articular y 8.200 pasos completados. El volumen de tracción se transfirió al sábado 5 de sep.
+      </p>
+<div class="flex gap-space-sm pt-space-xxs">
+<button class="h-8 px-space-base rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm uppercase tracking-wider flex items-center gap-1 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+          Reasignar día
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Dynamic bottom nav highlight sync for 'Calendario'
+  (function() {
+    const calendarNavBtn = document.querySelector('nav a[data-path="calendario"]');
+    if (calendarNavBtn) {
+      calendarNavBtn.classList.remove('text-on-surface-variant');
+      calendarNavBtn.classList.add('text-primary-container', 'font-medium');
+      const icon = calendarNavBtn.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.style.fontVariationSettings = "'FILL' 1";
+      }
+    }
+
+    // Calendar day touch feedback
+    const dayButtons = document.querySelectorAll('.calendar-day');
+    dayButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dayButtons.forEach(b => b.classList.remove('bg-surface-container-highest', 'shadow-[0_0_8px_#c8f322]'));
+        btn.classList.add('bg-surface-container-highest');
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-1px_12px_rgba(0,0,0,0.06)]" data-active-classes="text-primary-container font-medium"><div class="flex items-center justify-around h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[4.25rem] h-touch-target-min gap-space-xxs transition-all text-primary-container font-medium" data-path="hoy" href="#"><span class="material-symbols-outlined text-[22px]">target</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Hoy</span></a><a class="flex flex-col items-center justify-center min-w-[4.25rem] h-touch-target-min gap-space-xxs text-on-surface-variant transition-all" data-path="calendario" href="#"><span class="material-symbols-outlined text-[22px]">calendar_today</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Calendario</span></a><a class="flex flex-col items-center justify-center min-w-[4.25rem] h-touch-target-min gap-space-xxs text-on-surface-variant transition-all" data-path="progreso" href="#"><span class="material-symbols-outlined text-[22px]">query_stats</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Progreso</span></a><a class="flex flex-col items-center justify-center min-w-[4.25rem] h-touch-target-min gap-space-xxs text-on-surface-variant transition-all" data-path="rutinas" href="#"><span class="material-symbols-outlined text-[22px]">fitness_center</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Rutinas</span></a></div></nav></body></html>

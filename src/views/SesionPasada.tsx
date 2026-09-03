@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate, useParams } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
-import { deleteSession, reopenSession, repeatSession } from '../db/repo'
-import { fmtDateLong } from '../lib/format'
+import { deleteSession, reopenSession, repeatSession, sessionStats } from '../db/repo'
+import { fmtDateLong, fmtDateShort, fmtDuration, fmtNum } from '../lib/format'
 import { todayISO } from '../lib/dates'
-import { MaterialHeader, materialFor } from '../components/MaterialHeader'
 import { TopBar } from '../components/TopBar'
 import { ExerciseCard } from '../components/ExerciseCard'
+import { Icon } from '../components/Icon'
 import { useSessionCards } from '../components/useSessionCards'
 
 export function SesionPasada() {
@@ -18,18 +18,15 @@ export function SesionPasada() {
 
   const settings = useLiveQuery(getSettings)
   const session = useLiveQuery(async () => (id !== undefined ? ((await db.sessions.get(id)) ?? null) : null), [id])
-  const routine = useLiveQuery(
-    async () => (session?.routine_id != null ? ((await db.routines.get(session.routine_id)) ?? null) : null),
-    [session?.routine_id],
-  )
+  const stats = useLiveQuery(async () => (id !== undefined ? sessionStats(id) : null), [id])
   const cards = useSessionCards(session?.id)
 
   if (settings === undefined || session === undefined) return null
   if (session === null) {
     return (
-      <div className="screen screen--stacked">
-        <TopBar />
-        <p className="t-body pad">Esta sesión ya no existe.</p>
+      <div className="screen screen--stacked pad">
+        <TopBar title="Sesión" />
+        <p className="t-body">Esta sesión ya no existe.</p>
       </div>
     )
   }
@@ -48,78 +45,103 @@ export function SesionPasada() {
     }
   }
 
-  return (
-    <div className="screen screen--stacked">
-      <MaterialHeader
-        material={materialFor(routine?.routine_type ?? null, session.routine_id ?? '')}
-        eyebrow={fmtDateLong(session.date)}
-        title={session.routine_name_snapshot}
-        minHeight={200}
-      >
-        <TopBar
-          onMaterial
-          right={
-            <button style={{ color: 'var(--on-material)' }} onClick={() => setEditing((v) => !v)}>
-              {editing ? 'Hecho' : 'Editar'}
-            </button>
-          }
-        />
-      </MaterialHeader>
+  const list = cards ?? []
+  const totalWork = list.flatMap((c) => c.sets.filter((s) => s.kind !== 'warmup')).length
+  const doneWork = list.flatMap((c) => c.sets.filter((s) => s.kind !== 'warmup' && s.completed)).length
 
-      <div className="sheet">
-        {(cards ?? []).map((c) => (
-          <ExerciseCard
-            key={c.se.id}
-            data={c}
-            open={openCard === c.se.id}
-            onToggle={() => setOpenCard(openCard === c.se.id ? null : c.se.id)}
-            active={editing}
-            removable={editing}
-            unit={settings.unit}
-          />
-        ))}
+  return (
+    <div className="screen screen--stacked pad">
+      <TopBar
+        title={fmtDateShort(session.date)}
+        right={
+          <button className="t-label" onClick={() => setEditing((v) => !v)}>
+            {editing ? 'Hecho' : 'Editar'}
+          </button>
+        }
+      />
+      <div className="stack">
+        <section className="card" aria-label="Sesión">
+          <div className="between">
+            <span className={`chip t-label-sm${session.finished_at !== null ? ' chip--volt' : ''}`}>
+              <span className="chip__dot" />
+              {session.finished_at === null ? 'En curso' : 'Hecha'} · {doneWork}/{totalWork} series
+            </span>
+            <span className="t-label-sm mute">{fmtDateLong(session.date)}</span>
+          </div>
+          <h1 className="t-display hero__title">{session.routine_name_snapshot}</h1>
+          {stats != null && (
+            <div className="tiles" style={{ marginTop: 'var(--sp-4)' }}>
+              <div className="tile">
+                <span className="tile__label t-label-sm">Duración</span>
+                <span className="t-metric">{stats.duration_ms === null ? '—' : fmtDuration(stats.duration_ms)}</span>
+              </div>
+              <div className="tile">
+                <span className="tile__label t-label-sm">Ejercicios</span>
+                <span className="t-metric">{list.length}</span>
+              </div>
+              <div className="tile">
+                <span className="tile__label t-label-sm">Volumen</span>
+                <span className="t-metric" style={{ color: 'var(--volt-ink)' }}>
+                  {fmtNum(Math.round(stats.volume))} <span className="t-label-sm soft">{settings.unit}</span>
+                </span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <section className="stack stack--tight" aria-label="Ejercicios">
+          {list.map((c) => (
+            <ExerciseCard
+              key={c.se.id}
+              data={c}
+              open={openCard === c.se.id}
+              onToggle={() => setOpenCard(openCard === c.se.id ? null : c.se.id)}
+              active={editing}
+              removable={editing}
+              unit={settings.unit}
+            />
+          ))}
+        </section>
 
         {session.notes !== '' && (
-          <p className="t-body" style={{ marginTop: 'var(--sp-5)' }}>
-            {session.notes}
-          </p>
+          <section className="card">
+            <span className="t-label-sm mute">Notas</span>
+            <p className="t-body" style={{ marginTop: 'var(--sp-1)' }}>
+              {session.notes}
+            </p>
+          </section>
         )}
 
-        <div style={{ marginTop: 'var(--sp-6)' }}>
-          <button className="btn-text" onClick={() => void onRepeat()}>
-            Repetir esta sesión
+        <button className="btn btn--secondary" onClick={() => void onRepeat()}>
+          <Icon name="history" size={18} />
+          Repetir esta sesión
+        </button>
+        {session.date === todayISO() && session.finished_at !== null && (
+          <button className="btn btn--ghost t-label" onClick={() => void reopenSession(session.id).then(() => navigate('/'))}>
+            Reabrir sesión (vuelve a Hoy en curso)
           </button>
-          {session.date === todayISO() && session.finished_at !== null && (
-            <button
-              className="btn-text soft"
-              onClick={() => {
-                void reopenSession(session.id).then(() => navigate('/'))
-              }}
-            >
-              Reabrir sesión (vuelve a Hoy en curso)
+        )}
+
+        {editing && (
+          <section className="card stack stack--tight" aria-label="Edición">
+            <div className="between">
+              <span className="t-body">Fecha</span>
+              <input
+                type="date"
+                aria-label="Fecha de la sesión"
+                className="t-metric-sm time-input"
+                value={session.date}
+                onChange={(e) => {
+                  if (e.target.value !== '') void db.sessions.update(session.id, { date: e.target.value })
+                }}
+              />
+            </div>
+            <button className="btn btn--ghost t-label" onClick={() => void onDelete()}>
+              <Icon name="close" size={16} />
+              Borrar sesión
             </button>
-          )}
-          {editing && (
-            <>
-              <div className="row" style={{ marginTop: 'var(--sp-4)' }}>
-                <span className="row__main t-body">Fecha</span>
-                <input
-                  type="date"
-                  aria-label="Fecha de la sesión"
-                  className="t-data"
-                  value={session.date}
-                  onChange={(e) => {
-                    if (e.target.value !== '') void db.sessions.update(session.id, { date: e.target.value })
-                  }}
-                  style={{ background: 'var(--panel-deep)', borderRadius: 10, padding: '10px 12px' }}
-                />
-              </div>
-              <button className="btn-text soft" onClick={() => void onDelete()}>
-                Borrar sesión
-              </button>
-            </>
-          )}
-        </div>
+          </section>
+        )}
       </div>
     </div>
   )

@@ -1,39 +1,14 @@
-/* fonts.css — fuentes auto-alojadas (DESIGN.md §3).
-   WOFF2 con subset latino (cubre el español: U+0000-00FF).
-   Cero CDN: la app arranca y funciona sin red. */
+/* fonts.css — fuentes auto-alojadas (DESIGN.md v2.2 §3).
+   WOFF2 con subset latino (cubre el español). Cero CDN: la app arranca y
+   funciona sin red. Una sola familia, Inter variable, para todo (v2.4). */
 
-/* Archivo variable: wght 100-900, wdth 62-125. Display. */
+/* Inter variable: wght 100-900. Display, títulos y nombres. */
 @font-face {
-  font-family: "Archivo";
+  font-family: "Inter";
   font-style: normal;
   font-weight: 100 900;
-  font-stretch: 62% 125%;
   font-display: swap;
-  src: url("../assets/fonts/archivo-var-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
-    U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* IBM Plex Sans variable: wght 100-700. Texto y UI (400/500/600). */
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 100 700;
-  font-display: swap;
-  src: url("../assets/fonts/ibm-plex-sans-var-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
-    U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* IBM Plex Mono 500, el único peso que usa el sistema (data y data-lg). */
-@font-face {
-  font-family: "IBM Plex Mono";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("../assets/fonts/ibm-plex-mono-500-latin.woff2") format("woff2");
+  src: url("../assets/fonts/inter-var-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
     U+2212, U+2215, U+FEFF, U+FFFD;

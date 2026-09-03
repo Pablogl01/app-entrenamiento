@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useLiveQuery } from 'dexie-react-hooks'
 import type { Exercise, SessionExercise, SetEntry, WeightUnit } from '../db/types'
-import { addSet, removeSessionExercise } from '../db/repo'
+import { lastPerformance } from '../db/repo'
+import { fmtNum } from '../lib/format'
 import { ExerciseMark } from './ExerciseMark'
-import { SetRow } from './SetRow'
+import { Icon } from './Icon'
+import { SetTable } from './SetTable'
 
 export interface CardData {
   se: SessionExercise
@@ -21,64 +24,53 @@ interface Props {
   unit: WeightUnit
   dragging?: boolean
   dragHandlers?: React.HTMLAttributes<HTMLDivElement>
+  onSetConfirmed?: () => void
 }
 
-export function ExerciseCard({ data, open, onToggle, active, removable = false, unit, dragging = false, dragHandlers }: Props) {
+export function ExerciseCard({ data, open, onToggle, active, removable = false, unit, dragging = false, dragHandlers, onSetConfirmed }: Props) {
   const { se, exercise, sets } = data
-  const ordered = [...sets].sort((a, b) => a.set_index - b.set_index)
-  const warmups = ordered.filter((s) => s.kind === 'warmup')
-  const work = ordered.filter((s) => s.kind !== 'warmup')
+  const past = useLiveQuery(() => lastPerformance(exercise.id), [exercise.id]) ?? []
+
+  const work = sets.filter((s) => s.kind !== 'warmup')
   const done = work.filter((s) => s.completed).length
   const sub = `${se.target_sets}×${se.target_reps_min}-${se.target_reps_max} · ${done}/${work.length}`
+  const isCurrent = active && sets.some((s) => !s.completed)
+  const lastWeight = past.find((p) => p.weight !== null)?.weight ?? null
 
   return (
-    <section className={`xcard${open ? ' open' : ''}${dragging ? ' dragging' : ''}`} {...dragHandlers}>
+    <section className={`xcard${open ? ' open' : ''}${dragging ? ' dragging' : ''}${isCurrent && open ? ' is-current' : ''}`} {...dragHandlers}>
       <button className="xcard__head" onClick={onToggle} aria-expanded={open}>
-        <span className="xcard__panel">
+        <span className="mark">
           <ExerciseMark group={exercise.muscle_group} />
         </span>
-        <span className="xcard__meta">
-          <span className="xcard__names">
-            <span className="t-item">
-              {active ? (
-                <Link to={`/ejercicio/${exercise.id}`} onClick={(e) => e.stopPropagation()} style={{ color: 'inherit', textDecoration: 'none' }}>
-                  {exercise.name}
-                </Link>
-              ) : (
-                exercise.name
-              )}
+        <span className="xcard__names">
+          <span className="t-h3">
+            {active ? (
+              <Link to={`/ejercicio/${exercise.id}`} onClick={(e) => e.stopPropagation()}>
+                {exercise.name}
+              </Link>
+            ) : (
+              exercise.name
+            )}
+          </span>
+          <span className="xcard__sub t-metric-sm">{sub}</span>
+        </span>
+        {lastWeight !== null && exercise.unit_mode === 'weight_reps' && (
+          <span className="xcard__last">
+            <span className="t-metric-sm">
+              {fmtNum(lastWeight)} <span className="t-label-sm soft">{unit}</span>
             </span>
-            <span className="xcard__sub t-data">{sub}</span>
+            <span className="t-label-sm">último</span>
           </span>
-          <span className="xcard__chev" aria-hidden="true">
-            ⌄
-          </span>
+        )}
+        <span className="xcard__chev">
+          <Icon name="chevron-down" />
         </span>
       </button>
 
       <div className={`fold${open ? ' open' : ''}`} inert={!open || undefined}>
         <div>
-          {warmups.map((s) => (
-            <SetRow key={s.id} set={s} exercise={exercise} workNumber={0} active={active} unit={unit} />
-          ))}
-          {work.map((s, i) => (
-            <SetRow key={s.id} set={s} exercise={exercise} workNumber={i + 1} active={active} unit={unit} />
-          ))}
-          {active && (
-            <div className="xcard__foot">
-              <button className="t-info" onClick={() => void addSet(se.id, 'work')}>
-                Añadir serie
-              </button>
-              <button className="t-info" onClick={() => void addSet(se.id, 'warmup')}>
-                Calentamiento
-              </button>
-              {removable && (
-                <button className="t-info" onClick={() => void removeSessionExercise(se.id)}>
-                  Quitar
-                </button>
-              )}
-            </div>
-          )}
+          <SetTable se={se} exercise={exercise} sets={sets} past={past} active={active} removable={removable} unit={unit} onSetConfirmed={onSetConfirmed} />
         </div>
       </div>
     </section>

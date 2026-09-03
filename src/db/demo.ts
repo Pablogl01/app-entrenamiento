@@ -2,7 +2,7 @@
 // cinco semanas de sesiones con progresión (y un ejercicio estancado a
 // propósito) y pesajes diarios con tendencia. Determinista, sin azar.
 import { db, USER_ID } from './db'
-import type { Routine, Session, SessionExercise, SetEntry } from './types'
+import type { Cycle, Routine, Session, SessionExercise, SetEntry } from './types'
 import { addDays, todayISO, weekdayMon0 } from '../lib/dates'
 
 function uuid(): string {
@@ -45,6 +45,8 @@ export async function seedDemo(): Promise<void> {
       target_sets: 3,
       target_reps_min: 8,
       target_reps_max: 10,
+      target_rpe: 8,
+      rest_seconds: 90,
     })),
   )
   // programada hoy y hace 3 días de la semana
@@ -53,11 +55,46 @@ export async function seedDemo(): Promise<void> {
     [wdToday, (wdToday + 3) % 7].map((weekday) => ({ id: uuid(), user_id: USER_ID, routine_id: routine.id, weekday })),
   )
 
+  // ciclo activo de 6 semanas, empezado hace 3 semanas y media (semana 4)
+  const cycle: Cycle = {
+    id: uuid(),
+    user_id: USER_ID,
+    name: 'Fuerza-Volumen',
+    goal: 'hipertrofia',
+    start_date: addDays(today, -24),
+    archived: false,
+  }
+  await db.cycles.add(cycle)
+  await db.cycle_blocks.bulkAdd(
+    [
+      ['Acumulación', 3, 'volumen'],
+      ['Intensificación', 2, 'fuerza'],
+      ['Descarga', 1, 'descarga'],
+    ].map(([name, weeks, goal], position) => ({
+      id: uuid(),
+      user_id: USER_ID,
+      cycle_id: cycle.id,
+      position,
+      name: String(name),
+      weeks: Number(weeks),
+      goal: goal as 'volumen' | 'fuerza' | 'descarga',
+    })),
+  )
+  // un día programado de la semana pasada, reasignado al día siguiente
+  const lastWeekSlot = addDays(today, -7)
+  await db.schedule_overrides.add({
+    id: uuid(),
+    user_id: USER_ID,
+    routine_id: routine.id,
+    from_date: lastWeekSlot,
+    to_date: addDays(lastWeekSlot, 1),
+  })
+
   // pesajes: 38 días bajando ~0,3 kg/semana con ruido determinista
   for (let i = 38; i >= 1; i--) {
     const date = addDays(today, -i)
     const weight = 80.5 - ((38 - i) * 0.3) / 7 + Math.sin(i * 1.7) * 0.5
-    await db.body_metrics.add({ id: uuid(), user_id: USER_ID, date, weight: Math.round(weight * 10) / 10, notes: '' })
+    await db.body_metrics.add({ id: uuid(), user_id: USER_ID, date, weight: Math.round(weight * 10) / 10, notes: '', sleep_hours: null, recovery: null })
   }
 
   // 10 sesiones terminadas: dos por semana, las últimas 5 semanas
@@ -73,7 +110,10 @@ export async function seedDemo(): Promise<void> {
       routine_id: routine.id,
       routine_name_snapshot: routine.name,
       notes: '',
-      rating: 3 + ((s * 7) % 3),
+      rating: 7 + ((s * 7) % 3),
+      paused_at: null,
+      paused_ms: 0,
+      planned_sets: plan.length * 3,
     }
     await db.sessions.add(session)
     for (let i = 0; i < plan.length; i++) {
@@ -87,6 +127,8 @@ export async function seedDemo(): Promise<void> {
         target_sets: 3,
         target_reps_min: 8,
         target_reps_max: 10,
+        target_rpe: 8,
+        rest_seconds: 90,
       }
       await db.session_exercises.add(se)
       const progress = p.plateau ? 0 : Math.floor((10 - s) / 2) * p.inc
@@ -97,7 +139,8 @@ export async function seedDemo(): Promise<void> {
         set_index: idx,
         weight: p.base + progress,
         reps: 10 - idx,
-        rir: null,
+        rpe: 7.5 + ((idx + s) % 3) * 0.5,
+        velocity: null,
         kind: 'work',
         completed: true,
         logged_at: startedAt + (i * 8 + idx * 2) * 60_000,

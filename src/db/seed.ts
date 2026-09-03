@@ -1,4 +1,8 @@
 import type { Exercise, LoadType, MuscleGroup, UnitMode } from './types'
+import imageMap from '../assets/exercises/map.json'
+
+/** Nombre del catálogo → clave de la foto (src/assets/exercises, dominio público). */
+export const SEED_IMAGES: Record<string, string> = imageMap
 
 type SeedRow = [name: string, group: MuscleGroup, load: LoadType, inc: number, mode?: UnitMode]
 
@@ -122,5 +126,6 @@ export function seedExercises(userId: string): Exercise[] {
     notes: '',
     is_custom: false,
     archived: false,
+    image: SEED_IMAGES[name] ?? null,
   }))
 }
