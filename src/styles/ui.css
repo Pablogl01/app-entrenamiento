@@ -148,25 +148,45 @@ input, textarea, select {
   right: 0;
   margin: 0 auto;
   max-width: 560px;
-  height: calc(var(--h-bar) + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Altura propia + área segura del móvil: las etiquetas nunca caen bajo el indicador. */
+  padding: 6px 4px calc(env(safe-area-inset-bottom, 0px) + 6px);
   background: var(--surface);
   border-top: var(--hairline) solid var(--rule);
-  display: flex;
   z-index: 10;
 }
 
+.bottomnav__row {
+  display: flex;
+  align-items: stretch;
+  height: 52px;
+}
+
+/* Cuatro columnas iguales: los destinos no se tocan a 320px ni a 390px. */
 .bottomnav a {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  color: var(--ink-mute);
+  gap: 4px;
+  color: var(--md-on-surface-variant);
 }
 
-.bottomnav a.active { color: var(--volt-ink); }
+.bottomnav a.active { color: var(--md-primary-fixed); }
+
+.bottomnav__label {
+  font-family: var(--font-data);
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 
 /* ---- Tarjetas ---- */
 

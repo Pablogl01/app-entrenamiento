@@ -12,16 +12,16 @@ export const TABS: readonly { to: string; label: string; icon: IconName }[] = [
 export function BottomNav() {
   return (
     <nav className="bottomnav">
-      <div className="flex items-center justify-around h-16 px-xs">
+      <div className="bottomnav__row">
         {TABS.map((t) => (
           <NavLink
             key={t.to}
             to={t.to}
             end={t.to === '/'}
-            className={({ isActive }) => `flex flex-col items-center justify-center min-w-nav h-touch gap-xxs ${isActive ? 'text-volt font-medium' : 'text-on-surface-variant'}`}
+            className={({ isActive }) => (isActive ? 'active' : '')}
           >
             <Icon name={t.icon} size={22} />
-            <span className="type-label-sm text-9 uppercase tracking-wide nowrap">{t.label}</span>
+            <span className="bottomnav__label">{t.label}</span>
           </NavLink>
         ))}
       </div>
