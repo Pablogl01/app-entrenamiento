@@ -6,7 +6,7 @@ import { createDraftFromRoutine, reorderPositions, routineWeekdays, setRoutineWe
 import { WEEKDAY_LETTERS } from '../lib/dates'
 import { syncSchedule } from '../lib/push'
 import { TopBar } from '../components/TopBar'
-import { ExerciseMark } from '../components/ExerciseMark'
+import { ExerciseVisual } from '../components/ExerciseVisual'
 import { Icon } from '../components/Icon'
 import { Stepper } from '../components/Stepper'
 import { useReorder } from '../components/useReorder'
@@ -184,9 +184,7 @@ export function RutinaEditor() {
           {list.map(({ re, exercise }, i) => (
             <div key={re.id} className={`xcard${dragIndex === i ? ' dragging' : ''}${openRow === re.id ? ' open' : ''}`} {...handlers(i)}>
               <button className="xcard__head" onClick={() => setOpenRow(openRow === re.id ? null : re.id)} aria-expanded={openRow === re.id}>
-                <span className="mark">
-                  <ExerciseMark group={exercise.muscle_group} />
-                </span>
+                <ExerciseVisual exercise={exercise} />
                 <span className="xcard__names">
                   <span className="t-h3">{exercise.name}</span>
                   <span className="xcard__sub t-metric-sm">

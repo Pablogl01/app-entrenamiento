@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import type { Exercise, SessionExercise, SetEntry, WeightUnit } from '../db/types'
 import { lastPerformance } from '../db/repo'
 import { fmtNum } from '../lib/format'
-import { ExerciseMark } from './ExerciseMark'
+import { ExerciseVisual } from './ExerciseVisual'
 import { Icon } from './Icon'
 import { SetTable } from './SetTable'
 
@@ -40,9 +40,7 @@ export function ExerciseCard({ data, open, onToggle, active, removable = false, 
   return (
     <section className={`xcard${open ? ' open' : ''}${dragging ? ' dragging' : ''}${isCurrent && open ? ' is-current' : ''}`} {...dragHandlers}>
       <button className="xcard__head" onClick={onToggle} aria-expanded={open}>
-        <span className="mark">
-          <ExerciseMark group={exercise.muscle_group} />
-        </span>
+        <ExerciseVisual exercise={exercise} />
         <span className="xcard__names">
           <span className="t-h3">
             {active ? (
