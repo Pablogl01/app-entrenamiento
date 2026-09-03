@@ -286,3 +286,7 @@
 
 /* Los botones de la maqueta centran su texto (Tailwind no lo alinea a la izquierda). */
 button.rounded, button.rounded-lg, button.rounded-xl, button.rounded-full { text-align: center; }
+
+/* Chips de estado de Hoy: se reparten el ancho; si no caben, la última baja de línea. */
+.chipbar { flex: 1 1 0; min-width: max-content; letter-spacing: 0.04em; }
+.chipbar .type-label-sm { letter-spacing: 0.04em; }

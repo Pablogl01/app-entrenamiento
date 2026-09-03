@@ -155,23 +155,23 @@ export function Hoy() {
       <RootTopBar tab="Hoy" live={live} />
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full space-y-lg">
-          {/* Micro Performance Adherence Bar */}
-          <div className="flex items-center justify-between gap-xs overflow-x-auto pb-xxs hscroll">
-            <div className="flex items-center gap-xs bg-sc-low px-md py-xs rounded-full shadow-sm flex-none">
-              <Icon name="flame" size={16} className="text-volt" />
-              <span className="type-label-sm text-on-surface uppercase tracking-wider nowrap">
+          {/* Micro Performance Adherence Bar: las tres a la vista, sin scroll */}
+          <div className="flex items-center gap-xs" style={{ flexWrap: 'wrap' }}>
+            <div className="chipbar flex items-center justify-center gap-xs bg-sc-low px-sm py-xs rounded-full shadow-sm">
+              <Icon name="flame" size={16} className="text-volt flex-none" />
+              <span className="type-label-sm text-on-surface uppercase nowrap">
                 Racha {streak ?? 0} {streak === 1 ? 'día' : 'días'}
               </span>
             </div>
-            <div className="flex items-center gap-xs bg-sc-low px-md py-xs rounded-full shadow-sm flex-none">
-              <Icon name="calendar" size={16} className="text-secondary" />
-              <span className="type-label-sm text-on-surface-variant uppercase tracking-wider nowrap">
-                Semana: {weekDone}/{weekTarget > 0 ? weekTarget : '—'}
+            <div className="chipbar flex items-center justify-center gap-xs bg-sc-low px-sm py-xs rounded-full shadow-sm">
+              <Icon name="calendar" size={16} className="text-secondary flex-none" />
+              <span className="type-label-sm text-on-surface-variant uppercase nowrap">
+                Semana {weekDone}/{weekTarget > 0 ? weekTarget : '—'}
               </span>
             </div>
-            <div className="flex items-center gap-xs bg-sc-low px-md py-xs rounded-full shadow-sm flex-none">
-              <span className={`w-2 h-2 rounded-full ${recovery == null ? 'bg-sc-highest' : 'bg-volt pulse'}`} />
-              <span className="type-label-sm text-on-surface uppercase tracking-wider nowrap">Recuperación {recovery == null ? '—' : `${recovery.pct}%`}</span>
+            <div className="chipbar flex items-center justify-center gap-xs bg-sc-low px-sm py-xs rounded-full shadow-sm">
+              <span className={`w-2 h-2 rounded-full flex-none ${recovery == null ? 'bg-sc-highest' : 'bg-volt pulse'}`} />
+              <span className="type-label-sm text-on-surface uppercase nowrap">Recup. {recovery == null ? '—' : `${recovery.pct}%`}</span>
             </div>
           </div>
 
