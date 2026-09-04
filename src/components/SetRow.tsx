@@ -103,7 +103,7 @@ export function SetActive({ set, exercise, workNumber, prev, unit, onConfirmed, 
   const isWarmup = set.kind === 'warmup'
 
   return (
-    <div className="rounded-xl p-md bg-sc-highest shadow-md my-xxs">
+    <div className="rounded-xl p-md bg-sc-highest shadow-md my-xxs enter-block">
       <div className="flex items-center justify-between mb-sm">
         <div className="flex items-center gap-xs">
           <span className="w-6 h-6 rounded-full bg-volt flex items-center justify-center type-label-sm font-bold text-on-volt">{isWarmup ? 'C' : workNumber}</span>

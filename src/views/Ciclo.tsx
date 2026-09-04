@@ -149,7 +149,7 @@ export function Ciclo() {
               : `Semana ${week} de ${totalWeeks} · ${block ? `Bloque ${blocks.findIndex((b) => b.id === block.id) + 1} «${block.name}» · Microciclo ${microcycle}` : 'Sin bloques'}`}
           </p>
           <div className="progress" style={{ marginTop: 'var(--sp-3)' }} role="progressbar" aria-valuenow={week} aria-valuemax={totalWeeks}>
-            <div className="progress__fill" style={{ width: `${pct}%` }} />
+            <div className="progress__fill" style={{ transform: `scaleX(${pct / 100})` }} />
           </div>
           <div className="seg t-label" role="radiogroup" aria-label="Objetivo del ciclo" style={{ marginTop: 'var(--sp-4)' }}>
             {GOALS.map((g) => (

@@ -3,11 +3,12 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
 import { overridesBetween, rescheduleDay, scheduledOn, sessionStats } from '../db/repo'
-import { MONTHS, WEEKDAY_SHORT, addDays, isoOf, todayISO, weekdayMon0 } from '../lib/dates'
+import { MONTHS, WEEKDAY_SHORT, addDays, isoOf, shortDate, todayISO, weekdayMon0 } from '../lib/dates'
 import { fmtDuration, fmtNum } from '../lib/format'
 import type { Routine, ScheduleOverride, Session } from '../db/types'
 import { RootTopBar } from '../components/TopBar'
 import { Icon } from '../components/Icon'
+import { MoveSheet } from '../components/MoveSheet'
 
 interface DayInfo {
   iso: string
@@ -32,16 +33,11 @@ function longDate(iso: string): string {
   return `${WEEKDAY_SHORT[weekdayMon0(iso)][0].toUpperCase()}${WEEKDAY_SHORT[weekdayMon0(iso)].slice(1)} ${d} de ${MONTHS[Number(iso.slice(5, 7)) - 1][0].toUpperCase()}${MONTHS[Number(iso.slice(5, 7)) - 1].slice(1)}`
 }
 
-function shortDate(iso: string): string {
-  const wd = WEEKDAY_SHORT[weekdayMon0(iso)]
-  return `${wd[0].toUpperCase()}${wd.slice(1)} ${Number(iso.slice(8))} ${MONTHS[Number(iso.slice(5, 7)) - 1].slice(0, 3)}`
-}
-
 export function Calendario() {
   const today = todayISO()
   const [cursor, setCursor] = useState(() => ({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) - 1 }))
   const [selected, setSelected] = useState<string | null>(null)
-  const [reassigning, setReassigning] = useState<string | null>(null)
+  const [moving, setMoving] = useState<{ routineId: string; name: string; fromDate: string } | null>(null)
 
   const settings = useLiveQuery(getSettings)
   const live = useLiveQuery(async () => {
@@ -111,6 +107,9 @@ export function Calendario() {
   const shownMissed = missed.filter((d) => !movedFrom.has(d.iso) && (selected === null || d.iso === selected)).sort((a, b) => b.iso.localeCompare(a.iso))
   const shownOverrides = data.overrides.filter((o) => selected === null || o.from_date === selected || o.to_date === selected)
   const detailDate = selected ?? data.rows[0]?.session.date ?? today
+  // Día programado (hoy o futuro) sin sesión hecha: se puede mover, intercambiar o descansar.
+  const selectedDay = selected === null ? null : (data.days.find((d) => d.iso === selected) ?? null)
+  const scheduledHere = selectedDay !== null && selectedDay.iso >= today && selectedDay.sessions.length === 0 ? selectedDay.scheduled : []
 
   return (
     <div className="screen">
@@ -256,7 +255,7 @@ export function Calendario() {
               {shownRows[0] !== undefined && <span className="type-label-sm text-on-surface-variant font-mono-ish">ID: SES-{shownRows[0].session.id.slice(0, 3).toUpperCase()}</span>}
             </div>
 
-            {shownRows.length === 0 && shownMissed.length === 0 && shownOverrides.length === 0 && (
+            {shownRows.length === 0 && shownMissed.length === 0 && shownOverrides.length === 0 && scheduledHere.length === 0 && (
               <p className="type-body-sm text-on-surface-variant">{selected === null ? 'Sin sesiones este mes. Las hechas aparecerán aquí.' : 'Nada ese día.'}</p>
             )}
 
@@ -309,6 +308,35 @@ export function Calendario() {
               )
             })}
 
+            {selectedDay !== null &&
+              scheduledHere.map((r) => (
+                <div key={r.id} className="bg-sc-low p-base rounded-xl flex flex-col gap-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-xs">
+                      <span className="w-1p5 h-1p5 rounded-full bg-outline" />
+                      <span className="type-body-md text-on-surface font-medium">{selectedDay.iso === today ? 'Hoy' : shortDate(selectedDay.iso)} · Programada</span>
+                    </div>
+                    <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">Pendiente</span>
+                  </div>
+                  <p className="type-body-lg text-on-surface font-semibold">{r.name}</p>
+                  <div className="flex gap-sm pt-xxs">
+                    <button
+                      className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95"
+                      onClick={() => setMoving({ routineId: r.id, name: r.name, fromDate: selectedDay.iso })}
+                    >
+                      <Icon name="swap" size={16} />
+                      Mover
+                    </button>
+                    <button className="h-8 px-base rounded bg-sc text-on-surface-variant type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void rescheduleDay(r.id, selectedDay.iso, null)}>
+                      <Icon name="moon" size={16} />
+                      Descansar
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+            {moving !== null && <MoveSheet routineId={moving.routineId} routineName={moving.name} fromDate={moving.fromDate} onClose={() => setMoving(null)} />}
+
             {selected === null && data.next !== null && (
               <div className="bg-sc-low p-base rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-base min-w-0">
@@ -346,30 +374,20 @@ export function Calendario() {
                   {d.scheduled[0]?.name ?? 'Sesión'} programada y sin hacer. Puedes moverla a otro día o dejarla como descanso.
                 </p>
                 <div className="flex gap-sm pt-xxs items-center">
-                  {reassigning === d.iso ? (
+                  {d.scheduled[0] !== undefined && (
                     <>
-                      <input
-                        type="date"
-                        aria-label="Nueva fecha"
-                        className="h-8 px-base rounded bg-sc text-on-surface type-label-sm"
-                        style={{ border: 'none', outline: 'none' }}
-                        min={today}
-                        defaultValue={today}
-                        onChange={(e) => {
-                          if (e.target.value === '' || d.scheduled[0] === undefined) return
-                          void rescheduleDay(d.scheduled[0].id, d.iso, e.target.value)
-                          setReassigning(null)
-                        }}
-                      />
-                      <button className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider press press-95" onClick={() => setReassigning(null)}>
-                        Cancelar
+                      <button
+                        className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95"
+                        onClick={() => setMoving({ routineId: d.scheduled[0].id, name: d.scheduled[0].name, fromDate: d.iso })}
+                      >
+                        <Icon name="swap" size={16} />
+                        Mover
+                      </button>
+                      <button className="h-8 px-base rounded bg-sc text-on-surface-variant type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void rescheduleDay(d.scheduled[0].id, d.iso, null)}>
+                        <Icon name="moon" size={16} />
+                        Descansar
                       </button>
                     </>
-                  ) : (
-                    <button className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => setReassigning(d.iso)}>
-                      <Icon name="swap" size={16} />
-                      Reasignar día
-                    </button>
                   )}
                 </div>
               </div>

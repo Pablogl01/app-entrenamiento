@@ -3,7 +3,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
 import {
+  cancelStart,
   cycleState,
+  movedAwayFrom,
   elapsedMs,
   estimatedDurationMin,
   lastPerformance,
@@ -16,7 +18,7 @@ import {
   syncTodayDraft,
   todaySession,
 } from '../db/repo'
-import { addDays, parseISO, todayISO } from '../lib/dates'
+import { addDays, parseISO, shortDate, todayISO } from '../lib/dates'
 import { fmtNum } from '../lib/format'
 import { movingAvg7, type Point } from '../lib/calc'
 import { bodyWeightVerdict, weeklySessions } from '../lib/verdicts'
@@ -25,6 +27,7 @@ import { RootTopBar } from '../components/TopBar'
 import { EXERCISE_IMAGES } from '../components/ExerciseVisual'
 import { Icon } from '../components/Icon'
 import { useSessionCards } from '../components/useSessionCards'
+import { MoveSheet } from '../components/MoveSheet'
 import type { CardData } from '../components/ExerciseCard'
 import { goalLabel } from './Ciclo'
 
@@ -88,6 +91,17 @@ export function Hoy() {
     return rows.sort((a, b) => a.date.localeCompare(b.date))
   }, [today])
   const cards = useSessionCards(session?.id)
+  // Entrenos movidos desde hoy a otro día (o anulados): Hoy lo dice y ofrece deshacer.
+  const movedToday = useLiveQuery(async () => {
+    const rows = await movedAwayFrom(today)
+    const out: { id: string; name: string; to: string | null }[] = []
+    for (const o of rows) {
+      const r = await db.routines.get(o.routine_id)
+      if (r) out.push({ id: o.id, name: r.name, to: o.to_date })
+    }
+    return out
+  }, [today])
+  const [moving, setMoving] = useState(false)
 
   useEffect(() => {
     if (routine === undefined || session === undefined || draftCreationInFlight) return
@@ -170,7 +184,7 @@ export function Hoy() {
               </span>
             </div>
             <div className="chipbar flex items-center justify-center gap-xs bg-sc-low px-sm py-xs rounded-full shadow-sm">
-              <span className={`w-2 h-2 rounded-full flex-none ${recovery == null ? 'bg-sc-highest' : 'bg-volt pulse'}`} />
+              <span className={`w-2 h-2 rounded-full flex-none ${recovery == null ? 'bg-sc-highest' : 'bg-volt'}`} />
               <span className="type-label-sm text-on-surface uppercase nowrap">Recup. {recovery == null ? '—' : `${recovery.pct}%`}</span>
             </div>
           </div>
@@ -218,6 +232,11 @@ export function Hoy() {
                       <span className="type-label-md text-on-primary-container uppercase font-semibold tracking-wider">Continuar sesión</span>
                     </Link>
                   )}
+                  {live && session && doneWork === 0 && (
+                    <button className="w-touch h-touch bg-sc-high press rounded-lg flex items-center justify-center text-on-surface-variant" aria-label="Cancelar inicio" onClick={() => void cancelStart(session.id)}>
+                      <Icon name="close" size={20} />
+                    </button>
+                  )}
                   {finished && session && (
                     <>
                       <Link to={`/resumen/${session.id}`} className="flex-1 h-touch bg-sc-high press rounded-lg flex items-center justify-center gap-sm px-lg">
@@ -234,10 +253,46 @@ export function Hoy() {
                       <Icon name="sliders" size={20} />
                     </Link>
                   )}
+                  {!started && session?.routine_id != null && (
+                    <button
+                      className="w-touch h-touch bg-sc-high press rounded-lg flex items-center justify-center text-on-surface-variant"
+                      aria-label={doneWork > 0 ? 'Mover a otro día: ya hay series hechas hoy' : 'Mover a otro día'}
+                      disabled={doneWork > 0}
+                      style={doneWork > 0 ? { opacity: 0.45 } : undefined}
+                      onClick={() => setMoving(true)}
+                    >
+                      <Icon name="calendar" size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           )}
+
+          {/* Día sin entreno porque se movió: decirlo y poder deshacerlo */}
+          {!hasTraining &&
+            (movedToday ?? []).map((m) => (
+              <div key={m.id} className="w-full rounded-xl bg-sc p-lg shadow-xl flex flex-col space-y-md">
+                <div className="flex items-center gap-xs bg-sc-high px-sm py-xxs rounded-lg self-start">
+                  <span className="w-1p5 h-1p5 rounded-full bg-sc-highest" />
+                  <span className="type-label-sm text-on-surface-variant uppercase tracking-wider">Descanso</span>
+                </div>
+                <div className="flex flex-col gap-xxs">
+                  <h1 className="type-display-sm text-on-surface uppercase font-extrabold" style={{ letterSpacing: '-0.03em' }}>
+                    Hoy libre
+                  </h1>
+                  <p className="type-body-sm text-on-surface-variant">
+                    {m.name} {m.to === null ? 'anulado hoy' : `movido al ${shortDate(m.to)}`}
+                  </p>
+                </div>
+                <button className="w-full h-touch bg-sc-high press rounded-lg flex items-center justify-center gap-sm text-on-surface" onClick={() => void db.schedule_overrides.delete(m.id)}>
+                  <Icon name="swap" size={20} className="text-on-surface-variant" />
+                  <span className="type-label-md uppercase font-semibold tracking-wider">Deshacer</span>
+                </button>
+              </div>
+            ))}
+
+          {moving && session?.routine_id != null && <MoveSheet routineId={session.routine_id} routineName={trainingName} fromDate={today} onClose={() => setMoving(false)} />}
 
           {/* Visual Benchmark Anchor (Context Snapshot) */}
           {hasTraining && (
@@ -350,7 +405,7 @@ export function Hoy() {
                 </div>
               </div>
               <div className="w-full bg-sc-high rounded-full h-1p5 overflow-hidden">
-                <div className="bg-volt h-full" style={{ width: `${pct}%`, transition: 'width 0.3s' }} />
+                <div className="progress__fill" style={{ transform: `scaleX(${pct / 100})` }} />
               </div>
               <div className="flex justify-between items-center">
                 <span className="type-label-sm text-on-surface-variant">

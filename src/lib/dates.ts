@@ -40,6 +40,12 @@ export const WEEKDAY_LETTERS = ['l', 'm', 'x', 'j', 'v', 's', 'd'] as const
 
 export const WEEKDAY_SHORT = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'] as const
 
+/** «Jue 11 sep». */
+export function shortDate(iso: string): string {
+  const wd = WEEKDAY_SHORT[weekdayMon0(iso)]
+  return `${wd[0].toUpperCase()}${wd.slice(1)} ${Number(iso.slice(8))} ${MONTHS[Number(iso.slice(5, 7)) - 1].slice(0, 3)}`
+}
+
 export const MONTHS = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',

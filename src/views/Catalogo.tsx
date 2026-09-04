@@ -244,7 +244,7 @@ export function Catalogo() {
           <div className="px-gutter mb-lg">
             <div className="flex items-center justify-between mb-sm">
               <div className="flex items-center gap-xs">
-                <span className="w-1p5 h-1p5 rounded-full bg-volt pulse" />
+                <span className="w-1p5 h-1p5 rounded-full bg-volt" />
                 <h2 className="type-label-sm text-secondary uppercase tracking-widest font-semibold">Recientes en tu ciclo</h2>
               </div>
               <span className="type-label-sm text-secondary-fixed-dim">Últimos 7 días</span>
@@ -326,7 +326,7 @@ export function Catalogo() {
 
       {/* Toast / CTA de selección múltiple */}
       {picking && selected.length > 0 && (
-        <div className="cat-toast" style={{ position: 'fixed', bottom: 24, left: 16, right: 16, zIndex: 40, maxWidth: 528, margin: '0 auto' }}>
+        <div className="cat-toast enter-sheet" style={{ position: 'fixed', bottom: 24, left: 16, right: 16, zIndex: 40, maxWidth: 528, margin: '0 auto' }}>
           <button type="button" className="w-full bg-volt text-on-volt py-sm px-md rounded-xl flex items-center justify-between shadow-xl press" onClick={() => void confirmAdd()}>
             <div className="flex items-center gap-sm">
               <Icon name="check-circle" size={18} />

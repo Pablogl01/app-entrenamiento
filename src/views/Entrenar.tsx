@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
 import {
   addSet,
+  cancelStart,
   cycleState,
   deleteSession,
   elapsedMs,
@@ -22,6 +23,7 @@ import { platesPerSide } from '../lib/plates'
 import { addRest, skipRest, startRest, useRest } from '../lib/rest'
 import { fmtClock, useNow } from '../lib/useNow'
 import { TopBar } from '../components/TopBar'
+import { MoveSheet } from '../components/MoveSheet'
 import { Icon } from '../components/Icon'
 import { SetTable } from '../components/SetTable'
 import { useReorder } from '../components/useReorder'
@@ -60,7 +62,7 @@ function RestTimer() {
   const mm = String(Math.floor(rest.remainingSeconds / 60)).padStart(2, '0')
   const ss = String(rest.remainingSeconds % 60).padStart(2, '0')
   return (
-    <div className="px-gutter mb-md">
+    <div className="px-gutter mb-md enter-soft">
       <div className="bg-sc rounded-xl p-md shadow-md flex items-center justify-between gap-sm" aria-label="Descanso" aria-live="polite">
         <div className="flex items-center gap-md min-w-0">
           <div className="relative flex items-center justify-center w-11 h-11 rounded-lg bg-sc-highest">
@@ -114,6 +116,7 @@ export function Entrenar() {
   const [notesOpen, setNotesOpen] = useState(false)
   const [platesOpen, setPlatesOpen] = useState(false)
   const [chosenId, setChosenId] = useState<string | null>(null)
+  const [moving, setMoving] = useState(false)
 
   const started = session?.started_at != null
   const finished = session?.finished_at != null
@@ -179,6 +182,13 @@ export function Entrenar() {
     navigate(`/resumen/${session!.id}`)
   }
 
+  /** Iniciada sin querer y sin ninguna serie hecha: vuelve a borrador y a Hoy. Sin confirmar: no se pierde nada. */
+  async function onCancelStart() {
+    skipRest()
+    await cancelStart(session!.id)
+    navigate('/')
+  }
+
   async function onDiscard() {
     if (!window.confirm('¿Descartar la sesión de hoy? Se borran las series registradas.')) return
     skipRest()
@@ -237,7 +247,7 @@ export function Entrenar() {
                 </span>
               </div>
               <div className="w-full h-1p5 bg-sc-highest rounded-full overflow-hidden" role="progressbar" aria-valuenow={doneWork} aria-valuemax={totalWork}>
-                <div className="bg-volt rounded-full" style={{ height: '100%', width: `${pct}%`, transition: 'width 0.5s' }} />
+                <div className="progress__fill" style={{ transform: `scaleX(${pct / 100})` }} />
               </div>
             </div>
             {!started && (
@@ -247,7 +257,25 @@ export function Entrenar() {
               </button>
             )}
             {menuOpen && (
-              <div className="mt-md rounded-lg bg-sc-high flex flex-col">
+              <div className="mt-md rounded-lg bg-sc-high flex flex-col enter-menu">
+                {live && doneWork === 0 && (
+                  <button className="h-touch px-md flex items-center gap-sm type-label-md uppercase tracking-wider text-on-surface" onClick={() => void onCancelStart()}>
+                    <Icon name="close" size={18} />
+                    Cancelar inicio
+                  </button>
+                )}
+                {!started && session.routine_id !== null && doneWork === 0 && (
+                  <button
+                    className="h-touch px-md flex items-center gap-sm type-label-md uppercase tracking-wider text-on-surface"
+                    onClick={() => {
+                      setMoving(true)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <Icon name="calendar" size={18} />
+                    Mover a otro día
+                  </button>
+                )}
                 <Link to={`/catalogo?session=${session.id}`} className="h-touch px-md flex items-center gap-sm type-label-md uppercase tracking-wider text-on-surface">
                   <Icon name="add-circle" size={18} />
                   Añadir ejercicio
@@ -272,6 +300,10 @@ export function Entrenar() {
         </div>
 
         <RestTimer />
+
+        {moving && session.routine_id !== null && (
+          <MoveSheet routineId={session.routine_id} routineName={session.routine_name_snapshot} fromDate={today} onClose={() => setMoving(false)} onDone={() => navigate('/')} />
+        )}
 
         <div className="px-gutter flex flex-col gap-md">
           {/* Primary Active Exercise Card */}
@@ -333,7 +365,7 @@ export function Entrenar() {
                 />
 
                 {platesOpen && current.exercise.load_type === 'barbell' && (
-                  <div className="bg-sc-lowest rounded-lg p-2p5">
+                  <div className="bg-sc-lowest rounded-lg p-2p5 enter-panel">
                     <div className="flex justify-between items-center type-label-sm text-outline uppercase tracking-wider">
                       <span>Discos por lado</span>
                       <span>
@@ -450,7 +482,7 @@ export function Entrenar() {
           ))}
 
           {notesOpen && (
-            <div className="bg-sc rounded-xl p-md shadow-sm flex flex-col gap-sm" aria-label="Notas y RPE">
+            <div className="bg-sc rounded-xl p-md shadow-sm flex flex-col gap-sm enter-panel" aria-label="Notas y RPE">
               <div className="flex items-center justify-between">
                 <span className="type-label-sm uppercase tracking-wider text-secondary">Esfuerzo percibido (RPE global)</span>
                 <span className="type-metric-md text-volt">{session.rating === null ? '—' : `${session.rating} / 10`}</span>
@@ -499,7 +531,7 @@ export function Entrenar() {
               </div>
               {started && (
                 <button
-                  className={`w-full h-touch rounded-lg type-label-md font-bold uppercase tracking-widest flex items-center justify-center gap-xs press shadow-sm${allDone ? ' bg-volt text-on-volt' : ' bg-sc-highest text-secondary-fixed'}`}
+                  className={`w-full h-touch rounded-lg type-label-md font-bold uppercase tracking-widest flex items-center justify-center gap-xs press shadow-sm finish-cta${allDone ? ' bg-volt text-on-volt' : ' bg-sc-highest text-secondary-fixed'}`}
                   onClick={() => void onFinish()}
                 >
                   <Icon name="flag" size={20} />

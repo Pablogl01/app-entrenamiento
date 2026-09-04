@@ -287,6 +287,8 @@ Cabecera «PARÁMETROS» / «AJUSTES» con chip de versión. Secciones con etiqu
 - **Una sola secuencia orquestada:** al abrir Hoy, la tarjeta hero entra y las de ejercicio escalonan con `animation-delay`. Una vez por sesión de app.
 - El resto responde a una acción: fold de tarjeta (220 ms), casilla que se rellena y borde que pasa a volt (180 ms), barra de progreso (200 ms), botones con `scale(.98)` en 60 ms lineal (respuesta mecánica, sin curvas blandas).
 - **Cambio de vista:** fundido de 140 ms entre pestañas, deslizamiento de 200 ms al apilar y 180 ms al volver; el gesto lateral anima en su dirección.
+- **Curvas** (tokens en `tokens.css`): `--ease-out` para entradas y respuestas del sistema, `--ease-in-out` para lo que gira o se desplaza en pantalla, `--ease-drawer` para hojas inferiores. Ningún componente escribe un `cubic-bezier` a mano. La pulsación sigue a 60 ms lineal.
+- **Lo que aparece por acción del usuario** (temporizador de descanso, menú ⋮, paneles de discos y notas, toast del catálogo, bloque de la serie en curso) entra con `@starting-style` en 150–250 ms con `--ease-out` (hojas con `--ease-drawer`), solo `transform` y `opacity`, y sale al instante. Las barras de progreso animan `transform: scaleX`, nunca `width`.
 - **Pulso** solo en el punto de «sesión en curso» (barra superior, tag de la hero).
 - **Prohibido:** animar al scrollear, hover con transición en cada tarjeta, glow permanente.
 - `prefers-reduced-motion` apaga todo.
@@ -354,6 +356,8 @@ Las anteriores: Las cuatro del rediseño se cerraron el 2026-09-03 antes de codi
 ---
 
 ## 11. Changelog
+
+- **2026-09-04** — v2.5. Movimiento: tokens de curva, entradas con `@starting-style`, barras a `transform`, sin pulsos fuera de la sesión en curso (§6). **Hoja «Mover»** (`MoveSheet`): catorce días (esta semana y la siguiente) con el estado real de cada uno (punto por entreno programado, punto volt por hecho); tocar un día libre mueve; un día ocupado abre un panel con «Mover aquí» e «Intercambiar» (solo si el otro entreno es otra rutina); «Dejar como descanso» anula. Se abre desde Hoy (icono calendario junto a Iniciar), desde el menú ⋮ de la sesión previa y desde el Calendario (día programado seleccionado o pospuesto). Hoy sin entreno por un movimiento muestra «Hoy libre · movido al …» con Deshacer. «Cancelar inicio» devuelve una sesión iniciada sin querer (sin series) a borrador.
 
 - **2026-09-03** — v2.4. Inter para todo: la serif de la captura no se leía a 10-12px. Tamaños pequeños de la maqueta un punto arriba (etiquetas 11/13, texto 13/15). Tinos sale del bundle.
 

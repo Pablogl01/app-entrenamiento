@@ -204,7 +204,7 @@ export function Progreso() {
                 <h1 className="type-headline-lg font-bold text-on-surface uppercase tracking-tight">Progreso y analítica</h1>
               </div>
               <div className="flex items-center gap-xs bg-sc-low px-xs py-1 rounded-full shadow-inner flex-none">
-                <span className={`w-2 h-2 rounded-full ${calibrated ? 'bg-volt ping' : 'bg-outline'}`} />
+                <span className={`w-2 h-2 rounded-full ${calibrated ? 'bg-volt' : 'bg-outline'}`} />
                 <span className={`type-label-sm uppercase font-semibold ${calibrated ? 'text-volt' : 'text-on-surface-variant'}`}>{calibrated ? 'Calibrado' : 'Calibrando'}</span>
               </div>
             </div>
@@ -293,7 +293,7 @@ export function Progreso() {
                       {d.done ? (
                         <div className="w-full bg-volt rounded-sm glow-bar" style={{ height: '100%' }} />
                       ) : d.scheduled ? (
-                        <div className={`w-full bg-sc-highest rounded-sm${isToday ? ' pulse' : ''}`} style={{ height: isToday ? '55%' : '45%', opacity: isToday ? 1 : 0.6 }} />
+                        <div className="w-full bg-sc-highest rounded-sm" style={{ height: isToday ? '55%' : '45%', opacity: isToday ? 1 : 0.6 }} />
                       ) : (
                         <div className="w-full border-t-dashed-variant h-1" />
                       )}

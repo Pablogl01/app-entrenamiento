@@ -50,7 +50,14 @@ function MockToggle({ checked, onChange, label, small = false }: { checked: bool
       className={`${small ? 'w-10 h-6 p-0p5' : 'w-12 h-7 p-1'} rounded-full flex items-center flex-none ${checked ? 'bg-volt' : 'bg-sc-highest'}`}
       onClick={() => onChange(!checked)}
     >
-      <div className={`w-5 h-5 rounded-full shadow-sm ${checked ? 'ml-auto' : ''}`} style={{ background: checked ? 'var(--md-on-primary-container)' : 'var(--md-on-surface-variant)', transition: 'all 0.15s' }} />
+      <div
+        className="w-5 h-5 rounded-full shadow-sm"
+        style={{
+          background: checked ? 'var(--md-on-primary-container)' : 'var(--md-on-surface-variant)',
+          transform: checked ? `translateX(${small ? 16 : 20}px)` : 'translateX(0)',
+          transition: 'transform 150ms var(--ease-out), background-color 150ms ease',
+        }}
+      />
     </button>
   )
 }

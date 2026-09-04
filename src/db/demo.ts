@@ -55,6 +55,34 @@ export async function seedDemo(): Promise<void> {
     [wdToday, (wdToday + 3) % 7].map((weekday) => ({ id: uuid(), user_id: USER_ID, routine_id: routine.id, weekday })),
   )
 
+  // segunda rutina, dos días después, sin historial: sirve para mover e intercambiar
+  const legs: Routine = {
+    id: uuid(),
+    user_id: USER_ID,
+    name: 'Pierna',
+    routine_type: 'strength',
+    notes: '',
+    created_at: Date.now() - 30 * 86_400_000,
+    archived: false,
+  }
+  await db.routines.add(legs)
+  const legPlan = [pick('Sentadilla'), pick('Peso muerto'), pick('Prensa')].filter((e) => e !== undefined)
+  await db.routine_exercises.bulkAdd(
+    legPlan.map((ex, i) => ({
+      id: uuid(),
+      user_id: USER_ID,
+      routine_id: legs.id,
+      exercise_id: ex.id,
+      position: i,
+      target_sets: 3,
+      target_reps_min: 6,
+      target_reps_max: 8,
+      target_rpe: 8,
+      rest_seconds: 120,
+    })),
+  )
+  await db.routine_schedules.add({ id: uuid(), user_id: USER_ID, routine_id: legs.id, weekday: (wdToday + 2) % 7 })
+
   // ciclo activo de 6 semanas, empezado hace 3 semanas y media (semana 4)
   const cycle: Cycle = {
     id: uuid(),

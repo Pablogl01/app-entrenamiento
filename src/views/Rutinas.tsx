@@ -123,7 +123,7 @@ export function Rutinas() {
   function tag(r: RoutineRow) {
     switch (r.state) {
       case 'today':
-        return <span className="bg-volt text-on-primary-container type-label-sm uppercase px-xs py-2px rounded font-bold tracking-wider pulse">Toca hoy</span>
+        return <span className="bg-volt text-on-primary-container type-label-sm uppercase px-xs py-2px rounded font-bold tracking-wider">Toca hoy</span>
       case 'done_today':
         return <span className="bg-sc-high text-secondary-fixed type-label-sm uppercase px-xs py-2px rounded font-medium">Hecha hoy</span>
       case 'done_yesterday':
@@ -148,7 +148,7 @@ export function Rutinas() {
         <div className="flex flex-col w-full space-y-md">
           <Link to="/ciclo" className="flex items-center justify-between px-xs py-xxs bg-sc-low rounded-lg text-on-surface-variant">
             <div className="flex items-center gap-xs">
-              <span className={`w-1p5 h-1p5 rounded-full ${cycle ? 'bg-volt ping' : 'bg-sc-highest'}`} />
+              <span className={`w-1p5 h-1p5 rounded-full ${cycle ? 'bg-volt' : 'bg-sc-highest'}`} />
               <span className="type-label-sm uppercase tracking-wider text-on-surface">{cycle ? `Ciclo activo · semana ${cycle.week}` : 'Sin ciclo · crear uno'}</span>
             </div>
             <span className="type-label-sm text-on-surface-variant uppercase">

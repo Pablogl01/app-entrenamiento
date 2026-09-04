@@ -43,6 +43,7 @@ export async function scheduledOn(dateISO: string): Promise<Routine[]> {
     if (r && !r.archived) out.push(r)
   }
   for (const o of movedHere) {
+    if (movedAway.has(o.routine_id)) continue
     const r = await db.routines.get(o.routine_id)
     if (r && !r.archived && !out.some((x) => x.id === r.id)) out.push(r)
   }
@@ -53,8 +54,23 @@ export async function scheduledRoutineFor(dateISO: string): Promise<Routine | nu
   return (await scheduledOn(dateISO))[0] ?? null
 }
 
-/** Reasigna el día programado `fromDate` de una rutina a `toDate` (null = anular). */
+/**
+ * Reasigna el día programado `fromDate` de una rutina a `toDate` (null = anular).
+ * Si `fromDate` ya era el destino de un movimiento anterior (lunes → jueves, y ahora
+ * jueves → viernes), se encadena actualizando ese movimiento en vez de crear otro;
+ * volver al día de origen lo borra.
+ */
 export async function rescheduleDay(routineId: string, fromDate: string, toDate: string | null): Promise<void> {
+  const chained = await db.schedule_overrides
+    .where('to_date')
+    .equals(fromDate)
+    .filter((o) => o.routine_id === routineId)
+    .first()
+  if (chained) {
+    if (toDate === chained.from_date) await db.schedule_overrides.delete(chained.id)
+    else await db.schedule_overrides.update(chained.id, { to_date: toDate })
+    return
+  }
   const existing = await db.schedule_overrides
     .where('from_date')
     .equals(fromDate)
@@ -62,6 +78,23 @@ export async function rescheduleDay(routineId: string, fromDate: string, toDate:
     .first()
   if (existing) await db.schedule_overrides.update(existing.id, { to_date: toDate })
   else await db.schedule_overrides.add({ id: uuid(), user_id: USER_ID, routine_id: routineId, from_date: fromDate, to_date: toDate })
+}
+
+/** Intercambia dos días programados: A pasa al día de B y B al día de A. */
+export async function swapDays(routineA: string, dateA: string, routineB: string, dateB: string): Promise<void> {
+  await rescheduleDay(routineA, dateA, dateB)
+  await rescheduleDay(routineB, dateB, dateA)
+}
+
+/** Movimientos cuyo origen es `dateISO` (para decir «movido al …» en Hoy). */
+export async function movedAwayFrom(dateISO: string): Promise<ScheduleOverride[]> {
+  return db.schedule_overrides.where('from_date').equals(dateISO).toArray()
+}
+
+/** true si la sesión de hoy ya tiene alguna serie confirmada: lo hecho no se mueve. */
+export async function todayHasProgress(): Promise<boolean> {
+  const s = await todaySession()
+  return s !== null && (await draftHasProgress(s.id))
 }
 
 export async function overridesBetween(fromISO: string, toISO: string): Promise<ScheduleOverride[]> {
@@ -331,6 +364,15 @@ export async function addExerciseToSession(sessionId: string, exerciseId: string
 
 export async function startSession(sessionId: string): Promise<void> {
   await db.sessions.update(sessionId, { started_at: Date.now() })
+}
+
+/**
+ * Deshace un «Iniciar sesión» pulsado sin querer: la sesión vuelve a ser el
+ * borrador de hoy, con sus ejercicios y series prellenadas intactas. Solo
+ * tiene sentido (y solo se ofrece) mientras no hay ninguna serie confirmada.
+ */
+export async function cancelStart(sessionId: string): Promise<void> {
+  await db.sessions.update(sessionId, { started_at: null, paused_at: null, paused_ms: 0 })
 }
 
 export async function pauseSession(sessionId: string): Promise<void> {

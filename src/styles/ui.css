@@ -645,16 +645,18 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
 }
 
 .progress__fill {
+  width: 100%;
   height: 100%;
   background: var(--volt);
   border-radius: var(--radius-pill);
-  transition: width 0.2s ease;
+  transform-origin: left;
+  transition: transform 0.2s var(--ease-out);
 }
 
 .ring { display: grid; place-items: center; position: relative; flex: none; }
 .ring svg { display: block; transform: rotate(-90deg); }
 .ring__track { stroke: var(--surface-hi); }
-.ring__fill { stroke: var(--volt); transition: stroke-dashoffset 0.2s ease; }
+.ring__fill { stroke: var(--volt); transition: stroke-dashoffset 0.2s var(--ease-out); }
 .ring__text { position: absolute; color: var(--ink); }
 
 /* ---- Casilla de serie ---- */
@@ -715,7 +717,7 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
   color: var(--ink-mute);
   display: grid;
   place-items: center;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s var(--ease-in-out);
 }
 
 .xcard.open .xcard__chev { transform: rotate(180deg); }
@@ -872,9 +874,9 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
 @keyframes view-push { from { opacity: 0; transform: translateX(24px); } }
 @keyframes view-pop { from { opacity: 0; transform: translateX(-16px); } }
 
-.view-fade { animation: view-fade 0.14s ease both; }
-.view-push { animation: view-push 0.2s ease both; }
-.view-pop { animation: view-pop 0.18s ease both; }
+.view-fade { animation: view-fade 0.14s var(--ease-out) both; }
+.view-push { animation: view-push 0.2s var(--ease-out) both; }
+.view-pop { animation: view-pop 0.18s var(--ease-out) both; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -905,6 +907,113 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
 }
 
 .setrow { transition: border-color 0.18s ease, color 0.18s ease; }
+
+/* Entradas por @starting-style: solo transform y opacity; la salida es instantánea a propósito
+   (el sistema responde, no se hace esperar). Reducción de movimiento las acorta desde tokens.css. */
+.enter-soft {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+  @starting-style { opacity: 0; transform: translateY(-4px); }
+}
+
+.enter-panel {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+  @starting-style { opacity: 0; transform: translateY(-4px); }
+}
+
+.enter-menu {
+  opacity: 1;
+  transform: scale(1);
+  transform-origin: top right;
+  transition: opacity 0.15s var(--ease-out), transform 0.15s var(--ease-out);
+  @starting-style { opacity: 0; transform: scale(0.97); }
+}
+
+.enter-sheet {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s var(--ease-drawer), transform 0.25s var(--ease-drawer);
+  @starting-style { opacity: 0; transform: translateY(100%); }
+}
+
+.enter-block {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+  @starting-style { opacity: 0; transform: scale(0.98); }
+}
+
+/* ---- Hoja inferior (radio 12, scrim). Entra con --ease-drawer; sale al instante. ---- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  opacity: 1;
+  transition: opacity 0.25s var(--ease-out);
+  @starting-style { opacity: 0; }
+}
+
+.sheet__panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-top: var(--hairline) solid var(--rule);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  padding: var(--sp-5) var(--sp-4) calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.sheet__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--sp-1);
+  text-align: center;
+}
+
+.sheet__wd { color: var(--ink-mute); min-height: 20px; display: grid; place-items: center; }
+
+.sheet__day {
+  min-height: var(--touch);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: var(--radius-control);
+  color: var(--ink);
+}
+
+.sheet__day:disabled { color: var(--ink-mute); opacity: 0.45; }
+
+.sheet__day.is-origin { background: var(--surface-hi); }
+
+.sheet__day.is-picked { outline: var(--hairline) solid var(--volt-edge); outline-offset: -1px; background: var(--surface-hi); }
+
+.sheet__dots { display: flex; gap: 3px; min-height: 5px; }
+
+.sheet__dot { width: 5px; height: 5px; border-radius: var(--radius-pill); background: var(--ink-mute); }
+
+.sheet__dot--done { background: var(--volt); }
+
+/* Finalizar: pasa a volt cuando todas las series están hechas (DESIGN.md §1). */
+.press.finish-cta { transition: transform 60ms linear, background-color 0.2s ease, color 0.2s ease; }
 
 /* ---- Sesión en vivo ---- */
 
