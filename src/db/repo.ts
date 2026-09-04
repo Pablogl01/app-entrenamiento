@@ -34,7 +34,8 @@ export async function activeRoutines(): Promise<Routine[]> {
 export async function scheduledOn(dateISO: string): Promise<Routine[]> {
   const wd = weekdayMon0(dateISO)
   const schedules = await db.routine_schedules.where('weekday').equals(wd).toArray()
-  const movedAway = new Set((await db.schedule_overrides.where('from_date').equals(dateISO).toArray()).map((o) => o.routine_id))
+  const away = await db.schedule_overrides.where('from_date').equals(dateISO).toArray()
+  const movedAway = new Set(away.map((o) => o.routine_id))
   const movedHere = await db.schedule_overrides.where('to_date').equals(dateISO).toArray()
   const out: Routine[] = []
   for (const sc of schedules) {
@@ -42,12 +43,60 @@ export async function scheduledOn(dateISO: string): Promise<Routine[]> {
     const r = await db.routines.get(sc.routine_id)
     if (r && !r.archived) out.push(r)
   }
+  // sustituciones: la rutina anulada deja su sitio a otra ese mismo día
+  for (const o of away) {
+    if (o.replaced_by == null || movedAway.has(o.replaced_by)) continue
+    const r = await db.routines.get(o.replaced_by)
+    if (r && !r.archived && !out.some((x) => x.id === r.id)) out.push(r)
+  }
   for (const o of movedHere) {
     if (movedAway.has(o.routine_id)) continue
     const r = await db.routines.get(o.routine_id)
     if (r && !r.archived && !out.some((x) => x.id === r.id)) out.push(r)
   }
   return out
+}
+
+/** La sustitución vigente en una fecha (rutina anulada → rutina que la reemplaza), o null. */
+export async function replacementOn(dateISO: string): Promise<ScheduleOverride | null> {
+  const rows = await db.schedule_overrides.where('from_date').equals(dateISO).toArray()
+  return rows.find((o) => o.replaced_by != null) ?? null
+}
+
+/**
+ * Cambia la rutina de un día por otra: `routineId` queda anulada ese día y en su
+ * lugar se entrena `byRoutineId`. Si el día ya tenía un movimiento de `routineId`
+ * (movida o anulada), se reutiliza el registro para que deshacer sea un solo paso.
+ * Si `routineId` está ese día porque fue movida ahí, la sustitución se aplica
+ * anulando el movimiento y registrando la nueva rutina en su lugar.
+ */
+export async function replaceRoutineOn(dateISO: string, routineId: string, byRoutineId: string): Promise<void> {
+  const existing = await db.schedule_overrides
+    .where('from_date')
+    .equals(dateISO)
+    .filter((o) => o.routine_id === routineId)
+    .first()
+  if (existing) {
+    await db.schedule_overrides.update(existing.id, { to_date: null, replaced_by: byRoutineId })
+    return
+  }
+  const movedHere = await db.schedule_overrides
+    .where('to_date')
+    .equals(dateISO)
+    .filter((o) => o.routine_id === routineId)
+    .first()
+  if (movedHere) {
+    // estaba aquí por un movimiento: ese movimiento pasa a ser una sustitución en este día
+    await db.schedule_overrides.update(movedHere.id, { from_date: dateISO, to_date: null, replaced_by: byRoutineId })
+    return
+  }
+  await db.schedule_overrides.add({ id: uuid(), user_id: USER_ID, routine_id: routineId, from_date: dateISO, to_date: null, replaced_by: byRoutineId })
+}
+
+/** Deshace una sustitución: vuelve la rutina programada originalmente. */
+export async function undoReplacement(dateISO: string): Promise<void> {
+  const o = await replacementOn(dateISO)
+  if (o) await db.schedule_overrides.delete(o.id)
 }
 
 export async function scheduledRoutineFor(dateISO: string): Promise<Routine | null> {
@@ -61,6 +110,18 @@ export async function scheduledRoutineFor(dateISO: string): Promise<Routine | nu
  * volver al día de origen lo borra.
  */
 export async function rescheduleDay(routineId: string, fromDate: string, toDate: string | null): Promise<void> {
+  // Si la rutina está ese día como sustituta de otra, moverla o anularla deja la
+  // original anulada (ya no se entrena) y la sustituta se reprograma aparte.
+  const asReplacement = await db.schedule_overrides
+    .where('from_date')
+    .equals(fromDate)
+    .filter((o) => o.replaced_by === routineId)
+    .first()
+  if (asReplacement) {
+    await db.schedule_overrides.update(asReplacement.id, { replaced_by: null })
+    if (toDate !== null) await db.schedule_overrides.add({ id: uuid(), user_id: USER_ID, routine_id: routineId, from_date: fromDate, to_date: toDate })
+    return
+  }
   const chained = await db.schedule_overrides
     .where('to_date')
     .equals(fromDate)

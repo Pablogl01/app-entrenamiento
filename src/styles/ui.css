@@ -978,7 +978,26 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
+  max-height: 85dvh;
 }
+
+/* Cabecera y «Descansar» fijos; lo de en medio hace scroll si hay muchas rutinas. */
+.sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sheet__group { margin: 0 0 calc(-1 * var(--sp-2)); }
+
+.sheet__alts { display: flex; flex-direction: column; overflow: hidden; }
+
+.sheet__alt { width: 100%; text-align: left; }
+
+.sheet__alt + .sheet__alt { border-top: var(--hairline) solid var(--rule); }
 
 .sheet__grid {
   display: grid;

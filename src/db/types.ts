@@ -74,6 +74,9 @@ export interface RoutineSchedule {
 /**
  * Reasignación de un día programado (especificaciones §3.9): la sesión de
  * `from_date` pasa a `to_date`. to_date = null la anula sin mover.
+ * `replaced_by` (con to_date = null): ese día se entrena OTRA rutina en su
+ * lugar. Un solo registro, un solo «deshacer». Los registros anteriores a
+ * este campo se leen como «sin sustitución».
  */
 export interface ScheduleOverride {
   id: string
@@ -81,6 +84,7 @@ export interface ScheduleOverride {
   routine_id: string
   from_date: string
   to_date: string | null
+  replaced_by?: string | null
 }
 
 export interface Session {

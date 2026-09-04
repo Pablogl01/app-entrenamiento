@@ -6,6 +6,7 @@ import {
   cancelStart,
   cycleState,
   movedAwayFrom,
+  replacementOn,
   elapsedMs,
   estimatedDurationMin,
   lastPerformance,
@@ -93,13 +94,19 @@ export function Hoy() {
   const cards = useSessionCards(session?.id)
   // Entrenos movidos desde hoy a otro día (o anulados): Hoy lo dice y ofrece deshacer.
   const movedToday = useLiveQuery(async () => {
-    const rows = await movedAwayFrom(today)
+    const rows = (await movedAwayFrom(today)).filter((o) => o.replaced_by == null)
     const out: { id: string; name: string; to: string | null }[] = []
     for (const o of rows) {
       const r = await db.routines.get(o.routine_id)
       if (r) out.push({ id: o.id, name: r.name, to: o.to_date })
     }
     return out
+  }, [today])
+  // Hoy se entrena otra rutina en lugar de la programada: la hero lo dice.
+  const replacedName = useLiveQuery(async () => {
+    const o = await replacementOn(today)
+    if (o === null) return null
+    return (await db.routines.get(o.routine_id))?.name ?? null
   }, [today])
   const [moving, setMoving] = useState(false)
 
@@ -216,7 +223,7 @@ export function Hoy() {
                         ? 'Sesión en curso · continúa donde la dejaste'
                         : session?.routine_id === null && routine === null
                           ? 'Sesión libre, sin plantilla'
-                          : `Sesión programada para hoy${blockGoal !== null ? ` · Enfoque ${goalLabel(blockGoal).toLowerCase()}` : ''}`}
+                          : `${replacedName != null ? `En lugar de ${replacedName}` : 'Sesión programada para hoy'}${blockGoal !== null ? ` · Enfoque ${goalLabel(blockGoal).toLowerCase()}` : ''}`}
                   </p>
                 </div>
                 <div className="pt-xs flex items-center gap-sm">
@@ -256,7 +263,7 @@ export function Hoy() {
                   {!started && session?.routine_id != null && (
                     <button
                       className="w-touch h-touch bg-sc-high press rounded-lg flex items-center justify-center text-on-surface-variant"
-                      aria-label={doneWork > 0 ? 'Mover a otro día: ya hay series hechas hoy' : 'Mover a otro día'}
+                      aria-label={doneWork > 0 ? 'Mover o cambiar: ya hay series hechas hoy' : 'Mover o cambiar'}
                       disabled={doneWork > 0}
                       style={doneWork > 0 ? { opacity: 0.45 } : undefined}
                       onClick={() => setMoving(true)}

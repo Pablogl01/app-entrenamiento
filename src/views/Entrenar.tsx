@@ -273,7 +273,7 @@ export function Entrenar() {
                     }}
                   >
                     <Icon name="calendar" size={18} />
-                    Mover a otro día
+                    Mover o cambiar rutina
                   </button>
                 )}
                 <Link to={`/catalogo?session=${session.id}`} className="h-touch px-md flex items-center gap-sm type-label-md uppercase tracking-wider text-on-surface">

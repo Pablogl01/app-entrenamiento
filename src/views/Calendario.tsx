@@ -73,8 +73,11 @@ export function Calendario() {
     const overrides = await overridesBetween(fromISO, toISO)
     const routineNames = new Map<string, string>()
     for (const o of overrides) {
-      const r = await db.routines.get(o.routine_id)
-      if (r) routineNames.set(r.id, r.name)
+      for (const id of [o.routine_id, o.replaced_by ?? null]) {
+        if (id === null || routineNames.has(id)) continue
+        const r = await db.routines.get(id)
+        if (r) routineNames.set(r.id, r.name)
+      }
     }
     let next: { iso: string; name: string } | null = null
     for (let i = 0; i <= 7; i++) {
@@ -368,7 +371,7 @@ export function Calendario() {
                       {shortDate(d.iso)} · Sesión pospuesta
                     </span>
                   </div>
-                  <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">Descanso activo</span>
+                  <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">{o.replaced_by != null ? 'Cambio' : 'Descanso activo'}</span>
                 </div>
                 <p className="type-body-sm text-on-surface-variant">
                   {d.scheduled[0]?.name ?? 'Sesión'} programada y sin hacer. Puedes moverla a otro día o dejarla como descanso.
@@ -399,14 +402,18 @@ export function Calendario() {
                   <div className="flex items-center gap-xs">
                     <Icon name="history" size={18} className="text-secondary" />
                     <span className="type-body-md text-on-surface font-medium">
-                      {shortDate(o.from_date)} · Sesión pospuesta
+                      {shortDate(o.from_date)} · {o.replaced_by != null ? 'Rutina cambiada' : 'Sesión pospuesta'}
                     </span>
                   </div>
                   <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">Descanso activo</span>
                 </div>
                 <p className="type-body-sm text-on-surface-variant">
                   {data.routineNames.get(o.routine_id) ?? 'Rutina'}
-                  {o.to_date === null ? ' anulada ese día.' : ` reasignada al ${shortDate(o.to_date)}.`}
+                  {o.replaced_by != null
+                    ? ` sustituida por ${data.routineNames.get(o.replaced_by) ?? 'otra rutina'} ese día.`
+                    : o.to_date === null
+                      ? ' anulada ese día.'
+                      : ` reasignada al ${shortDate(o.to_date)}.`}
                 </p>
                 <div className="flex gap-sm pt-xxs">
                   <button className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void db.schedule_overrides.delete(o.id)}>
