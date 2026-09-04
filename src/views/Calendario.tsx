@@ -371,7 +371,7 @@ export function Calendario() {
                       {shortDate(d.iso)} · Sesión pospuesta
                     </span>
                   </div>
-                  <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">{o.replaced_by != null ? 'Cambio' : 'Descanso activo'}</span>
+                  <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">Descanso activo</span>
                 </div>
                 <p className="type-body-sm text-on-surface-variant">
                   {d.scheduled[0]?.name ?? 'Sesión'} programada y sin hacer. Puedes moverla a otro día o dejarla como descanso.
@@ -405,7 +405,7 @@ export function Calendario() {
                       {shortDate(o.from_date)} · {o.replaced_by != null ? 'Rutina cambiada' : 'Sesión pospuesta'}
                     </span>
                   </div>
-                  <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">Descanso activo</span>
+                  <span className="type-label-sm text-on-surface-variant uppercase px-2 py-0p5 rounded bg-sc">{o.replaced_by != null ? 'Cambio' : 'Descanso activo'}</span>
                 </div>
                 <p className="type-body-sm text-on-surface-variant">
                   {data.routineNames.get(o.routine_id) ?? 'Rutina'}
