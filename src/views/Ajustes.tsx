@@ -6,6 +6,7 @@ import { cycleState } from '../db/repo'
 import { downloadExport, importSnapshot, uploadBackup } from '../lib/backup'
 import { enablePush, pushStatus, sendTestNotification, syncPrefs, type PushStatus } from '../lib/push'
 import { applyTheme } from '../lib/theme'
+import { logout, useAuthState } from '../lib/auth'
 import { fmtNum } from '../lib/format'
 import { TopBar } from '../components/TopBar'
 import { Icon, type IconName } from '../components/Icon'
@@ -87,7 +88,8 @@ function Row({ icon, iconVolt = false, title, hint, hintVolt = false, children }
           <Icon name={icon} size={18} />
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="type-body-md font-medium text-on-surface">{title}</span>
+          {/* Un correo no tiene espacios: que parta antes de desbordar la fila. */}
+          <span className="type-body-md font-medium text-on-surface" style={{ overflowWrap: 'anywhere' }}>{title}</span>
           <span className={`type-label-sm ${hintVolt ? 'text-primary-dim' : 'text-on-surface-variant'}`}>{hint}</span>
         </div>
       </div>
@@ -99,6 +101,7 @@ function Row({ icon, iconVolt = false, title, hint, hintVolt = false, children }
 export function Ajustes() {
   const settings = useLiveQuery(getSettings)
   const cycle = useLiveQuery(() => cycleState(), [])
+  const auth = useAuthState()
   const location = useLocation()
   const [push, setPush] = useState<PushStatus | null>(null)
   const [testResult, setTestResult] = useState<string | null>(null)
@@ -278,10 +281,35 @@ export function Ajustes() {
             </div>
           </section>
 
+          {/* Cuenta: justo antes de las dos secciones que la necesitan (plans/007 §4.1) */}
+          <section id="cuenta" className="flex flex-col gap-sm" style={{ scrollMarginTop: 72 }}>
+            <SectionHead title="Cuenta" hint="Avisos y copia" />
+            <div className="flex flex-col rounded-xl bg-sc-low overflow-hidden shadow-sm">
+              {auth.status === 'in' ? (
+                <Row icon="user" title={auth.email} hint="Sesión abierta en este dispositivo">
+                  <button type="button" className="h-touch px-sm rounded-lg type-label-md uppercase tracking-wider text-on-surface-variant press flex-none" onClick={() => void logout()}>
+                    Salir
+                  </button>
+                </Row>
+              ) : (
+                <Link to="/cuenta" className="flex flex-col">
+                  <Row
+                    icon="user"
+                    title={auth.status === 'anon' ? 'Sin cuenta' : auth.email}
+                    hint={auth.status === 'anon' ? 'Avisos y copia se quedan en este móvil' : auth.status === 'expired' ? 'Sesión caducada · toca para entrar' : 'Sin conexión · se comprueba al volver la red'}
+                  >
+                    <Icon name="chevron-right" size={20} className="text-on-surface-variant" />
+                  </Row>
+                </Link>
+              )}
+            </div>
+          </section>
+
           {/* Peso corporal y recordatorios */}
           <section ref={avisosRef} id="avisos" className="flex flex-col gap-sm" style={{ scrollMarginTop: 72 }}>
             <SectionHead title="Peso corporal y recordatorios" hint={settings.notif_weight_enabled || settings.notif_train_enabled ? 'Alertas activas' : 'Sin alertas'} />
             <div className="flex flex-col gap-sm">
+              {auth.status === 'anon' && <p className="type-body-sm text-on-surface-variant px-xxs">Sin cuenta, los avisos se quedan en este móvil: si reinstalas la app, se pierden.</p>}
               <div className="p-md rounded-xl bg-sc-low flex flex-col gap-sm">
                 <div className="flex items-center justify-between gap-sm">
                   <div className="flex items-center gap-md min-w-0">
@@ -405,6 +433,7 @@ export function Ajustes() {
                   </div>
                 </div>
               </div>
+              {auth.status === 'anon' && <p className="type-body-sm text-on-surface-variant">Sin cuenta, la copia se guarda con la clave de este móvil.</p>}
               <button type="button" className="w-full h-touch rounded-lg bg-sc-high text-on-surface type-label-md uppercase tracking-wider flex items-center justify-center gap-sm press" onClick={() => void uploadBackup().then((ok) => setImportResult(ok ? 'Copia subida.' : 'El servidor no respondió.'))}>
                 <Icon name="sync" size={18} />
                 <span>Sincronizar ahora</span>

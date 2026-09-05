@@ -1,9 +1,35 @@
--- Tablas del notificador (especificaciones §6.2), idénticas al servidor Node.
+-- Tablas del notificador (especificaciones §6.2) más la cuenta de usuario
+-- (plans/007). Una base ya creada se pone al día con migrations/001-auth.sql.
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
+  -- Instalaciones sin cuenta: SHA-256 del token anónimo del cliente.
+  -- Cuentas: 'acct:' || id (único, sin uso). La columna se retirará con el token anónimo.
   token_hash TEXT UNIQUE NOT NULL,
   timezone TEXT NOT NULL,
-  created_at INTEGER NOT NULL
+  created_at INTEGER NOT NULL,
+  email TEXT,
+  password_hash TEXT,
+  password_salt TEXT,
+  password_iterations INTEGER
+);
+CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users(email);
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  token_hash TEXT UNIQUE NOT NULL,
+  family TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  last_used_at INTEGER,
+  expires_at INTEGER NOT NULL,
+  revoked_at INTEGER,
+  replaced_by TEXT,
+  user_agent TEXT
+);
+CREATE INDEX IF NOT EXISTS refresh_tokens_user ON refresh_tokens(user_id);
+CREATE TABLE IF NOT EXISTS login_attempts (
+  email TEXT PRIMARY KEY,
+  failures INTEGER NOT NULL,
+  locked_until INTEGER
 );
 CREATE TABLE IF NOT EXISTS push_subscriptions (
   endpoint TEXT PRIMARY KEY,

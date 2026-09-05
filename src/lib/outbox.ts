@@ -3,21 +3,29 @@
 // notificador necesita para no dar la lata. Si no hay backend accesible, los
 // intentos se agotan en silencio y la app no se entera.
 import { db, USER_ID, getSettings } from '../db/db'
+import { API_BASE, authState, getAccessToken, refreshSession } from './auth'
+
+export { API_BASE }
 
 const MAX_RETRIES = 10
 
-export const API_BASE: string = (import.meta.env.VITE_API_URL as string | undefined) ?? ''
-
-export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
+/** Con sesión, el access token; sin ella, el token anónimo del primer arranque.
+ *  Si el access token ha caducado (401), se renueva una vez y se reintenta. */
+export async function apiFetch(path: string, init?: RequestInit, retry = true): Promise<Response> {
   const settings = await getSettings()
-  return fetch(`${API_BASE}${path}`, {
+  const access = getAccessToken()
+  const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${settings.api_token}`,
+      Authorization: `Bearer ${access ?? settings.api_token}`,
       ...init?.headers,
     },
   })
+  if (res.status === 401 && retry && access !== null && (await refreshSession())) {
+    return apiFetch(path, init, false)
+  }
+  return res
 }
 
 export async function enqueue(path: string, body: unknown): Promise<void> {
@@ -69,7 +77,12 @@ export async function reportFact(fact: 'weighed_in' | 'trained', localDate: stri
 
 export function initOutbox(): void {
   window.addEventListener('online', () => void flushOutbox())
-  // Alta idempotente al arrancar: el token largo del primer arranque + tz IANA.
+  // Con cuenta, la identidad la da la sesión: nada que registrar.
+  if (authState().status !== 'anon') {
+    void flushOutbox()
+    return
+  }
+  // Sin cuenta, alta anónima idempotente: el token largo del primer arranque + tz IANA.
   void apiFetch('/api/register', {
     method: 'POST',
     body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),

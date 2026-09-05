@@ -33,6 +33,7 @@ export default defineConfig({
     },
   }), cloudflare()],
   server: {
-    proxy: { '/api': 'http://localhost:8787' },
+    // IP explícita: `localhost` puede resolver a ::1 y caer en otro proceso; wrangler dev escucha en 127.0.0.1.
+    proxy: { '/api': 'http://127.0.0.1:8787' },
   },
 })

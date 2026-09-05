@@ -114,6 +114,7 @@ export function defaultSettings(): Settings {
     bar_weight: 20,
     plates: [25, 20, 15, 10, 5, 2.5, 1.25],
     api_token: crypto.randomUUID() + crypto.randomUUID(),
+    account_email: null,
     notif_weight_enabled: false,
     notif_weight_time: '08:00',
     notif_train_enabled: false,

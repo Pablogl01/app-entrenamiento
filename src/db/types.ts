@@ -186,8 +186,10 @@ export interface Settings {
   /** Calculadora de discos. */
   bar_weight: number
   plates: number[]
-  /** Token largo generado en el primer arranque (especificaciones §6.6). */
+  /** Token largo generado en el primer arranque (especificaciones §6.6). Identidad sin cuenta. */
   api_token: string
+  /** Correo de la cuenta con sesión en este dispositivo; null sin cuenta (plans/007). */
+  account_email: string | null
   notif_weight_enabled: boolean
   notif_weight_time: string
   notif_train_enabled: boolean

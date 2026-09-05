@@ -3,7 +3,7 @@
 Sistema de diseño «Kinetic Nordic Craft». Se lee **antes** de escribir cualquier UI.
 Complementa `especificaciones-app-entrenamiento.md`, que define el comportamiento. Este documento define el aspecto.
 
-**Versión:** 2.4 · septiembre 2026. Sustituye por completo a la v1.x (crema, material fotográfico, verde funcional). Las maquetas de origen y los dos DESIGN exportados de Stitch están en `docs/stitch/`; el plan de implementación en `docs/rediseno-v2-plan.md`.
+**Versión:** 2.7 · septiembre 2026. Sustituye por completo a la v1.x (crema, material fotográfico, verde funcional). Las maquetas de origen y los dos DESIGN exportados de Stitch están en `docs/stitch/`; el plan de implementación en `docs/rediseno-v2-plan.md`.
 
 ---
 
@@ -259,7 +259,11 @@ Pantalla de recompensa. Chip volt con series y ejercicios, número de registro, 
 
 ### Ajustes
 
-Cabecera «PARÁMETROS» / «AJUSTES» con chip de versión. Secciones con etiqueta mono y punto volt: **Apariencia** (segmentado Sistema / Oscuro / Claro), **Unidad de peso** (dos opciones de 56px), **Incrementos por defecto** (filas título + descripción + stepper pequeño, sin icono para que el texto respire), **Peso corporal y avisos** (toggles volt, chips de hora, bloque de estado del push en texto sincero), **Datos y copia** (sincronizar, exportar, importar).
+Cabecera «PARÁMETROS» / «AJUSTES» con chip de versión. Secciones con etiqueta mono y punto volt: **Apariencia** (segmentado Sistema / Oscuro / Claro), **Unidad de peso** (dos opciones de 56px), **Incrementos por defecto** (filas título + descripción + stepper pequeño, sin icono para que el texto respire), **Cuenta** (una fila: icono `user`, «Sin cuenta» / correo, pista de estado; «Salir» como botón de texto a la derecha cuando hay sesión; enlaza a `/cuenta`. Va justo antes de las dos secciones que la necesitan, no en cabeza: la cuenta es un medio para avisos y copia, no la identidad de la app), **Peso corporal y avisos** (toggles volt, chips de hora, bloque de estado del push en texto sincero; sin cuenta, una línea dice que los avisos se quedan en este móvil), **Datos y copia** (sincronizar, exportar, importar; sin cuenta, una línea dice que la copia va con la clave del móvil).
+
+### Cuenta (`/cuenta`)
+
+Pantalla apilada. Cabecera «AVISOS Y COPIA» / «ENTRAR O CREAR CUENTA». Segmentado Entrar / Crear cuenta idéntico al de Apariencia. Dos campos `.field` (lecho `--well`, 56, radio 4, anillo volt al foco) con etiqueta `label-sm` mayúsculas; la contraseña lleva «Mostrar / Ocultar» como botón de texto de 44 en la misma línea de la etiqueta: **un solo campo, sin repetir contraseña**. Botón de 56 volt solo cuando se puede enviar; hasta entonces `--surface-hi` apagado. El error va debajo en `body-sm` `on-surface-variant`, sin icono ni rojo, y dice qué pasó y qué hacer. Sin «¿Olvidaste tu contraseña?», sin botones sociales, sin ilustración: no hay correo saliente y esto es una pantalla de Ajustes, no un onboarding. Con sesión abierta muestra la misma fila que Ajustes y «Salir».
 
 ---
 
@@ -356,6 +360,8 @@ Las anteriores: Las cuatro del rediseño se cerraron el 2026-09-03 antes de codi
 ---
 
 ## 11. Changelog
+
+- **2026-09-05** — v2.7. **Cuenta opcional con sesión persistente** (`plans/007`). Sección «Cuenta» en Ajustes entre Incrementos y Avisos, con tres estados en la misma fila (sin cuenta · sesión abierta con «Salir» · sesión caducada o sin conexión, en `on-surface-variant`, nunca alerta). Pantalla nueva `/cuenta` (§4): segmentado Entrar / Crear cuenta, dos `.field`, «Mostrar» en texto, botón volt solo cuando se puede enviar, errores en texto plano. Avisos y Copia dicen en una línea qué pasa sin cuenta. El correo largo parte con `overflow-wrap: anywhere` en vez de truncarse: el dominio identifica la cuenta. Tokens y clases existentes, ningún icono nuevo.
 
 - **2026-09-04** — v2.6. La hoja «Mover» pasa a ser **«Mover o cambiar»**: dos grupos con etiqueta (`label-sm` mayúsculas, mute), «Mover a otro día» con la rejilla de catorce días y **«Cambiar por»** con las demás rutinas activas en filas de 44 separadas por hairline (nombre · «N ejerc.» o «también el Dom 6» si ya está programada esa quincena · icono swap). Un toque sustituye la rutina de ese día sin tocar el resto de la semana; si el día ya es una sustitución, la original va primera como «Volver a …». Panel con tope de 85dvh y scroll interno entre cabecera y «Dejar como descanso». Hero de Hoy: «En lugar de Torso superior · Enfoque …». Calendario: tarjeta «Rutina cambiada» con chip «Cambio». Modelo: `schedule_overrides.replaced_by`, un registro por sustitución.
 

@@ -25,3 +25,9 @@ Ningún plan toca el código por sí mismo: cada uno está escrito para que lo e
 ## Decisiones pendientes (no son planes)
 
 Ver `000-auditoria-movimiento.md §5`: reducción de movimiento «a cero» frente a «conservar color y opacidad»; press a 60 ms lineal; destino de la secuencia orquestada.
+
+## Otros planes (fuera de la auditoría de movimiento)
+
+| # | Plan | Estado |
+| --- | --- | --- |
+| 007 | Cuenta de usuario con sesión persistente (access + refresh token) | HECHO y desplegado (2026-09-05). Sin commit |

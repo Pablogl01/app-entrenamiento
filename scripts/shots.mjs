@@ -13,7 +13,8 @@ const context = await browser.newContext({ viewport: { width: 380, height: 800 }
 const page = await context.newPage()
 const errors = []
 page.on('console', (msg) => {
-  if (msg.type() === 'error' && !msg.text().includes('502')) errors.push(msg.text())
+  // 401: el refresh de sesión al arrancar sin cuenta (plans/007); no es un error de la app.
+  if (msg.type() === 'error' && !msg.text().includes('502') && !msg.text().includes('401')) errors.push(msg.text())
 })
 page.on('pageerror', (err) => errors.push(String(err)))
 

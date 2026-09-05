@@ -3,6 +3,23 @@
 // la alternativa que las especificaciones §6.3 anticipaban para runtimes edge.
 // El registro de series nunca pasa por aquí.
 import { buildPushPayload, type PushSubscription } from '@block65/webcrypto-web-push'
+import {
+  LOCK_AFTER_FAILURES,
+  LOCK_MS,
+  MIN_PASSWORD_LENGTH,
+  REFRESH_COOKIE,
+  REFRESH_TTL_S,
+  clearedRefreshCookie,
+  hashPassword,
+  normalizeEmail,
+  randomToken,
+  readCookie,
+  refreshCookie,
+  sha256hex,
+  signAccessToken,
+  verifyAccessToken,
+  verifyPassword,
+} from './auth'
 
 export interface Env {
   DB: D1Database
@@ -10,12 +27,28 @@ export interface Env {
   VAPID_SUBJECT: string
   VAPID_PUBLIC_KEY: string
   VAPID_PRIVATE_KEY: string
+  /** Firma de los access tokens (plans/007). `wrangler secret put AUTH_SECRET`; en dev, `.dev.vars`. */
+  AUTH_SECRET?: string
 }
 
 interface UserRow {
   id: string
   token_hash: string
   timezone: string
+  email: string | null
+  password_hash: string | null
+  password_salt: string | null
+  password_iterations: number | null
+  created_at: number
+}
+
+interface RefreshRow {
+  id: string
+  user_id: string
+  family: string
+  expires_at: number
+  revoked_at: number | null
+  replaced_by: string | null
 }
 
 interface SubRow {
@@ -46,10 +79,7 @@ function json(data: unknown, status = 200): Response {
   })
 }
 
-async function hashToken(token: string): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token))
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
-}
+const hashToken = sha256hex
 
 function bearer(req: Request): string | null {
   const h = req.headers.get('Authorization')
@@ -57,9 +87,14 @@ function bearer(req: Request): string | null {
   return h.slice(7)
 }
 
+/** Primero como access token de una cuenta; si no lo es, como token anónimo (compatibilidad). */
 async function authUser(req: Request, env: Env): Promise<UserRow | null> {
   const token = bearer(req)
   if (token === null) return null
+  if (env.AUTH_SECRET !== undefined && token.split('.').length === 3) {
+    const claims = await verifyAccessToken(token, env.AUTH_SECRET)
+    if (claims !== null) return env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(claims.sub).first<UserRow>()
+  }
   const hash = await hashToken(token)
   return env.DB.prepare('SELECT * FROM users WHERE token_hash = ?').bind(hash).first<UserRow>()
 }
@@ -105,6 +140,196 @@ async function sendToUser(env: Env, userId: string, payload: Payload): Promise<n
   return sent
 }
 
+// ---- Cuenta (plans/007) ----
+
+function publicUser(user: UserRow): { id: string; email: string | null; created_at: number } {
+  return { id: user.id, email: user.email, created_at: user.created_at }
+}
+
+/** Crea un refresh token (familia nueva o la indicada) y responde con el access token y la cookie. */
+async function issueSession(
+  env: Env,
+  secret: string,
+  user: UserRow,
+  req: Request,
+  family = crypto.randomUUID(),
+  status = 200,
+): Promise<{ response: Response; tokenId: string }> {
+  const now = Date.now()
+  const raw = randomToken()
+  const tokenId = crypto.randomUUID()
+  await env.DB.prepare(
+    'INSERT INTO refresh_tokens (id, user_id, token_hash, family, created_at, last_used_at, expires_at, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  )
+    .bind(tokenId, user.id, await sha256hex(raw), family, now, now, now + REFRESH_TTL_S * 1000, req.headers.get('User-Agent'))
+    .run()
+  const access = await signAccessToken(user.id, user.email ?? '', secret, now)
+  const response = new Response(JSON.stringify({ access_token: access, user: publicUser(user) }), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Set-Cookie': refreshCookie(raw) },
+  })
+  return { response, tokenId }
+}
+
+function authFailure(data: unknown, status: number): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Set-Cookie': clearedRefreshCookie() },
+  })
+}
+
+/** Fila anónima (token del primer arranque, sin email) que corresponde a `legacy_token`. */
+async function anonymousRow(env: Env, legacyToken: unknown): Promise<UserRow | null> {
+  if (typeof legacyToken !== 'string' || legacyToken.length < 16) return null
+  return env.DB.prepare('SELECT * FROM users WHERE token_hash = ? AND email IS NULL').bind(await hashToken(legacyToken)).first<UserRow>()
+}
+
+/** Pasa a la cuenta lo que este móvil guardó sin cuenta (prefs, suscripción, programación, hechos, copias) y borra la fila anónima. */
+async function mergeAnonymousInto(env: Env, anon: UserRow, account: UserRow): Promise<void> {
+  const a = anon.id
+  const u = account.id
+  await env.DB.batch([
+    env.DB.prepare('UPDATE push_subscriptions SET user_id = ? WHERE user_id = ?').bind(u, a),
+    env.DB.prepare('UPDATE backups SET user_id = ? WHERE user_id = ?').bind(u, a),
+    // Las prefs del móvil que entra son las recién tocadas: mandan.
+    env.DB.prepare(
+      'INSERT OR REPLACE INTO notification_prefs (user_id, type, enabled, local_time, only_scheduled_days) SELECT ?, type, enabled, local_time, only_scheduled_days FROM notification_prefs WHERE user_id = ?',
+    ).bind(u, a),
+    env.DB.prepare('INSERT OR IGNORE INTO weekly_schedule (user_id, weekday, routine_name) SELECT ?, weekday, routine_name FROM weekly_schedule WHERE user_id = ?').bind(u, a),
+    env.DB.prepare('INSERT OR IGNORE INTO notification_log (user_id, type, local_date) SELECT ?, type, local_date FROM notification_log WHERE user_id = ?').bind(u, a),
+    env.DB.prepare(
+      `INSERT INTO daily_facts (user_id, local_date, weighed_in, trained) SELECT ?, local_date, weighed_in, trained FROM daily_facts WHERE user_id = ?
+       ON CONFLICT(user_id, local_date) DO UPDATE SET weighed_in = MAX(weighed_in, excluded.weighed_in), trained = MAX(trained, excluded.trained)`,
+    ).bind(u, a),
+    env.DB.prepare('DELETE FROM notification_prefs WHERE user_id = ?').bind(a),
+    env.DB.prepare('DELETE FROM weekly_schedule WHERE user_id = ?').bind(a),
+    env.DB.prepare('DELETE FROM notification_log WHERE user_id = ?').bind(a),
+    env.DB.prepare('DELETE FROM daily_facts WHERE user_id = ?').bind(a),
+    env.DB.prepare('DELETE FROM users WHERE id = ?').bind(a),
+  ])
+}
+
+async function handleAuth(req: Request, env: Env, route: string): Promise<Response> {
+  const secret = env.AUTH_SECRET
+  if (secret === undefined || secret.length < 32) {
+    console.error('AUTH_SECRET sin configurar: wrangler secret put AUTH_SECRET (o .dev.vars en desarrollo)')
+    return json({ error: 'cuenta no configurada en el servidor' }, 500)
+  }
+
+  switch (route) {
+    case 'POST /api/auth/register': {
+      const body = await readBody(req)
+      const email = normalizeEmail(body.email)
+      if (email === null) return json({ error: 'correo inválido' }, 400)
+      if (typeof body.password !== 'string' || body.password.length < MIN_PASSWORD_LENGTH) {
+        return json({ error: `contraseña de al menos ${MIN_PASSWORD_LENGTH} caracteres` }, 400)
+      }
+      const taken = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first<{ id: string }>()
+      if (taken !== null) return json({ error: 'ya hay una cuenta con este correo' }, 409)
+
+      const pw = await hashPassword(body.password)
+      const timezone = typeof body.timezone === 'string' ? body.timezone : 'Europe/Madrid'
+      const anon = await anonymousRow(env, body.legacy_token)
+      let id: string
+      if (anon !== null) {
+        // La fila anónima de este móvil se convierte en la cuenta: cero movimientos de datos.
+        id = anon.id
+        await env.DB.prepare('UPDATE users SET email = ?, password_hash = ?, password_salt = ?, password_iterations = ?, timezone = ? WHERE id = ?')
+          .bind(email, pw.hash, pw.salt, pw.iterations, timezone, id)
+          .run()
+      } else {
+        id = crypto.randomUUID()
+        await env.DB.prepare(
+          'INSERT INTO users (id, token_hash, timezone, created_at, email, password_hash, password_salt, password_iterations) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        )
+          .bind(id, `acct:${id}`, timezone, Date.now(), email, pw.hash, pw.salt, pw.iterations)
+          .run()
+      }
+      const user = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(id).first<UserRow>()
+      if (user === null) return json({ error: 'no se pudo crear la cuenta' }, 500)
+      return (await issueSession(env, secret, user, req, undefined, 201)).response
+    }
+
+    case 'POST /api/auth/login': {
+      const body = await readBody(req)
+      const email = normalizeEmail(body.email)
+      if (email === null || typeof body.password !== 'string') return json({ error: 'correo o contraseña incorrectos' }, 401)
+
+      const now = Date.now()
+      const attempt = await env.DB.prepare('SELECT failures, locked_until FROM login_attempts WHERE email = ?')
+        .bind(email)
+        .first<{ failures: number; locked_until: number | null }>()
+      if (attempt !== null && attempt.locked_until !== null && attempt.locked_until > now) {
+        return new Response(JSON.stringify({ error: 'demasiados intentos' }), {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', 'Retry-After': String(Math.ceil((attempt.locked_until - now) / 1000)) },
+        })
+      }
+
+      const user = await env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(email).first<UserRow>()
+      const ok =
+        user !== null &&
+        user.password_hash !== null &&
+        user.password_salt !== null &&
+        user.password_iterations !== null &&
+        (await verifyPassword(body.password, { hash: user.password_hash, salt: user.password_salt, iterations: user.password_iterations }))
+      if (!ok || user === null) {
+        const failures = (attempt?.failures ?? 0) + 1
+        const lockedUntil = failures >= LOCK_AFTER_FAILURES ? now + LOCK_MS : null
+        await env.DB.prepare(
+          'INSERT INTO login_attempts (email, failures, locked_until) VALUES (?, ?, ?) ON CONFLICT(email) DO UPDATE SET failures = excluded.failures, locked_until = excluded.locked_until',
+        )
+          .bind(email, failures, lockedUntil)
+          .run()
+        return json({ error: 'correo o contraseña incorrectos' }, 401)
+      }
+      await env.DB.prepare('DELETE FROM login_attempts WHERE email = ?').bind(email).run()
+
+      const anon = await anonymousRow(env, body.legacy_token)
+      if (anon !== null && anon.id !== user.id) await mergeAnonymousInto(env, anon, user)
+      if (typeof body.timezone === 'string') await env.DB.prepare('UPDATE users SET timezone = ? WHERE id = ?').bind(body.timezone, user.id).run()
+      return (await issueSession(env, secret, user, req)).response
+    }
+
+    case 'POST /api/auth/refresh': {
+      const raw = readCookie(req, REFRESH_COOKIE)
+      if (raw === null) return authFailure({ error: 'sin sesión' }, 401)
+      const row = await env.DB.prepare('SELECT * FROM refresh_tokens WHERE token_hash = ?').bind(await sha256hex(raw)).first<RefreshRow>()
+      if (row === null) return authFailure({ error: 'sin sesión' }, 401)
+      const now = Date.now()
+      if (row.revoked_at !== null || row.replaced_by !== null) {
+        // Un token ya rotado vuelve a usarse: alguien lo copió. Cae toda la familia.
+        await env.DB.prepare('UPDATE refresh_tokens SET revoked_at = ? WHERE family = ? AND revoked_at IS NULL').bind(now, row.family).run()
+        return authFailure({ error: 'sesión revocada' }, 401)
+      }
+      if (row.expires_at <= now) return authFailure({ error: 'sesión caducada' }, 401)
+      const user = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(row.user_id).first<UserRow>()
+      if (user === null) return authFailure({ error: 'sin sesión' }, 401)
+      // Rotación: el nuevo sustituye al viejo, que queda marcado para detectar reutilización.
+      const { response, tokenId } = await issueSession(env, secret, user, req, row.family)
+      await env.DB.prepare('UPDATE refresh_tokens SET replaced_by = ?, last_used_at = ? WHERE id = ?').bind(tokenId, now, row.id).run()
+      return response
+    }
+
+    case 'POST /api/auth/logout': {
+      const raw = readCookie(req, REFRESH_COOKIE)
+      if (raw !== null) {
+        await env.DB.prepare('UPDATE refresh_tokens SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL').bind(Date.now(), await sha256hex(raw)).run()
+      }
+      return new Response(null, { status: 204, headers: { 'Set-Cookie': clearedRefreshCookie() } })
+    }
+
+    case 'GET /api/auth/me': {
+      const user = await authUser(req, env)
+      if (user === null || user.email === null) return json({ error: 'sin sesión' }, 401)
+      return json(publicUser(user))
+    }
+
+    default:
+      return json({ error: 'no existe' }, 404)
+  }
+}
+
 // ---- API ----
 
 async function handleApi(req: Request, env: Env): Promise<Response> {
@@ -130,6 +355,8 @@ async function handleApi(req: Request, env: Env): Promise<Response> {
     }
     return json({ ok: true })
   }
+
+  if (url.pathname.startsWith('/api/auth/')) return handleAuth(req, env, route)
 
   const user = await authUser(req, env)
   if (user === null) return json({ error: 'sin token o usuario no registrado' }, 401)

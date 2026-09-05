@@ -11,12 +11,14 @@ import { EjercicioDetalle } from './views/EjercicioDetalle'
 import { SesionPasada } from './views/SesionPasada'
 import { Resumen } from './views/Resumen'
 import { Ajustes } from './views/Ajustes'
+import { Cuenta } from './views/Cuenta'
 import { Entrenar } from './views/Entrenar'
 import { Ciclo } from './views/Ciclo'
 import { getSettings } from './db/db'
 import { cleanupStaleDrafts, syncCatalog } from './db/repo'
 import { seedDemo } from './db/demo'
 import { initOutbox } from './lib/outbox'
+import { hydrateAuthState, refreshSession } from './lib/auth'
 import { ensureSubscription } from './lib/push'
 import { dailyBackupIfDue } from './lib/backup'
 import { applyTheme } from './lib/theme'
@@ -107,6 +109,10 @@ function App() {
       applyTheme(forced === 'light' || forced === 'dark' ? forced : settings.theme)
       await syncCatalog()
       await cleanupStaleDrafts()
+      // Sesión: primero lo que sabe el móvil (sin red), luego la renovación con la cookie.
+      // Si falla, la app sigue igual: solo avisos y copia necesitan cuenta (plans/007).
+      await hydrateAuthState()
+      await refreshSession()
       initOutbox()
       void ensureSubscription()
       void dailyBackupIfDue()
@@ -131,6 +137,7 @@ function App() {
           <Route path="/sesion/:id" element={<SesionPasada />} />
           <Route path="/resumen/:id" element={<Resumen />} />
           <Route path="/ajustes" element={<Ajustes />} />
+          <Route path="/cuenta" element={<Cuenta />} />
           <Route path="/entrenar" element={<Entrenar />} />
           <Route path="/ciclo" element={<Ciclo />} />
         </Route>

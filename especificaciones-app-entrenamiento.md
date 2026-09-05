@@ -384,15 +384,22 @@ Mantener también el **export a JSON manual** en Ajustes: un borrado de datos de
 
 ### 6.6 Autenticación
 
-Con un usuario, no construir cuentas: token largo generado en el primer arranque, guardado en local, enviado en cada petición.
+**Hasta la v2.6:** con un usuario, sin cuentas: token largo generado en el primer arranque, guardado en local, enviado en cada petición. La columna `user_id` existía desde el día uno precisamente para poder cambiar esto sin migrar datos locales.
 
-**Pero dejar la columna `user_id` en las tablas desde el día uno.** Cambiar el esquema después es molesto, y tener la columna no obliga a construir un login.
+**Desde 2026-09-05 (plan `plans/007`): cuenta opcional con sesión persistente.**
+
+- **La cuenta es un medio, no una puerta.** Entrenar, registrar series y peso funcionan igual sin cuenta: IndexedDB sigue siendo la fuente de verdad (§6.2). Solo los avisos push y la copia en el servidor la necesitan, y por eso vive en Ajustes, justo antes de esas dos secciones, no al arrancar la app.
+- **Dos credenciales.** *Access token*: JWT HS256 de 15 minutos, solo en memoria del cliente, en cada petición como `Authorization: Bearer`. *Refresh token*: 32 bytes aleatorios en cookie `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`, 90 días deslizantes; el servidor guarda su SHA-256 en `refresh_tokens`. Al abrir la app, `POST /api/auth/refresh` renueva el access token sin que el usuario haga nada. Cada refresh **rota** la cookie; reutilizar una ya rotada revoca toda la familia (robo detectado) y obliga a entrar de nuevo.
+- **Nunca en localStorage.** Un XSS se llevaría el refresh durante 90 días. La cookie `HttpOnly` no la puede leer, y en iOS la caducidad de 7 días de ITP no afecta a una cookie puesta por el servidor en una PWA instalada.
+- **Contraseñas:** PBKDF2-SHA-256 (WebCrypto; Workers no tiene bcrypt ni argon2), sal de 16 bytes por usuario, **50 000 iteraciones** guardadas por fila para poder subirlas. Workers limita a 100 000 y el plan gratuito da 10 ms de CPU; 100 000 midieron ~12 ms en local. Está por debajo de lo que recomienda OWASP y se compensa con contraseña mínima de 10 caracteres y bloqueo de 15 minutos tras 10 fallos por correo. Registro abierto, sin verificación de correo ni recuperación de contraseña (no hay correo saliente): la app no promete lo que no puede hacer.
+- **El token anónimo convive** una versión más: `authUser` acepta primero un JWT y, si no lo es, el `token_hash` antiguo. Al crear cuenta o entrar, el cliente manda `legacy_token` y el servidor convierte la fila anónima en la cuenta (register) o fusiona sus prefs, suscripción, programación, hechos y copias en ella (login). Retirarlo, junto con `POST /api/register`, es un plan posterior.
+- Endpoints: `POST /api/auth/register|login|refresh|logout`, `GET /api/auth/me`. Tablas nuevas: `refresh_tokens`, `login_attempts`; `users` gana `email`, `password_hash`, `password_salt`, `password_iterations`. Detalle en `plans/007-cuenta-y-sesion-persistente.md` y `worker/README.md`.
 
 ---
 
 ## 7. Fuera de alcance de la v1
 
-Superseries, dropsets, cardio, fotos de progreso, medidas corporales adicionales, cuentas de usuario, sync multidispositivo, rotación por ciclos (Push/Pull/Legs girando cada N entrenamientos independientemente del día).
+Superseries, dropsets, cardio, fotos de progreso, medidas corporales adicionales, sync multidispositivo, rotación por ciclos (Push/Pull/Legs girando cada N entrenamientos independientemente del día). Las cuentas de usuario salieron de esta lista el 2026-09-05 (§6.6); siguen fuera la restauración de la copia al entrar en un móvil nuevo, la recuperación de contraseña y las passkeys.
 
 **Con interfaz pero sin fuente de datos (v2.1):** velocidad media propulsiva (hace falta un encoder de barra), sueño y recuperación medida (hace falta pulsera). La recuperación que se muestra es una estimación por horas desde la última sesión frente a una ventana de 24/48/72 h según su RPE.
 
