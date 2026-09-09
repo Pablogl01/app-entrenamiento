@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Link, useLocation } from 'react-router-dom'
 import { getSettings, patchSettings } from '../db/db'
 import { cycleState } from '../db/repo'
-import { downloadExport, importSnapshot, uploadBackup } from '../lib/backup'
+import { downloadExport, fetchServerBackup, importSnapshot, restoreSnapshot, uploadBackup } from '../lib/backup'
 import { enablePush, pushStatus, sendTestNotification, syncPrefs, type PushStatus } from '../lib/push'
 import { applyTheme } from '../lib/theme'
 import { logout, useAuthState } from '../lib/auth'
@@ -138,6 +138,33 @@ export function Ajustes() {
     if (!window.confirm('Importar reemplaza todos los datos actuales. ¿Seguir?')) return
     const res = await importSnapshot(file)
     setImportResult(res === 'ok' ? 'Datos importados.' : 'Ese archivo no es un export válido.')
+  }
+
+  /** Trae la copia del servidor, la enseña, y solo reemplaza si se confirma. */
+  async function onRestore() {
+    setImportResult('Buscando la copia del servidor…')
+    const found = await fetchServerBackup()
+    if (!found.ok) {
+      setImportResult(
+        found.reason === 'auth'
+          ? 'Entra con tu cuenta para restaurar la copia del servidor.'
+          : found.reason === 'none'
+            ? 'No hay ninguna copia guardada en el servidor.'
+            : found.reason === 'offline'
+              ? 'Sin conexión: la copia vive en el servidor.'
+              : 'El servidor no devolvió una copia válida.',
+      )
+      return
+    }
+    const when = new Date(found.created_at).toLocaleString('es-ES', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+    const { routines, sessions, weights, sets } = found.counts
+    const what = `${routines} rutinas · ${sessions} sesiones · ${weights} pesajes · ${sets} series`
+    if (!window.confirm(`Copia del ${when}\n${what}\n\nRestaurar reemplaza todos los datos de este móvil. ¿Seguir?`)) {
+      setImportResult(null)
+      return
+    }
+    const res = await restoreSnapshot(found.snapshot)
+    setImportResult(res === 'ok' ? `Restaurada la copia del ${when}.` : 'No se pudo restaurar la copia.')
   }
 
   const inc = settings.increments
@@ -435,10 +462,17 @@ export function Ajustes() {
                 </div>
               </div>
               {auth.status === 'anon' && <p className="type-body-sm text-on-surface-variant">Sin cuenta, la copia se guarda con la clave de este móvil.</p>}
-              <button type="button" className="w-full h-touch rounded-lg bg-sc-high text-on-surface type-label-md uppercase tracking-wider flex items-center justify-center gap-sm press" onClick={() => void uploadBackup().then((ok) => setImportResult(ok ? 'Copia subida.' : 'El servidor no respondió.'))}>
-                <Icon name="sync" size={18} />
-                <span>Sincronizar ahora</span>
-              </button>
+              {/* Las dos direcciones del servidor, emparejadas: subir y recuperar. */}
+              <div className="grid grid-cols-2 gap-sm">
+                <button type="button" className="h-touch rounded-lg bg-sc-high text-on-surface p-sm flex items-center justify-center gap-xs type-label-sm uppercase tracking-wider press" onClick={() => void uploadBackup().then((ok) => setImportResult(ok ? 'Copia subida.' : 'El servidor no respondió.'))}>
+                  <Icon name="sync" size={18} />
+                  <span>Subir copia</span>
+                </button>
+                <button type="button" className="h-touch rounded-lg bg-sc-high text-on-surface p-sm flex items-center justify-center gap-xs type-label-sm uppercase tracking-wider press" onClick={() => void onRestore()}>
+                  <Icon name="history" size={18} className="text-primary-dim" />
+                  <span>Restaurar copia</span>
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-sm pt-xs">
                 <button type="button" className="h-touch rounded-lg bg-sc-high text-on-surface p-sm flex items-center justify-center gap-xs type-label-sm uppercase tracking-wider press" onClick={() => void downloadExport()}>
                   <Icon name="download" size={18} className="text-primary-dim" />
