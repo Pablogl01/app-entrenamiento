@@ -36,8 +36,10 @@ export function RootTopBar({ tab, live = false }: RootProps) {
           <Link to="/ajustes#avisos" className="w-touch h-touch flex items-center justify-center text-on-surface-variant" aria-label="Avisos">
             <Icon name="bell" size={20} />
           </Link>
-          <Link to="/ajustes" className="w-8 h-8 rounded-circle bg-primary flex items-center justify-center text-on-primary" aria-label="Ajustes">
-            <Icon name="user" size={18} />
+          <Link to="/ajustes" className="w-touch h-touch flex items-center justify-center" style={{ marginRight: -6 }} aria-label="Ajustes">
+            <span className="w-8 h-8 rounded-circle bg-primary flex items-center justify-center text-on-primary">
+              <Icon name="user" size={18} />
+            </span>
           </Link>
         </div>
       </div>
@@ -48,10 +50,12 @@ export function RootTopBar({ tab, live = false }: RootProps) {
 interface StackedProps {
   title: string
   right?: ReactNode
+  /** `p` cuando la vista ya tiene su propio h1: un solo h1 por pantalla. */
+  as?: 'h1' | 'p'
 }
 
 /** Barra superior de las pantallas apiladas: flecha, título en mayúsculas y avatar. */
-export function TopBar({ title, right }: StackedProps) {
+export function TopBar({ title, right, as: Heading = 'h1' }: StackedProps) {
   const navigate = useNavigate()
   const scrolled = useScrolled()
   return (
@@ -61,12 +65,14 @@ export function TopBar({ title, right }: StackedProps) {
           <button className="w-touch h-touch -ml-sm flex items-center justify-center text-on-surface" aria-label="Volver" onClick={() => navigate(-1)}>
             <Icon name="arrow-left" size={24} />
           </button>
-          <h1 className="type-headline-sm font-bold uppercase tracking-tight text-on-surface truncate">{title}</h1>
+          <Heading className="type-headline-sm font-bold uppercase tracking-tight text-on-surface truncate">{title}</Heading>
         </div>
         <div className="flex items-center gap-sm">
           {right !== undefined && <div className="type-label-md uppercase tracking-wider text-on-surface px-sm">{right}</div>}
-          <Link to="/ajustes" className="w-8 h-8 rounded-circle bg-primary flex items-center justify-center text-on-primary" aria-label="Ajustes">
-            <Icon name="user" size={18} />
+          <Link to="/ajustes" className="w-touch h-touch flex items-center justify-center" style={{ marginRight: -6 }} aria-label="Ajustes">
+            <span className="w-8 h-8 rounded-circle bg-primary flex items-center justify-center text-on-primary">
+              <Icon name="user" size={18} />
+            </span>
           </Link>
         </div>
       </div>

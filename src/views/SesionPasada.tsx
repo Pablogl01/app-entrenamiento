@@ -25,7 +25,7 @@ export function SesionPasada() {
   if (session === null) {
     return (
       <div className="screen screen--stacked pad">
-        <TopBar title="Sesión" />
+        <TopBar as="p" title="Sesión" />
         <p className="t-body">Esta sesión ya no existe.</p>
       </div>
     )
@@ -112,7 +112,7 @@ export function SesionPasada() {
           </section>
         )}
 
-        <button className="btn btn--secondary" onClick={() => void onRepeat()}>
+        <button className="btn btn--primary" onClick={() => void onRepeat()}>
           <Icon name="history" size={18} />
           Repetir esta sesión
         </button>

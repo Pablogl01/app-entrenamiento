@@ -7,6 +7,7 @@ import {
   LOCK_AFTER_FAILURES,
   LOCK_MS,
   MIN_PASSWORD_LENGTH,
+  REGISTER_PER_HOUR,
   REFRESH_COOKIE,
   REFRESH_TTL_S,
   clearedRefreshCookie,
@@ -75,7 +76,7 @@ interface Payload {
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Content-Type-Options': 'nosniff' },
   })
 }
 
@@ -226,6 +227,25 @@ async function handleAuth(req: Request, env: Env, route: string): Promise<Respon
       }
       const taken = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first<{ id: string }>()
       if (taken !== null) return json({ error: 'ya hay una cuenta con este correo' }, 409)
+
+      // Tope por red: REGISTER_PER_HOUR altas por hora y direccion IP, en login_attempts con clave 'register:<ip>'.
+      const ipKey = `register:${req.headers.get('CF-Connecting-IP') ?? 'desconocida'}`
+      const nowReg = Date.now()
+      const quota = await env.DB.prepare('SELECT failures, locked_until FROM login_attempts WHERE email = ?')
+        .bind(ipKey)
+        .first<{ failures: number; locked_until: number | null }>()
+      const active = quota !== null && quota.locked_until !== null && quota.locked_until > nowReg ? quota : null
+      if (active !== null && active.failures >= REGISTER_PER_HOUR) {
+        return new Response(JSON.stringify({ error: 'demasiadas cuentas desde esta red' }), {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', 'Retry-After': String(Math.ceil(((active.locked_until ?? nowReg) - nowReg) / 1000)) },
+        })
+      }
+      await env.DB.prepare(
+        'INSERT INTO login_attempts (email, failures, locked_until) VALUES (?, ?, ?) ON CONFLICT(email) DO UPDATE SET failures = excluded.failures, locked_until = excluded.locked_until',
+      )
+        .bind(ipKey, active !== null ? active.failures + 1 : 1, active !== null ? active.locked_until : nowReg + 3600_000)
+        .run()
 
       const pw = await hashPassword(body.password)
       const timezone = typeof body.timezone === 'string' ? body.timezone : 'Europe/Madrid'

@@ -11,6 +11,7 @@ import { Icon } from '../components/Icon'
 import { Stepper } from '../components/Stepper'
 import { useReorder } from '../components/useReorder'
 import type { Exercise, RoutineExercise, RoutineType } from '../db/types'
+import { radioGroupKeyDown } from '../lib/a11y'
 
 const NAME_MAX = 24 // cabe en dos líneas de display a 320px
 
@@ -117,12 +118,12 @@ export function RutinaEditor() {
       <TopBar title="Rutina" />
       <div className="stack">
         <section className="card">
-          <div className="seg t-label" role="radiogroup" aria-label="Tipo de rutina">
+          <div className="seg t-label" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Tipo de rutina">
             {TYPES.map((t) => (
               <button
                 key={t.label}
                 role="radio"
-                aria-checked={routine.routine_type === t.value}
+                aria-checked={routine.routine_type === t.value} tabIndex={routine.routine_type === t.value ? 0 : -1}
                 className={routine.routine_type === t.value ? 'active' : ''}
                 onClick={() => {
                   markTouched()

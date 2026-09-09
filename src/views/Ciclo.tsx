@@ -10,6 +10,7 @@ import { Icon } from '../components/Icon'
 import { Stepper } from '../components/Stepper'
 import { useReorder } from '../components/useReorder'
 import type { BlockGoal } from '../db/types'
+import { radioGroupKeyDown } from '../lib/a11y'
 
 export const GOALS: { key: BlockGoal; label: string }[] = [
   { key: 'fuerza', label: 'Fuerza' },
@@ -45,7 +46,7 @@ export function Ciclo() {
   if (state === null) {
     return (
       <div className="screen screen--stacked pad">
-        <TopBar title="Ciclo" />
+        <TopBar as="p" title="Ciclo" />
         <div className="stack">
           <header>
             <span className="t-label mute">Mesociclo</span>
@@ -62,9 +63,9 @@ export function Ciclo() {
             <span className="t-label-sm mute" style={{ marginTop: 'var(--sp-2)' }}>
               Objetivo
             </span>
-            <div className="seg t-label" role="radiogroup" aria-label="Objetivo">
+            <div className="seg t-label" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Objetivo">
               {GOALS.map((g) => (
-                <button key={g.key} role="radio" aria-checked={goal === g.key} className={goal === g.key ? 'active' : ''} onClick={() => setGoal(g.key)}>
+                <button key={g.key} role="radio" aria-checked={goal === g.key} tabIndex={goal === g.key ? 0 : -1} className={goal === g.key ? 'active' : ''} onClick={() => setGoal(g.key)}>
                   {g.label}
                 </button>
               ))}
@@ -107,7 +108,7 @@ export function Ciclo() {
 
   return (
     <div className="screen screen--stacked pad">
-      <TopBar title="Ciclo" />
+      <TopBar as="p" title="Ciclo" />
       <div className="stack">
         <section className="card card--active">
           <div className="between">
@@ -151,9 +152,9 @@ export function Ciclo() {
           <div className="progress" style={{ marginTop: 'var(--sp-3)' }} role="progressbar" aria-valuenow={week} aria-valuemax={totalWeeks}>
             <div className="progress__fill" style={{ transform: `scaleX(${pct / 100})` }} />
           </div>
-          <div className="seg t-label" role="radiogroup" aria-label="Objetivo del ciclo" style={{ marginTop: 'var(--sp-4)' }}>
+          <div className="seg t-label" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Objetivo del ciclo" style={{ marginTop: 'var(--sp-4)' }}>
             {GOALS.map((g) => (
-              <button key={g.key} role="radio" aria-checked={cycle.goal === g.key} className={cycle.goal === g.key ? 'active' : ''} onClick={() => void db.cycles.update(cycle.id, { goal: g.key })}>
+              <button key={g.key} role="radio" aria-checked={cycle.goal === g.key} tabIndex={cycle.goal === g.key ? 0 : -1} className={cycle.goal === g.key ? 'active' : ''} onClick={() => void db.cycles.update(cycle.id, { goal: g.key })}>
                 {g.label}
               </button>
             ))}
@@ -205,9 +206,9 @@ export function Ciclo() {
                   onCommit={(n) => void db.cycle_blocks.update(b.id, { weeks: Math.max(1, n) })}
                 />
               </div>
-              <div className="chips t-label-sm" style={{ marginTop: 'var(--sp-3)' }} role="radiogroup" aria-label="Objetivo del bloque">
+              <div className="chips t-label-sm" style={{ marginTop: 'var(--sp-3)' }} role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Objetivo del bloque">
                 {GOALS.map((g) => (
-                  <button key={g.key} className={`chip${b.goal === g.key ? ' active' : ''}`} onClick={() => void db.cycle_blocks.update(b.id, { goal: g.key })}>
+                  <button key={g.key} type="button" role="radio" aria-checked={b.goal === g.key} tabIndex={b.goal === g.key ? 0 : -1} className={`chip hit-lg${b.goal === g.key ? ' active' : ''}`} onClick={() => void db.cycle_blocks.update(b.id, { goal: g.key })}>
                     {g.label}
                   </button>
                 ))}

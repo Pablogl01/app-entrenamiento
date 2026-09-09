@@ -9,6 +9,7 @@ import { weeklySessions } from '../lib/verdicts'
 import { RootTopBar } from '../components/TopBar'
 import { Icon } from '../components/Icon'
 import type { MuscleGroup } from '../db/types'
+import { radioGroupKeyDown } from '../lib/a11y'
 
 const RANGES = [
   { key: '4s', label: '4 sem', days: 28 },
@@ -208,13 +209,13 @@ export function Progreso() {
                 <span className={`type-label-sm uppercase font-semibold ${calibrated ? 'text-volt' : 'text-on-surface-variant'}`}>{calibrated ? 'Calibrado' : 'Calibrando'}</span>
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-xs p-1 bg-sc-low rounded-xl" role="radiogroup" aria-label="Rango">
+            <div className="grid grid-cols-4 gap-xs p-1 bg-sc-low rounded-xl" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Rango">
               {RANGES.map((r) => (
                 <button
                   key={r.key}
                   type="button"
                   role="radio"
-                  aria-checked={range === r.key}
+                  aria-checked={range === r.key} tabIndex={range === r.key ? 0 : -1}
                   className={`py-2 text-center rounded-lg type-label-sm uppercase ${range === r.key ? 'font-semibold bg-volt text-on-volt shadow-sm' : 'text-on-surface-variant'}`}
                   onClick={() => setRange(r.key)}
                 >

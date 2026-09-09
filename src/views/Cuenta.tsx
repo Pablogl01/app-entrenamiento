@@ -3,12 +3,13 @@
 // correo saliente) y sin puerta al arrancar: la cuenta es opcional.
 import { useEffect, useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getSettings } from '../db/db'
 import { login, logout, register, useAuthState, type AuthResult } from '../lib/auth'
 import { ensureSubscription, syncPrefs } from '../lib/push'
 import { TopBar } from '../components/TopBar'
 import { Icon } from '../components/Icon'
+import { radioGroupKeyDown } from '../lib/a11y'
 
 type Mode = 'login' | 'register'
 
@@ -31,7 +32,7 @@ function message(result: AuthResult, mode: Mode): string | null {
     case 'weak':
       return mode === 'register' ? `La contraseña necesita al menos ${MIN_PASSWORD} caracteres.` : 'Revisa el correo y la contraseña.'
     case 'locked':
-      return 'Demasiados intentos. Espera 15 minutos.'
+      return mode === 'register' ? 'Demasiadas cuentas creadas desde esta red. Inténtalo dentro de una hora.' : 'Demasiados intentos. Espera 15 minutos.'
     case 'offline':
       return 'Sin conexión. La cuenta necesita red; entrenar no.'
     case 'server':
@@ -40,6 +41,13 @@ function message(result: AuthResult, mode: Mode): string | null {
 }
 
 const inputReset = { background: 'transparent', border: 'none', color: 'inherit', font: 'inherit' } as const
+const linkStyle = { textDecoration: 'underline', textUnderlineOffset: 2 } as const
+
+/** Misma regla que el servidor (worker/src/auth.ts normalizeEmail): suficiente para no enviar basura. */
+function looksLikeEmail(value: string): boolean {
+  const v = value.trim()
+  return v.length >= 5 && v.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+}
 
 export function Cuenta() {
   const navigate = useNavigate()
@@ -80,11 +88,11 @@ export function Cuenta() {
     navigate('/ajustes', { replace: true })
   }
 
-  const canSubmit = email.trim().length > 0 && password.length >= (mode === 'register' ? MIN_PASSWORD : 1) && !busy
+  const canSubmit = looksLikeEmail(email) && password.length >= (mode === 'register' ? MIN_PASSWORD : 1) && !busy
 
   return (
     <div className="screen screen--stacked">
-      <TopBar title="Cuenta" />
+      <TopBar as="p" title="Cuenta" />
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full gap-lg pb-2xl">
           <div className="flex flex-col pt-xs">
@@ -115,13 +123,13 @@ export function Cuenta() {
             </section>
           ) : (
             <form className="flex flex-col gap-lg" onSubmit={(e) => void onSubmit(e)} noValidate>
-              <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" aria-label="Entrar o crear cuenta">
+              <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Entrar o crear cuenta">
                 {MODES.map((m) => (
                   <button
                     key={m.key}
                     type="button"
                     role="radio"
-                    aria-checked={mode === m.key}
+                    aria-checked={mode === m.key} tabIndex={mode === m.key ? 0 : -1}
                     className={`flex-1 h-touch rounded-lg flex items-center justify-center gap-xs type-label-md uppercase ${mode === m.key ? 'bg-volt text-on-primary-container shadow-sm' : 'text-on-surface-variant'}`}
                     onClick={() => {
                       setMode(m.key)
@@ -206,6 +214,19 @@ export function Cuenta() {
                   {error}
                 </p>
                 {hasAnonymousData && error === null && <p className="type-body-sm text-on-surface-variant px-xxs">Los avisos y la copia de este móvil pasarán a la cuenta.</p>}
+                {mode === 'register' && (
+                  <p className="type-body-sm text-on-surface-variant px-xxs">
+                    Al crear la cuenta aceptas los{' '}
+                    <Link to="/terminos" className="text-on-surface" style={linkStyle}>
+                      términos de uso
+                    </Link>{' '}
+                    y la{' '}
+                    <Link to="/privacidad" className="text-on-surface" style={linkStyle}>
+                      política de privacidad
+                    </Link>
+                    .
+                  </p>
+                )}
               </div>
             </form>
           )}

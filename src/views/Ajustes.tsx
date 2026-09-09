@@ -12,6 +12,7 @@ import { TopBar } from '../components/TopBar'
 import { Icon, type IconName } from '../components/Icon'
 import type { LoadType, Theme } from '../db/types'
 import { goalLabel } from './Ciclo'
+import { radioGroupKeyDown } from '../lib/a11y'
 
 const LOAD_LABELS: { key: LoadType; label: string; hint: string; icon: IconName }[] = [
   { key: 'barbell', label: 'Barra olímpica', hint: 'Discos estándar', icon: 'dumbbell' },
@@ -48,7 +49,7 @@ function MockToggle({ checked, onChange, label, small = false }: { checked: bool
       role="switch"
       aria-checked={checked}
       aria-label={label}
-      className={`${small ? 'w-10 h-6 p-0p5' : 'w-12 h-7 p-1'} rounded-full flex items-center flex-none ${checked ? 'bg-volt' : 'bg-sc-highest'}`}
+      className={`${small ? 'w-10 h-6 p-0p5' : 'w-12 h-7 p-1'} hit-lg rounded-full flex items-center flex-none ${checked ? 'bg-volt' : 'bg-sc-highest'}`}
       onClick={() => onChange(!checked)}
     >
       <div
@@ -67,13 +68,13 @@ function MockToggle({ checked, onChange, label, small = false }: { checked: bool
 function MockStepper({ value, unit, step, min, onCommit, label, integer = false }: { value: number | null; unit: string; step: number; min: number; onCommit: (n: number) => void; label: string; integer?: boolean }) {
   return (
     <div className="flex items-center bg-sc-high rounded-lg p-xxs flex-none">
-      <button type="button" className="w-8 h-8 flex items-center justify-center rounded text-on-surface press press-95" aria-label={`Bajar ${label}`} onClick={() => onCommit(Math.max(min, Math.round(((value ?? min) - step) * 100) / 100))}>
+      <button type="button" className="w-8 h-8 hit flex items-center justify-center rounded text-on-surface press press-95" aria-label={`Bajar ${label}`} onClick={() => onCommit(Math.max(min, Math.round(((value ?? min) - step) * 100) / 100))}>
         <Icon name="minus" size={16} />
       </button>
       <span className="type-metric-md px-sm text-center text-on-surface font-semibold nowrap" style={{ minWidth: 68 }}>
         {value === null ? '—' : integer ? value : fmtNum(value)} {unit}
       </span>
-      <button type="button" className="w-8 h-8 flex items-center justify-center rounded text-on-surface press press-95" aria-label={`Subir ${label}`} onClick={() => onCommit(Math.round(((value ?? min) + step) * 100) / 100)}>
+      <button type="button" className="w-8 h-8 hit flex items-center justify-center rounded text-on-surface press press-95" aria-label={`Subir ${label}`} onClick={() => onCommit(Math.round(((value ?? min) + step) * 100) / 100)}>
         <Icon name="plus" size={16} />
       </button>
     </div>
@@ -145,7 +146,7 @@ export function Ajustes() {
 
   return (
     <div className="screen screen--stacked">
-      <TopBar title="Ajustes" />
+      <TopBar as="p" title="Ajustes" />
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full gap-lg pb-2xl">
           {/* Header */}
@@ -160,13 +161,13 @@ export function Ajustes() {
           {/* Apariencia */}
           <section className="flex flex-col gap-sm">
             <SectionHead title="Apariencia" hint="Modo de color" />
-            <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" aria-label="Modo de color">
+            <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Modo de color">
               {THEMES.map((t) => (
                 <button
                   key={t.key}
                   type="button"
                   role="radio"
-                  aria-checked={settings.theme === t.key}
+                  aria-checked={settings.theme === t.key} tabIndex={settings.theme === t.key ? 0 : -1}
                   className={`flex-1 h-touch rounded-lg flex items-center justify-center gap-xs type-label-md uppercase ${settings.theme === t.key ? 'bg-volt text-on-primary-container shadow-sm' : 'text-on-surface-variant'}`}
                   onClick={() => {
                     applyTheme(t.key)
@@ -183,13 +184,13 @@ export function Ajustes() {
           {/* Unidad */}
           <section className="flex flex-col gap-sm">
             <SectionHead title="Unidad de peso" hint="Global" />
-            <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" aria-label="Unidad">
+            <div className="p-xxs rounded-xl bg-sc-low flex items-center gap-xxs" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Unidad">
               {(['kg', 'lb'] as const).map((u) => (
                 <button
                   key={u}
                   type="button"
                   role="radio"
-                  aria-checked={unit === u}
+                  aria-checked={unit === u} tabIndex={unit === u ? 0 : -1}
                   className={`flex-1 h-touch rounded-lg flex items-center justify-center gap-xs type-label-md uppercase ${unit === u ? 'bg-volt text-on-primary-container shadow-sm' : 'text-on-surface-variant'}`}
                   onClick={() => void patchSettings({ unit: u })}
                 >
@@ -236,7 +237,7 @@ export function Ajustes() {
                 <div className="flex items-center gap-xs">
                   <MockStepper value={settings.body_weight_goal} unit={unit} step={0.5} min={30} label="meta de peso" onCommit={(n) => void patchSettings({ body_weight_goal: n })} />
                   {settings.body_weight_goal !== null && (
-                    <button type="button" className="w-8 h-8 rounded bg-sc-high flex items-center justify-center text-on-surface-variant" aria-label="Quitar meta" onClick={() => void patchSettings({ body_weight_goal: null })}>
+                    <button type="button" className="w-8 h-8 hit rounded bg-sc-high flex items-center justify-center text-on-surface-variant" aria-label="Quitar meta" onClick={() => void patchSettings({ body_weight_goal: null })}>
                       <Icon name="close" size={16} />
                     </button>
                   )}
@@ -449,7 +450,32 @@ export function Ajustes() {
                 </button>
               </div>
               <input ref={fileRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={(e) => void onImport(e.target.files?.[0])} />
-              {importResult !== null && <p className="type-body-sm text-on-surface-variant">{importResult}</p>}
+              <p className="type-body-sm text-on-surface-variant" role="status">
+                {importResult}
+              </p>
+            </div>
+          </section>
+
+          {/* Legal y ayuda */}
+          <section className="flex flex-col gap-sm">
+            <SectionHead title="Legal y ayuda" hint="Léelo una vez" />
+            <div className="flex flex-col rounded-xl bg-sc-low overflow-hidden shadow-sm">
+              {(
+                [
+                  ['/ayuda', 'Ayuda', 'Sin conexión, copias, avisos en iPhone, cuenta'],
+                  ['/privacidad', 'Política de privacidad', 'Qué datos se guardan y dónde'],
+                  ['/terminos', 'Términos de uso', 'Condiciones de la cuenta'],
+                ] as const
+              ).map(([to, title, hint], i) => (
+                <div key={to}>
+                  {i > 0 && <div className="h-1px bg-sc mx-md" />}
+                  <Link to={to} className="flex flex-col">
+                    <Row icon={to === '/ayuda' ? 'note' : 'archive'} title={title} hint={hint}>
+                      <Icon name="chevron-right" size={20} className="text-on-surface-variant" />
+                    </Row>
+                  </Link>
+                </div>
+              ))}
             </div>
           </section>
 

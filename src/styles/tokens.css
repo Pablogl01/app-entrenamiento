@@ -19,7 +19,7 @@
   --md-bright: #faf9f6;
   --md-on-surface: #1a1c1a;
   --md-on-surface-variant: #444934;
-  --md-outline: #757962;
+  --md-outline: #6a6e58;             /* 4.6:1 sobre sc-low: --ink-mute a 11px pasa AA */
   --md-outline-variant: #c5c9ae;
   --md-primary: #111315;          /* títulos y cifras grandes (type-primary del DESIGN claro) */
   --md-on-primary: #ffffff;
@@ -53,6 +53,7 @@
   --volt-edge: #9ec412;
   --volt-tint: #f4fcd4;
   --volt-ink: #4d6100;
+  --volt-dim-ink: #526700;           /* texto volt apagado legible en claro (.text-primary-dim) */
 
   /* Solo destructivo: borrar sesión, archivar. Nunca para un hueco. */
   --alert: #e53935;
@@ -163,6 +164,7 @@
   --volt-edge: rgba(200, 243, 34, 0.35);
   --volt-tint: rgba(200, 243, 34, 0.12);
   --volt-ink: #c8f322;
+  --volt-dim-ink: #aed500;
 
   --alert: #ff4a4a;
 

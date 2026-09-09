@@ -117,6 +117,7 @@ export function Calendario() {
   return (
     <div className="screen">
       <RootTopBar tab="Calendario" live={live === true} />
+      <h1 className="sr-only">Calendario</h1>
       <main className="flex-1 w-full pb-24 px-gutter flex flex-col relative">
         <div className="flex flex-col w-full gap-lg select-none">
           {/* Month header */}
@@ -201,7 +202,7 @@ export function Calendario() {
             </div>
             <div className="grid grid-cols-7 gap-y-xs text-center">
               {leading.map((n) => (
-                <button key={`p${n}`} className="h-10 flex flex-col items-center justify-center rounded text-on-surface-variant opacity-30 type-label-md" disabled>
+                <button key={`p${n}`} className="h-11 flex flex-col items-center justify-center rounded text-on-surface-variant opacity-30 type-label-md" disabled>
                   {String(n).padStart(2, '0')}
                 </button>
               ))}
@@ -214,7 +215,7 @@ export function Calendario() {
                 return (
                   <button
                     key={day.iso}
-                    className={`h-10 flex flex-col items-center justify-center rounded type-label-md gap-0p5 relative${isToday || selected === day.iso ? ' bg-sc-highest text-primary' : isSched || isDone ? ' text-on-surface' : ' text-on-surface-variant'}`}
+                    className={`h-11 flex flex-col items-center justify-center rounded type-label-md gap-0p5 relative${isToday || selected === day.iso ? ' bg-sc-highest text-primary' : isSched || isDone ? ' text-on-surface' : ' text-on-surface-variant'}`}
                     aria-label={longDate(day.iso)}
                     aria-pressed={selected === day.iso}
                     onClick={() => setSelected(selected === day.iso ? null : day.iso)}
@@ -324,13 +325,13 @@ export function Calendario() {
                   <p className="type-body-lg text-on-surface font-semibold">{r.name}</p>
                   <div className="flex gap-sm pt-xxs">
                     <button
-                      className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95"
+                      className="h-8 px-base hit rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95"
                       onClick={() => setMoving({ routineId: r.id, name: r.name, fromDate: selectedDay.iso })}
                     >
                       <Icon name="swap" size={16} />
                       Mover
                     </button>
-                    <button className="h-8 px-base rounded bg-sc text-on-surface-variant type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void rescheduleDay(r.id, selectedDay.iso, null)}>
+                    <button className="h-8 px-base hit rounded bg-sc text-on-surface-variant type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void rescheduleDay(r.id, selectedDay.iso, null)}>
                       <Icon name="moon" size={16} />
                       Descansar
                     </button>
@@ -380,13 +381,13 @@ export function Calendario() {
                   {d.scheduled[0] !== undefined && (
                     <>
                       <button
-                        className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95"
+                        className="h-8 px-base hit rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95"
                         onClick={() => setMoving({ routineId: d.scheduled[0].id, name: d.scheduled[0].name, fromDate: d.iso })}
                       >
                         <Icon name="swap" size={16} />
                         Mover
                       </button>
-                      <button className="h-8 px-base rounded bg-sc text-on-surface-variant type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void rescheduleDay(d.scheduled[0].id, d.iso, null)}>
+                      <button className="h-8 px-base hit rounded bg-sc text-on-surface-variant type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void rescheduleDay(d.scheduled[0].id, d.iso, null)}>
                         <Icon name="moon" size={16} />
                         Descansar
                       </button>
@@ -416,7 +417,7 @@ export function Calendario() {
                       : ` reasignada al ${shortDate(o.to_date)}.`}
                 </p>
                 <div className="flex gap-sm pt-xxs">
-                  <button className="h-8 px-base rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void db.schedule_overrides.delete(o.id)}>
+                  <button className="h-8 px-base hit rounded bg-sc text-on-surface type-label-sm uppercase tracking-wider flex items-center gap-1 press press-95" onClick={() => void db.schedule_overrides.delete(o.id)}>
                     <Icon name="swap" size={16} />
                     Deshacer
                   </button>

@@ -30,4 +30,5 @@ Ver `000-auditoria-movimiento.md §5`: reducción de movimiento «a cero» frent
 
 | # | Plan | Estado |
 | --- | --- | --- |
-| 007 | Cuenta de usuario con sesión persistente (access + refresh token) | HECHO y desplegado (2026-09-05). Sin commit |
+| 007 | Cuenta de usuario con sesión persistente (access + refresh token) | HECHO, desplegado y en GitHub (`d720b19`, 2026-09-05) |
+| 008 | Auditoría de lanzamiento (20 puntos) y arreglos | HECHO en local (2026-09-05). Sin commit ni desplegar; faltan responsable y contacto en `src/content/legal.ts` |

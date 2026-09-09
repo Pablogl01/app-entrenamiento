@@ -1,11 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 import { BrowserRouter, Outlet, Route, Routes, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { BottomNav, TABS } from './components/BottomNav'
 import { Hoy } from './views/Hoy'
-import { Calendario } from './views/Calendario'
-import { Progreso } from './views/Progreso'
 import { Rutinas } from './views/Rutinas'
-import { RutinaEditor } from './views/RutinaEditor'
 import { Catalogo } from './views/Catalogo'
 import { EjercicioDetalle } from './views/EjercicioDetalle'
 import { SesionPasada } from './views/SesionPasada'
@@ -14,6 +11,8 @@ import { Ajustes } from './views/Ajustes'
 import { Cuenta } from './views/Cuenta'
 import { Entrenar } from './views/Entrenar'
 import { Ciclo } from './views/Ciclo'
+import { NoEncontrado } from './views/NoEncontrado'
+import { AYUDA, PRIVACIDAD, TERMINOS } from './content/legal'
 import { getSettings } from './db/db'
 import { cleanupStaleDrafts, syncCatalog } from './db/repo'
 import { seedDemo } from './db/demo'
@@ -22,6 +21,42 @@ import { hydrateAuthState, refreshSession } from './lib/auth'
 import { ensureSubscription } from './lib/push'
 import { dailyBackupIfDue } from './lib/backup'
 import { applyTheme } from './lib/theme'
+
+// Vistas pesadas o poco frecuentes en trozos aparte: el arranque carga menos JS.
+// El service worker las precachea igual, así que siguen funcionando sin red.
+const Calendario = lazy(() => import('./views/Calendario').then((m) => ({ default: m.Calendario })))
+const Progreso = lazy(() => import('./views/Progreso').then((m) => ({ default: m.Progreso })))
+const RutinaEditor = lazy(() => import('./views/RutinaEditor').then((m) => ({ default: m.RutinaEditor })))
+const TextPage = lazy(() => import('./views/TextPage').then((m) => ({ default: m.TextPage })))
+
+/** Título del documento por ruta: «Hoy · Entrenamiento». */
+const TITLES: [RegExp, string][] = [
+  [/^\/$/, 'Hoy'],
+  [/^\/calendario$/, 'Calendario'],
+  [/^\/progreso$/, 'Progreso'],
+  [/^\/rutinas$/, 'Rutinas'],
+  [/^\/rutinas\//, 'Editar rutina'],
+  [/^\/catalogo$/, 'Biblioteca de ejercicios'],
+  [/^\/ejercicio\//, 'Ejercicio'],
+  [/^\/sesion\//, 'Sesión'],
+  [/^\/resumen\//, 'Resumen de sesión'],
+  [/^\/ajustes$/, 'Ajustes'],
+  [/^\/cuenta$/, 'Cuenta'],
+  [/^\/entrenar$/, 'Entrenar'],
+  [/^\/ciclo$/, 'Ciclo'],
+  [/^\/ayuda$/, 'Ayuda'],
+  [/^\/privacidad$/, 'Política de privacidad'],
+  [/^\/terminos$/, 'Términos de uso'],
+]
+
+function DocumentTitle() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const name = TITLES.find(([re]) => re.test(pathname))?.[1] ?? 'No encontrado'
+    document.title = `${name} · Entrenamiento`
+  }, [pathname])
+  return null
+}
 
 /** La vista nueva entra: fundido entre pestañas, deslizamiento al apilar.
  *  Un cambio por gesto lateral anima en la dirección del deslizamiento. */
@@ -33,7 +68,9 @@ function AnimatedOutlet({ root }: { root: boolean }) {
     swipe === 'next' ? 'view-push' : swipe === 'prev' ? 'view-pop' : navType === 'POP' ? 'view-pop' : root ? 'view-fade' : 'view-push'
   return (
     <div key={location.pathname} className={cls}>
-      <Outlet />
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
     </div>
   )
 }
@@ -122,6 +159,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <DocumentTitle />
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Hoy />} />
@@ -140,6 +178,11 @@ function App() {
           <Route path="/cuenta" element={<Cuenta />} />
           <Route path="/entrenar" element={<Entrenar />} />
           <Route path="/ciclo" element={<Ciclo />} />
+          <Route path="/ayuda" element={<TextPage doc={AYUDA} />} />
+          <Route path="/privacidad" element={<TextPage doc={PRIVACIDAD} />} />
+          <Route path="/terminos" element={<TextPage doc={TERMINOS} />} />
+          {/* El servidor devuelve la app con 200 para cualquier ruta: la salida la da esta pantalla. */}
+          <Route path="*" element={<NoEncontrado />} />
         </Route>
       </Routes>
     </BrowserRouter>

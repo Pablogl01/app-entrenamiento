@@ -323,7 +323,7 @@ export function Resumen() {
                 <textarea
                   id="workout-notes"
                   className="w-full type-body-md text-on-surface"
-                  style={{ background: 'transparent', border: 'none', outline: 'none', resize: 'none' }}
+                  style={{ background: 'transparent', border: 'none', resize: 'none' }}
                   rows={2}
                   placeholder="Añade sensaciones articulares o notas técnicas..."
                   defaultValue={session.notes}

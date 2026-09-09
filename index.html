@@ -4,18 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#121315" />
+    <title>Entrenamiento · Registro de entrenamiento y peso</title>
+    <meta name="description" content="Registro de entrenamiento y peso corporal que funciona sin conexión: rutinas, series con RPE, calendario, progreso con veredictos y avisos a la hora que elijas." />
+    <link rel="canonical" href="https://app-entrenamiento.pablo-mdm.workers.dev/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Entrenamiento</title>
-    <script>
-      // Modo de color antes del primer pintado: ajuste guardado o sistema.
-      (function () {
-        var theme = 'system'
-        try { theme = localStorage.getItem('theme') || 'system' } catch (e) {}
-        var dark = theme === 'system' ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark'
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
-        document.querySelector('meta[name="theme-color"]').content = dark ? '#121315' : '#f8f7f4'
-      })()
-    </script>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Entrenamiento" />
+    <meta property="og:title" content="Entrenamiento · Registro de entrenamiento y peso" />
+    <meta property="og:description" content="Registro de entrenamiento y peso corporal que funciona sin conexión: rutinas, series con RPE, calendario, progreso y avisos." />
+    <meta property="og:url" content="https://app-entrenamiento.pablo-mdm.workers.dev/" />
+    <meta property="og:image" content="https://app-entrenamiento.pablo-mdm.workers.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Entrenamiento: registro de entrenamiento y peso corporal" />
+    <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Entrenamiento · Registro de entrenamiento y peso" />
+    <meta name="twitter:description" content="Registro de entrenamiento y peso corporal que funciona sin conexión: rutinas, series con RPE, calendario, progreso y avisos." />
+    <meta name="twitter:image" content="https://app-entrenamiento.pablo-mdm.workers.dev/og.png" />
+    <link rel="preload" href="/src/assets/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Modo de color antes del primer pintado. Externo para que la CSP no necesite 'unsafe-inline'. -->
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <div id="root"></div>

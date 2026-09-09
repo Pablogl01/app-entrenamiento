@@ -39,7 +39,7 @@ npx wrangler d1 execute entrenamiento --remote --file=migrations/001-auth.sql
 | Método | Ruta | Auth | Qué hace |
 |---|---|---|---|
 | GET | `/api/vapid-public` | — | Clave pública VAPID |
-| POST | `/api/auth/register` | — | `{email, password, legacy_token?, timezone?}` → 201 `{access_token, user}` + cookie `rt`. Contraseña ≥ 10. 409 si el correo existe. Si `legacy_token` es de una fila anónima, esa fila se convierte en la cuenta. |
+| POST | `/api/auth/register` | — | `{email, password, legacy_token?, timezone?}` → 201 `{access_token, user}` + cookie `rt`. Contraseña ≥ 10. 409 si el correo existe. Si `legacy_token` es de una fila anónima, esa fila se convierte en la cuenta. **Tope: 5 altas por hora y dirección IP** (`CF-Connecting-IP`, fila `register:<ip>` en `login_attempts`); 429 + `Retry-After`. |
 | POST | `/api/auth/login` | — | Igual, 200. 401 genérico; 429 + `Retry-After` tras 10 fallos (15 min). Si `legacy_token` es de otra fila anónima, se fusiona en la cuenta. |
 | POST | `/api/auth/refresh` | cookie `rt` | Access token nuevo + cookie **rotada**. Reutilizar una cookie ya rotada revoca toda la familia (401). |
 | POST | `/api/auth/logout` | cookie `rt` | Revoca ese refresh token; 204 y cookie borrada |
@@ -61,6 +61,14 @@ deslizantes). Solo viaja a `/api/auth/*`.
 Contraseñas: PBKDF2-SHA-256 con WebCrypto, sal de 16 bytes, **50 000 iteraciones** (guardadas por
 fila). Workers limita a 100 000 y el plan gratuito a 10 ms de CPU por petición; 100 000 midieron
 ~12 ms en local. Comprobar el tiempo de CPU real de `login` en el panel tras desplegar.
+
+## Cabeceras y ficheros estáticos
+
+`public/_headers` (Workers Static Assets lo aplica a lo que sirve sin pasar por el worker): CSP sin
+`unsafe-inline` en scripts (por eso el script del tema es `public/theme-init.js`), HSTS, `nosniff`,
+`X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, y `Cache-Control: immutable` un año para
+`/assets/*`. La API añade `nosniff` en `json()`. También en `public/`: `robots.txt`, `sitemap.xml`,
+`favicon.svg` + `favicon.ico`, `og.png` (1200×630) y un `icon-maskable-512.png` con zona segura real.
 
 ## Cron
 

@@ -1,6 +1,6 @@
 # 007 — Cuenta de usuario con sesión persistente (access + refresh token)
 
-- **Status**: HECHO y **DESPLEGADO** (2026-09-05, versión `0faec116`): migración remota aplicada, `AUTH_SECRET` subido, hash de producción igual al de `dist/`. Aprobado por Pablo con las cuatro recomendaciones de §6. **Sin commit** todavía.
+- **Status**: HECHO y **DESPLEGADO** (2026-09-05, versión `0faec116`): migración remota aplicada, `AUTH_SECRET` subido, hash de producción igual al de `dist/`. Aprobado por Pablo con las cuatro recomendaciones de §6. Commit `d720b19` en `master`.
 - **Resultado**: `worker/src/auth.ts` + rutas en `index.ts`, `migrations/001-auth.sql`, `scripts/auth-smoke.sh` (todo OK contra `wrangler dev`); cliente `src/lib/auth.ts`, `apiFetch` con reintento, `views/Cuenta.tsx`, sección Cuenta en Ajustes. PBKDF2 fijado en **50 000** iteraciones (100 000 = ~12 ms en local; el plan gratuito da 10 ms). Verificado con Playwright: registro → recarga mantiene sesión → cookie rotada → cookie borrada = «Sesión caducada» → reentrada → salir. Capturas 380/320, oscuro/claro, sin errores de consola.
 - **Severity**: —  (funcionalidad nueva, no corrección)
 - **Category**: Backend · Cliente · UI (dos pantallas tocadas)

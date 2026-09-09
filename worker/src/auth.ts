@@ -12,6 +12,7 @@ export const PBKDF2_ITERATIONS = 50_000
 export const MIN_PASSWORD_LENGTH = 10
 export const LOCK_AFTER_FAILURES = 10
 export const LOCK_MS = 15 * 60_000
+export const REGISTER_PER_HOUR = 5
 export const REFRESH_COOKIE = 'rt'
 const REFRESH_COOKIE_PATH = '/api/auth'
 
