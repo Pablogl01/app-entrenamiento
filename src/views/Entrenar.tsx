@@ -25,6 +25,7 @@ import { fmtClock, useNow } from '../lib/useNow'
 import { TopBar } from '../components/TopBar'
 import { MoveSheet } from '../components/MoveSheet'
 import { Icon } from '../components/Icon'
+import { ExerciseVisual } from '../components/ExerciseVisual'
 import { SetTable } from '../components/SetTable'
 import { useReorder } from '../components/useReorder'
 import { useSessionCards } from '../components/useSessionCards'
@@ -63,7 +64,7 @@ function RestTimer() {
   const ss = String(rest.remainingSeconds % 60).padStart(2, '0')
   return (
     <div className="px-gutter mb-md enter-soft">
-      <div className="bg-sc rounded-xl p-md shadow-md flex items-center justify-between gap-sm" aria-label="Descanso" aria-live="polite">
+      <div className="bg-sc rounded-xl p-md shadow-md flex items-center justify-between gap-sm" role="timer" aria-label="Descanso" aria-live="polite">
         <div className="flex items-center gap-md min-w-0">
           <div className="relative flex items-center justify-center w-11 h-11 rounded-lg bg-sc-highest">
             <svg className="w-10 h-10" viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
@@ -148,7 +149,7 @@ export function Entrenar() {
   if (session === null) {
     return (
       <div className="screen screen--stacked">
-        <TopBar title="Active Session" />
+        <TopBar as="p" title="Active Session" />
         <div className="px-gutter flex flex-col gap-md">
           <p className="type-body-md text-secondary">No hay ninguna sesión hoy. Se empieza desde Rutinas.</p>
           <Link to="/rutinas" className="h-touch rounded-lg bg-sc-high text-on-surface type-label-md font-semibold uppercase tracking-wider flex items-center justify-center">
@@ -202,7 +203,7 @@ export function Entrenar() {
 
   return (
     <div className="screen screen--stacked">
-      <TopBar title="Active Session" />
+      <TopBar as="p" title="Active Session" />
       <div className="flex flex-col w-full pb-10">
         {/* Top Session Telemetry Banner */}
         <div className="px-gutter pt-xs pb-sm">
@@ -438,9 +439,12 @@ export function Entrenar() {
                 <span className="type-label-sm text-volt bg-sc-highest px-2 py-0p5 rounded font-semibold uppercase">{next.se.target_sets} series</span>
               </div>
               <div className="flex items-center justify-between pt-1 gap-sm">
-                <div className="min-w-0">
-                  <h3 className="type-headline-sm text-on-surface font-semibold tracking-tight">{next.exercise.name}</h3>
-                  <NextLine card={next} unit={unit} />
+                <div className="flex items-center gap-md min-w-0">
+                  <ExerciseVisual exercise={next.exercise} zoom />
+                  <div className="min-w-0">
+                    <h3 className="type-headline-sm text-on-surface font-semibold tracking-tight">{next.exercise.name}</h3>
+                    <NextLine card={next} unit={unit} />
+                  </div>
                 </div>
                 <button className="w-10 h-10 rounded-lg bg-sc-high ibtn flex-none" aria-label="Hacer este ahora" onClick={() => void moveAfter(session.id, next.se.id, prevId).then(() => setChosenId(null))}>
                   <Icon name="swap" size={20} />
@@ -451,15 +455,20 @@ export function Entrenar() {
 
           {queue.slice(1).map((c, i) => (
             <div key={c.se.id} className={`bg-sc-low rounded-xl p-md opacity-85 flex items-center justify-between${dragIndex === i + 1 ? ' dragging' : ''}`} {...handlers(i + 1)}>
-              <button className="flex items-center gap-md text-left min-w-0" onClick={() => setChosenId(c.se.id)}>
-                <div className="w-8 h-8 rounded bg-sc-highest flex items-center justify-center type-label-sm text-outline font-bold flex-none">{currentIdx + 3 + i}</div>
-                <div className="min-w-0">
+              <div className="flex items-center gap-md min-w-0">
+                <span className="relative flex-none">
+                  <ExerciseVisual exercise={c.exercise} size="sm" zoom />
+                  <span className="absolute w-5 h-5 rounded-full bg-sc-highest text-outline flex items-center justify-center type-label-sm font-bold" style={{ right: -4, bottom: -4 }} aria-hidden="true">
+                    {currentIdx + 3 + i}
+                  </span>
+                </span>
+                <button className="text-left min-w-0" onClick={() => setChosenId(c.se.id)}>
                   <h4 className="type-body-lg text-on-surface font-semibold truncate">{c.exercise.name}</h4>
                   <span className="type-label-sm text-outline">
                     {GROUP_LABEL[c.exercise.muscle_group]} · {c.se.target_sets} series de {c.se.target_reps_min}-{c.se.target_reps_max}
                   </span>
-                </div>
-              </button>
+                </button>
+              </div>
               <Icon name="grip" size={20} className="text-outline flex-none" style={{ touchAction: 'none' }} />
             </div>
           ))}
@@ -467,9 +476,12 @@ export function Entrenar() {
           {done.map((c) => (
             <div key={c.se.id} className="bg-sc-low rounded-xl p-md opacity-70 flex items-center justify-between">
               <div className="flex items-center gap-md min-w-0">
-                <div className="w-8 h-8 rounded bg-volt text-on-volt flex items-center justify-center flex-none">
-                  <Icon name="check" size={18} strokeWidth={2.5} />
-                </div>
+                <span className="relative flex-none">
+                  <ExerciseVisual exercise={c.exercise} size="sm" zoom />
+                  <span className="absolute w-5 h-5 rounded-full bg-volt text-on-volt flex items-center justify-center" style={{ right: -4, bottom: -4 }} aria-hidden="true">
+                    <Icon name="check" size={12} strokeWidth={3} />
+                  </span>
+                </span>
                 <div className="min-w-0">
                   <h4 className="type-body-lg text-on-surface font-semibold truncate">{c.exercise.name}</h4>
                   <span className="type-label-sm text-outline">{c.sets.filter((s) => s.kind !== 'warmup').length} series hechas</span>

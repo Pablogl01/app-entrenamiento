@@ -49,7 +49,7 @@ export function EjercicioDetalle() {
   if (exercise === null) {
     return (
       <div className="screen screen--stacked pad">
-        <TopBar title="Ejercicio" />
+        <TopBar as="p" title="Ejercicio" />
         <p className="t-body">Este ejercicio ya no existe.</p>
       </div>
     )
@@ -59,7 +59,7 @@ export function EjercicioDetalle() {
 
   return (
     <div className="screen screen--stacked pad">
-      <TopBar title="Ejercicio" />
+      <TopBar as="p" title="Ejercicio" />
       <div className="stack">
         <header className="between" style={{ alignItems: 'flex-start' }}>
           <div>
@@ -71,7 +71,7 @@ export function EjercicioDetalle() {
             </div>
           </div>
           <span style={{ textAlign: 'center' }}>
-            <ExerciseVisual exercise={exercise} size="lg" />
+            <ExerciseVisual exercise={exercise} size="lg" zoom />
             {exercise.image === null && (
               <span className="t-label-sm mute inline" style={{ display: 'flex', justifyContent: 'center', marginTop: 4, gap: 4 }}>
                 <Icon name="camera" size={10} /> sin foto

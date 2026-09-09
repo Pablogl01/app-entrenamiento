@@ -1,6 +1,6 @@
 import type { Exercise, SetEntry, WeightUnit } from '../db/types'
 import type { PastSet } from '../db/repo'
-import { confirmSet, deleteSet, updateSet } from '../db/repo'
+import { confirmSet, deleteSet, updateSet, updateSetCascade } from '../db/repo'
 import { fmtNum } from '../lib/format'
 import { Icon } from './Icon'
 import { StepperBare } from './Stepper'
@@ -124,7 +124,7 @@ export function SetActive({ set, exercise, workNumber, prev, unit, onConfirmed, 
                 +{fmtNum(inc)} {unit}
               </span>
             </div>
-            <StepperBare value={set.weight} step={inc} ariaLabel="carga" onCommit={(n) => void updateSet(set.id, { weight: n })} />
+            <StepperBare value={set.weight} step={inc} ariaLabel="carga" onCommit={(n) => void updateSetCascade(set.id, { weight: n })} />
           </div>
         )}
         <div className="bg-sc-lowest rounded-lg p-2p5">
@@ -134,7 +134,7 @@ export function SetActive({ set, exercise, workNumber, prev, unit, onConfirmed, 
               {targetMin !== undefined && targetMax !== undefined ? `Meta: ${targetMin}-${targetMax}` : set.kind === 'failure' ? 'al fallo' : ''}
             </span>
           </div>
-          <StepperBare value={set.reps} step={isTime ? 5 : 1} integer ariaLabel={isTime ? 'segundos' : 'repeticiones'} onCommit={(n) => void updateSet(set.id, { reps: n })} />
+          <StepperBare value={set.reps} step={isTime ? 5 : 1} integer ariaLabel={isTime ? 'segundos' : 'repeticiones'} onCommit={(n) => void updateSetCascade(set.id, { reps: n })} />
         </div>
       </div>
 

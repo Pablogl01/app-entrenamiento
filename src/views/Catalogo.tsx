@@ -6,10 +6,11 @@ import { addExerciseToRoutine, addExerciseToSession, createExercise, lastPerform
 import { addDays, todayISO } from '../lib/dates'
 import { fmtNum } from '../lib/format'
 import { TopBar } from '../components/TopBar'
-import { EXERCISE_IMAGES } from '../components/ExerciseVisual'
+import { EXERCISE_IMAGES, ExerciseVisual } from '../components/ExerciseVisual'
 import { ExerciseMark } from '../components/ExerciseMark'
 import { Icon } from '../components/Icon'
 import type { Exercise, LoadType, MuscleGroup } from '../db/types'
+import { radioGroupKeyDown } from '../lib/a11y'
 
 const GROUPS: { key: MuscleGroup; label: string }[] = [
   { key: 'pecho', label: 'Pecho' },
@@ -178,7 +179,7 @@ export function Catalogo() {
               }}
             />
             {query !== '' && (
-              <button type="button" className="w-8 h-8 rounded-full bg-sc-highest text-secondary flex items-center justify-center ml-1 flex-none" aria-label="Borrar búsqueda" onClick={() => setQuery('')}>
+              <button type="button" className="w-8 h-8 rounded-full bg-sc-highest text-secondary flex items-center justify-center ml-1 flex-none hit" aria-label="Borrar búsqueda" onClick={() => setQuery('')}>
                 <Icon name="close" size={16} />
               </button>
             )}
@@ -186,14 +187,17 @@ export function Catalogo() {
         </div>
 
         {/* Filters */}
-        <div className="w-full overflow-x-auto px-gutter mb-lg flex items-center gap-xs hscroll" role="radiogroup" aria-label="Grupo muscular">
-          <button type="button" className={`shrink-0 px-md py-xs rounded-full type-label-md ${group === null ? 'bg-volt text-on-volt font-semibold shadow-sm' : 'bg-sc-high text-secondary'}`} onClick={() => setGroup(null)}>
+        <div className="w-full overflow-x-auto px-gutter mb-lg flex items-center gap-xs hscroll" role="radiogroup" onKeyDown={radioGroupKeyDown} aria-label="Grupo muscular">
+          <button type="button" role="radio" aria-checked={group === null} tabIndex={group === null ? 0 : -1} className={`shrink-0 px-md py-xs rounded-full type-label-md ${group === null ? 'bg-volt text-on-volt font-semibold shadow-sm' : 'bg-sc-high text-secondary'}`} onClick={() => setGroup(null)}>
             Todos
           </button>
           {GROUPS.map((g) => (
             <button
               key={g.key}
               type="button"
+              role="radio"
+              aria-checked={group === g.key}
+              tabIndex={group === g.key ? 0 : -1}
               className={`shrink-0 px-md py-xs rounded-full type-label-md flex items-center gap-xxs ${group === g.key ? 'bg-volt text-on-volt font-semibold shadow-sm' : 'bg-sc-high text-secondary'}`}
               onClick={() => setGroup(group === g.key ? null : g.key)}
             >
@@ -282,9 +286,10 @@ export function Catalogo() {
             const last = lastByExercise?.get(e.id)
             return (
               <div key={e.id} className={`relative bg-sc-low rounded-xl p-md flex items-center justify-between shadow-sm${on ? ' border-volt' : ''}`}>
-                <button type="button" className="flex items-center gap-md min-w-0 pr-xs text-left" onClick={() => pick(e)}>
-                  <Thumb exercise={e} className="w-12 h-12" />
-                  <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-md min-w-0 pr-xs">
+                  {/* La foto abre en grande; el texto elige el ejercicio. */}
+                  <ExerciseVisual exercise={e} zoom />
+                  <button type="button" className="flex flex-col min-w-0 text-left" onClick={() => pick(e)}>
                     <div className="flex items-center gap-xs mb-xxs">
                       <span className="type-headline-sm text-on-surface font-bold tracking-tight truncate">{e.name}</span>
                       {e.is_custom && <span className="px-1p5 py-0p5 rounded bg-sc-highest text-volt type-label-sm font-semibold flex-none">Propio</span>}
@@ -302,8 +307,8 @@ export function Catalogo() {
                         </span>
                       )}
                     </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
                 <button
                   type="button"
                   className={`w-touch h-touch rounded-xl shrink-0 flex items-center justify-center press press-95 ${on ? 'bg-volt text-on-volt' : 'bg-sc-high text-on-surface'}`}

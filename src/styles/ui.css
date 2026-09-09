@@ -350,7 +350,7 @@ input, textarea, select {
 }
 
 .seg button {
-  min-height: 40px;
+  min-height: var(--touch);
   display: grid;
   place-items: center;
   text-align: center;
@@ -870,13 +870,15 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
 
 .anim-enter { animation: enter-up 0.3s ease both; }
 
+/* backwards, no both: con both el transform final queda aplicado y convierte la vista en
+   bloque contenedor de todo position: fixed (toast del catálogo, hojas). */
 @keyframes view-fade { from { opacity: 0; } }
 @keyframes view-push { from { opacity: 0; transform: translateX(24px); } }
 @keyframes view-pop { from { opacity: 0; transform: translateX(-16px); } }
 
-.view-fade { animation: view-fade 0.14s var(--ease-out) both; }
-.view-push { animation: view-push 0.2s var(--ease-out) both; }
-.view-pop { animation: view-pop 0.18s var(--ease-out) both; }
+.view-fade { animation: view-fade 0.14s var(--ease-out) backwards; }
+.view-push { animation: view-push 0.2s var(--ease-out) backwards; }
+.view-pop { animation: view-pop 0.18s var(--ease-out) backwards; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -1119,3 +1121,64 @@ textarea.field:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--vol
 }
 
 a.queue-row { color: inherit; }
+
+/* ---- Foto en grande (toque sobre la marca con foto). Scrim de hoja, figura centrada. ---- */
+
+.mark--zoom { padding: 0; border: 0; cursor: zoom-in; font: inherit; color: inherit; }
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-4);
+}
+
+.lightbox__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: var(--scrim);
+  opacity: 1;
+  transition: opacity 0.25s var(--ease-out);
+  @starting-style { opacity: 0; }
+}
+
+/* La fuente es 360×240: se limita el ancho para no ampliarla más de lo que aguanta. */
+.lightbox__figure {
+  position: relative;
+  margin: 0;
+  width: min(100%, 420px);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius-sheet);
+  overflow: hidden;
+  cursor: zoom-out;
+}
+
+.lightbox__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background: #ffffff;
+}
+
+.lightbox__caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+/* La foto queda fuera del botón de plegar para poder tocarla y verla en grande. */
+.xcard__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}

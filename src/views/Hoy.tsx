@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { db, getSettings } from '../db/db'
 import {
   cancelStart,
@@ -25,7 +25,7 @@ import { movingAvg7, type Point } from '../lib/calc'
 import { bodyWeightVerdict, weeklySessions } from '../lib/verdicts'
 import { fmtClock, useNow } from '../lib/useNow'
 import { RootTopBar } from '../components/TopBar'
-import { EXERCISE_IMAGES } from '../components/ExerciseVisual'
+import { EXERCISE_IMAGES, ExerciseVisual } from '../components/ExerciseVisual'
 import { Icon } from '../components/Icon'
 import { useSessionCards } from '../components/useSessionCards'
 import { MoveSheet } from '../components/MoveSheet'
@@ -124,9 +124,13 @@ export function Hoy() {
   const todayWeight = metrics?.find((m) => m.date === today)?.weight ?? null
   const [weightText, setWeightText] = useState('')
   const weightInputRef = useRef<HTMLInputElement>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const focusWeight = searchParams.get('focus') === 'peso'
   useEffect(() => {
-    if (!weighedToday && new Date().getHours() < 15) weightInputRef.current?.focus()
-  }, [weighedToday])
+    // Por la manana sin pesaje, o porque el aviso push abrio /?focus=peso (especificaciones 6.4).
+    if (!weighedToday && (focusWeight || new Date().getHours() < 15)) weightInputRef.current?.focus()
+    if (focusWeight) setSearchParams({}, { replace: true })
+  }, [weighedToday, focusWeight, setSearchParams])
 
   function commitWeight() {
     const n = Number(weightText.replace(',', '.'))
@@ -459,11 +463,17 @@ function TodayRow({ card, unit }: { card: CardData; unit: string }) {
   const done = work.filter((s) => s.completed).length
   const complete = work.length > 0 && done === work.length
   return (
-    <Link to="/entrenar" className="rounded-xl bg-sc-low p-md flex items-center justify-between shadow-sm">
-      <div className="flex items-start gap-md min-w-0">
-        <span className={`w-7 h-7 rounded-md flex items-center justify-center mt-0p5 flex-none ${complete ? 'bg-volt text-on-primary-container' : 'bg-sc-high'}`} aria-hidden="true">
-          {complete && <Icon name="check" size={16} strokeWidth={2.5} />}
-        </span>
+    <div className="rounded-xl bg-sc-low p-md flex items-center gap-md shadow-sm">
+      {/* Foto del ejercicio (tocarla la abre en grande) o marca del grupo; hecho = insignia volt en la esquina. */}
+      <span className="relative flex-none">
+        <ExerciseVisual exercise={card.exercise} size="sm" zoom />
+        {complete && (
+          <span className="absolute w-5 h-5 rounded-full bg-volt text-on-primary-container flex items-center justify-center" style={{ right: -4, bottom: -4 }} aria-hidden="true">
+            <Icon name="check" size={12} strokeWidth={3} />
+          </span>
+        )}
+      </span>
+      <Link to="/entrenar" className="flex-1 min-w-0 flex items-center justify-between gap-sm">
         <div className="flex flex-col min-w-0">
           <span className="type-body-md text-on-surface font-semibold truncate">{card.exercise.name}</span>
           <span className="type-body-sm text-on-surface-variant">
@@ -472,11 +482,11 @@ function TodayRow({ card, unit }: { card: CardData; unit: string }) {
             {card.se.target_rpe !== null && ` · RPE ${fmtNum(card.se.target_rpe)}`}
           </span>
         </div>
-      </div>
-      <div className="flex flex-col items-end flex-none">
-        <span className="type-label-md text-on-surface font-medium nowrap">{top?.weight != null ? `${fmtNum(top.weight)} ${unit}` : '—'}</span>
-        <span className="type-label-sm text-volt">Objetivo</span>
-      </div>
-    </Link>
+        <div className="flex flex-col items-end flex-none">
+          <span className="type-label-md text-on-surface font-medium nowrap">{top?.weight != null ? `${fmtNum(top.weight)} ${unit}` : '—'}</span>
+          <span className="type-label-sm text-volt">Objetivo</span>
+        </div>
+      </Link>
+    </div>
   )
 }

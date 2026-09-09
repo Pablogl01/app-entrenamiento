@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Exercise } from '../db/types'
 import { ExerciseMark } from './ExerciseMark'
+import { PhotoLightbox } from './PhotoLightbox'
 
 /**
  * Fotos de ejercicio empaquetadas (DESIGN.md v2.1 §5): free-exercise-db,
@@ -16,17 +17,28 @@ export const EXERCISE_IMAGES: Record<string, string> = Object.fromEntries(
 interface Props {
   exercise: Exercise
   size?: 'sm' | 'md' | 'lg' | 'wide'
+  /**
+   * La foto se puede tocar para verla en grande. Solo donde la foto no está ya
+   * dentro de otro botón o enlace: aquí se renderiza un <button>.
+   */
+  zoom?: boolean
 }
 
-export function ExerciseVisual({ exercise, size = 'md' }: Props) {
+export function ExerciseVisual({ exercise, size = 'md', zoom = false }: Props) {
   const [failed, setFailed] = useState(false)
+  const [open, setOpen] = useState(false)
   const src = exercise.image !== null ? EXERCISE_IMAGES[exercise.image] : undefined
   const cls = size === 'sm' ? 'mark mark--sm' : size === 'lg' ? 'mark mark--lg' : size === 'wide' ? 'mark mark--wide' : 'mark'
   if (src !== undefined && !failed) {
+    const img = <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} />
+    if (!zoom) return <span className={`${cls} mark--photo`}>{img}</span>
     return (
-      <span className={`${cls} mark--photo`}>
-        <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} />
-      </span>
+      <>
+        <button type="button" className={`${cls} mark--photo mark--zoom`} aria-label={`Ver foto de ${exercise.name}`} onClick={() => setOpen(true)}>
+          {img}
+        </button>
+        {open && <PhotoLightbox exercise={exercise} src={src} onClose={() => setOpen(false)} />}
+      </>
     )
   }
   return (

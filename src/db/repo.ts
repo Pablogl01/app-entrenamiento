@@ -403,6 +403,39 @@ export async function syncTodayDraft(routine: Routine | null): Promise<void> {
   }
 }
 
+/**
+ * «Iniciar sesión» desde Rutinas: arranca hoy `routine` y devuelve la sesión en
+ * vivo. Con una sesión ya en marcha no hace nada (se continúa esa). Un borrador
+ * de hoy de la misma rutina se arranca tal cual; uno de otra rutina se sustituye,
+ * y si esa otra era la programada queda anulada en favor de esta (el mismo
+ * registro que «Cambiar por»), para que Hoy y el calendario cuenten lo mismo y
+ * el borrador automático de Hoy no deshaga el cambio. Si el borrador a sustituir
+ * ya tiene series hechas devuelve null salvo que `discardProgress` sea true.
+ */
+export async function startRoutineToday(routine: Routine, discardProgress = false): Promise<Session | null> {
+  const today = todayISO()
+  const current = await todaySession()
+  if (current !== null && current.started_at !== null && current.finished_at === null) return current
+  let draft = current !== null && current.started_at === null ? current : null
+  if (draft !== null && draft.routine_id !== routine.id) {
+    if (!discardProgress && (await draftHasProgress(draft.id))) return null
+    await deleteSession(draft.id)
+    draft = null
+  }
+  if (draft === null) {
+    // Solo se anula la programada si hoy no se ha entrenado ya (una sesión terminada no se «cambia»).
+    if (current === null || current.finished_at === null) {
+      const scheduled = await scheduledOn(today)
+      if (scheduled.length > 0 && !scheduled.some((r) => r.id === routine.id)) {
+        await replaceRoutineOn(today, scheduled[0].id, routine.id)
+      }
+    }
+    draft = await createDraftFromRoutine(routine)
+  }
+  await startSession(draft.id)
+  return { ...draft, started_at: Date.now() }
+}
+
 export async function addExerciseToSession(sessionId: string, exerciseId: string): Promise<void> {
   const count = await db.session_exercises.where('session_id').equals(sessionId).count()
   const se: SessionExercise = {
@@ -417,7 +450,8 @@ export async function addExerciseToSession(sessionId: string, exerciseId: string
     target_rpe: null,
     rest_seconds: (await getSettings()).default_rest_seconds,
   }
-  await db.transaction('rw', [db.session_exercises, db.sets], async () => {
+  // sessions también: addProposedSets lee la última vez (sessions + session_exercises + sets).
+  await db.transaction('rw', [db.sessions, db.session_exercises, db.sets], async () => {
     await db.session_exercises.add(se)
     await addProposedSets(se)
   })
@@ -743,6 +777,24 @@ export async function confirmSet(setId: string): Promise<void> {
 
 export async function updateSet(setId: string, patch: Partial<SetEntry>): Promise<void> {
   await db.sets.update(setId, patch)
+}
+
+/**
+ * Cambia carga o reps de una serie y lo copia a las series de trabajo
+ * pendientes que van detrás en el mismo ejercicio: lo que se fija en la serie
+ * en curso vale para el resto del ejercicio hoy y no hay que repetirlo. El
+ * prellenado de la última vez es solo el punto de partida. Las series ya
+ * hechas y el calentamiento no se tocan; editar la serie 2 no toca la 1.
+ */
+export async function updateSetCascade(setId: string, patch: Pick<Partial<SetEntry>, 'weight' | 'reps'>): Promise<void> {
+  const set = await db.sets.get(setId)
+  if (!set) return
+  const siblings = await db.sets.where('session_exercise_id').equals(set.session_exercise_id).toArray()
+  const followers = set.kind === 'warmup' ? [] : siblings.filter((s) => s.id !== set.id && !s.completed && s.kind !== 'warmup' && s.set_index > set.set_index)
+  await db.transaction('rw', db.sets, async () => {
+    await db.sets.update(setId, patch)
+    for (const f of followers) await db.sets.update(f.id, patch)
+  })
 }
 
 export async function addSet(sessionExerciseId: string, kind: SetKind): Promise<void> {

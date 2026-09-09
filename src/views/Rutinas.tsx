@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { db } from '../db/db'
 import {
   activeRoutines,
-  createDraftFromRoutine,
   createEmptySession,
   createRoutine,
   cycleState,
@@ -13,6 +12,7 @@ import {
   projectedVolume,
   routineWeekdays,
   scheduledOn,
+  startRoutineToday,
   todaySession,
   type LastHighlight,
 } from '../db/repo'
@@ -108,10 +108,14 @@ export function Rutinas() {
     navigate('/entrenar')
   }
 
+  /** «Iniciar sesión» / play: la sesión arranca aquí (especificaciones §4.2) y se va directo a la sesión en vivo. */
   async function onTrain(r: Routine) {
-    const existing = await todaySession()
-    if (existing === null) await createDraftFromRoutine(r)
-    navigate(existing !== null && existing.started_at !== null ? '/entrenar' : '/')
+    const started = await startRoutineToday(r)
+    if (started === null) {
+      if (!window.confirm(`Hoy hay un borrador de otra rutina con series hechas. ¿Descartarlo y empezar «${r.name}»?`)) return
+      await startRoutineToday(r, true)
+    }
+    navigate('/entrenar')
   }
 
   if (rows === undefined || cycle === undefined) return null
@@ -158,7 +162,7 @@ export function Rutinas() {
 
           <div className="flex items-center justify-between pt-xs">
             <div>
-              <h2 className="type-headline-lg uppercase tracking-tight text-on-surface font-black">Mis rutinas</h2>
+              <h1 className="type-headline-lg uppercase tracking-tight text-on-surface font-black">Mis rutinas</h1>
               <p className="type-body-sm text-on-surface-variant">
                 {rows.length === 0
                   ? 'Ninguna plantilla todavía'

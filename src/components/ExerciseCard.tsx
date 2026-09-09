@@ -39,8 +39,9 @@ export function ExerciseCard({ data, open, onToggle, active, removable = false, 
 
   return (
     <section className={`xcard${open ? ' open' : ''}${dragging ? ' dragging' : ''}${isCurrent && open ? ' is-current' : ''}`} {...dragHandlers}>
-      <button className="xcard__head" onClick={onToggle} aria-expanded={open}>
-        <ExerciseVisual exercise={exercise} />
+      <div className="xcard__head">
+        <ExerciseVisual exercise={exercise} zoom />
+        <button className="xcard__toggle" onClick={onToggle} aria-expanded={open}>
         <span className="xcard__names">
           <span className="t-h3">
             {active ? (
@@ -64,7 +65,8 @@ export function ExerciseCard({ data, open, onToggle, active, removable = false, 
         <span className="xcard__chev">
           <Icon name="chevron-down" />
         </span>
-      </button>
+        </button>
+      </div>
 
       <div className={`fold${open ? ' open' : ''}`} inert={!open || undefined}>
         <div>
