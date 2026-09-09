@@ -80,3 +80,7 @@ supresión, idempotencia por `notification_log`, limpieza de suscripciones muert
 Desde la raíz: `npm run build`, luego `rm -rf .wrangler/deploy` (el plugin de Vite deja un
 `deploy/config.json` que hace fallar a wrangler), luego `npx wrangler deploy` desde `worker/`.
 Comprobar que el hash de `assets/index-*.js` en producción coincide con `dist/index.html`.
+
+**Nunca `wrangler deploy` desde la raíz**: el `wrangler.jsonc` de la raíz es solo para `wrangler dev` con
+assets y no tiene worker, D1 ni cron; desplegarlo sustituye la API por un worker de solo assets (pasó el
+2026-09-09). El script `npm run deploy` de la raíz ya encadena build, limpieza y despliegue desde `worker/`.

@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && rm -rf .wrangler/deploy && npm run deploy --prefix worker"
   },
   "dependencies": {
     "dexie": "^4.4.5",
