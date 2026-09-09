@@ -1,6 +1,6 @@
 # 008 — Auditoría de lanzamiento (20 puntos) y sus arreglos
 
-- **Status**: HECHO en local (2026-09-05). **Sin commit ni despliegue**: Pablo decide.
+- **Status**: HECHO, en GitHub (`9ffd6f1`) y desplegado el 2026-09-09. **Pendiente**: rellenar `RESPONSABLE` y `CONTACTO` en `src/content/legal.ts`.
 - **Category**: Legal · SEO · Accesibilidad · Formularios · Rendimiento
 - **Origen**: checklist de 20 puntos pedida por Pablo tras abrir el registro de cuentas (plan 007). Auditoría con evidencia archivo:línea en la conversación del 2026-09-05; aquí queda el resultado.
 
