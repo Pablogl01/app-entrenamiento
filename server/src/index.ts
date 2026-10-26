@@ -20,7 +20,7 @@ if (existsSync(envPath)) {
 const PORT = Number(process.env.PORT ?? 8787)
 const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY
 const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT ?? 'mailto:p.garcia@mdmsystems.es'
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT ?? 'https://app-entrenamiento.pgl-dev.workers.dev'
 
 if (VAPID_PUBLIC === undefined || VAPID_PRIVATE === undefined) {
   console.error('Faltan las claves VAPID. Genera server/.env con: npm run vapid')
