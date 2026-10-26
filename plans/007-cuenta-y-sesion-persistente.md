@@ -173,10 +173,10 @@ Dos sitios. Las dos pantallas siguen la regla de la v2.3 (clases de `tw.css` com
 └──────────────────────────────────────────────┘
 
 estado «in»:
-│ │ [👤] p.garcia@mdmsystems.es      [ Salir ] │ │   email en body-md (truncate); botón texto
+│ │ [👤] ***      [ Salir ] │ │   email en body-md (truncate); botón texto
 │ │      Sesión abierta · desde 5 sep          │ │   label-md mayús on-surface-variant, 44px
 estado «expired» (refresh falló):
-│ │ [👤] p.garcia@mdmsystems.es              › │ │
+│ │ [👤] ***              › │ │
 │ │      Sesión caducada · toca para entrar    │ │   hint en on-surface-variant, NO alert ni rojo
 ```
 
