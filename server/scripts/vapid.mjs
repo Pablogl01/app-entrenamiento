@@ -13,7 +13,7 @@ if (existsSync(envPath)) {
 } else {
   writeFileSync(
     envPath,
-    `VAPID_PUBLIC_KEY=${keys.publicKey}\nVAPID_PRIVATE_KEY=${keys.privateKey}\nVAPID_SUBJECT=mailto:p.garcia@mdmsystems.es\nPORT=8787\n`,
+    `VAPID_PUBLIC_KEY=${keys.publicKey}\nVAPID_PRIVATE_KEY=${keys.privateKey}\nVAPID_SUBJECT=mailto:https://tu-app.workers.dev\nPORT=8787\n`,
   )
   console.log('server/.env creado con claves VAPID nuevas.')
 }
