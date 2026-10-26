@@ -19,7 +19,7 @@
   // Cron cada 15 minutos en UTC (especificaciones §6.3).
   "triggers": { "crons": ["*/15 * * * *"] },
   "vars": {
-    "VAPID_SUBJECT": "mailto:p.garcia@mdmsystems.es"
+      "VAPID_SUBJECT": "https://app-entrenamiento.pgl-dev.workers.dev"
   }
   // Secretos (wrangler secret put): VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY
 }
